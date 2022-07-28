@@ -1,3 +1,5 @@
+# Pull Request
+
 <!--
   Thanks for contributing!
 
@@ -5,11 +7,6 @@
 
   Please look at the following checklist to ensure that your PR can be accepted quickly:
 -->
-
-## Description
-
-<!--- Describe your changes in detail -->
-
 ## Type of Change
 
 <!--- Put an `x` in all the boxes that apply: -->
@@ -21,3 +18,27 @@
 - [ ] ✅ Build configuration change
 - [ ] 📝 Documentation
 - [ ] 🗑️ Chore
+
+## Description
+
+[Name][Card Title][Card Link]
+<!--- Describe your changes in detail -->
+### [What]
+
+Describe what the pull request is about
+
+### [Where]
+
+Describe where's the affected files
+
+### [Why]
+
+Describe why the problem happened
+
+### [How]
+
+Describe how to solve the problem
+
+### [Evidence]
+
+Include Screenshot or video evidence that the problem is solved
