@@ -1,4 +1,4 @@
-package com.vandra.expensetracker.expense_tracker
+package com.vandra.expensetracker
 
 import io.flutter.embedding.android.FlutterActivity
 
