@@ -1,6 +1,14 @@
 name: expense_tracker
 
-on: [pull_request, push]
+on:
+  push:
+    branches:
+      - master
+      - staging
+  pull_request:
+    branches:
+      - master
+      - staging
 
 jobs:
   semantic-pull-request:
@@ -11,3 +19,5 @@ jobs:
     with:
       flutter_channel: stable
       flutter_version: 3.0.4
+      min_coverage: 40
+      coverage_excludes: "*.g.dart *.freezed.dart *.config.dart"
