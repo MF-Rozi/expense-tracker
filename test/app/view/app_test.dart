@@ -5,14 +5,19 @@
 // https://opensource.org/licenses/MIT.
 
 import 'package:expense_tracker/app/app.dart';
-import 'package:expense_tracker/counter/counter.dart';
+import 'package:expense_tracker/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../helpers/helpers.dart';
+
 void main() {
+  setUpAll(() async {
+    await configureInjector();
+  });
   group('App', () {
-    testWidgets('renders CounterPage', (tester) async {
+    testWidgets('renders Splash Page', (tester) async {
       await tester.pumpWidget(const App());
-      expect(find.byType(CounterPage), findsOneWidget);
+      expect(find.byType(SplashPage), findsOneWidget);
     });
   });
 }
