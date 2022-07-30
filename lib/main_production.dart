@@ -6,7 +6,8 @@
 
 import 'package:expense_tracker/app/app.dart';
 import 'package:expense_tracker/bootstrap.dart';
+import 'package:expense_tracker/core/utils/constants.dart';
 
 void main() {
-  bootstrap(() => const App());
+  bootstrap(() => const App(), environment: Environment.production);
 }

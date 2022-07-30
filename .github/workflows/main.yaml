@@ -20,4 +20,4 @@ jobs:
       flutter_channel: stable
       flutter_version: 3.0.4
       min_coverage: 40
-      coverage_excludes: "*.g.dart *.freezed.dart *.config.dart"
+      coverage_excludes: "*.g.dart *.freezed.dart *.config.dart *.gen.dart"

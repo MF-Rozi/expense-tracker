@@ -6,6 +6,7 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "**/*.gen.dart"
     - lib/injector.config.dart
     - lib/firebase_options.dart
     - lib/firebase_options_dev.dart
