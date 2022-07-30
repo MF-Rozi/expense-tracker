@@ -24,6 +24,7 @@ mixin _$ValueFailure<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -33,6 +34,7 @@ mixin _$ValueFailure<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -42,6 +44,7 @@ mixin _$ValueFailure<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -52,6 +55,7 @@ mixin _$ValueFailure<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -61,6 +65,7 @@ mixin _$ValueFailure<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -70,6 +75,7 @@ mixin _$ValueFailure<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -194,6 +200,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) {
     return exceedingLength(failedValue, max);
   }
@@ -206,6 +213,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) {
     return exceedingLength?.call(failedValue, max);
   }
@@ -218,6 +226,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (exceedingLength != null) {
@@ -234,6 +243,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) {
     return exceedingLength(this);
   }
@@ -246,6 +256,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) {
     return exceedingLength?.call(this);
   }
@@ -258,6 +269,7 @@ class _$ValueExceedingLength<T> implements ValueExceedingLength<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (exceedingLength != null) {
@@ -367,6 +379,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) {
     return subceedingLength(failedValue, min);
   }
@@ -379,6 +392,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) {
     return subceedingLength?.call(failedValue, min);
   }
@@ -391,6 +405,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (subceedingLength != null) {
@@ -407,6 +422,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) {
     return subceedingLength(this);
   }
@@ -419,6 +435,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) {
     return subceedingLength?.call(this);
   }
@@ -431,6 +448,7 @@ class _$ValueSubsceedingLength<T> implements ValueSubsceedingLength<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (subceedingLength != null) {
@@ -527,6 +545,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) {
     return empty(failedValue);
   }
@@ -539,6 +558,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) {
     return empty?.call(failedValue);
   }
@@ -551,6 +571,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (empty != null) {
@@ -567,6 +588,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) {
     return empty(this);
   }
@@ -579,6 +601,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) {
     return empty?.call(this);
   }
@@ -591,6 +614,7 @@ class _$ValueEmpty<T> implements ValueEmpty<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (empty != null) {
@@ -684,6 +708,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) {
     return multiline(failedValue);
   }
@@ -696,6 +721,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) {
     return multiline?.call(failedValue);
   }
@@ -708,6 +734,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (multiline != null) {
@@ -724,6 +751,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) {
     return multiline(this);
   }
@@ -736,6 +764,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) {
     return multiline?.call(this);
   }
@@ -748,6 +777,7 @@ class _$ValueMultiline<T> implements ValueMultiline<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (multiline != null) {
@@ -854,6 +884,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     required TResult Function(T failedValue) empty,
     required TResult Function(T failedValue) multiline,
     required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
   }) {
     return numberTooLarge(failedValue, max);
   }
@@ -866,6 +897,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
   }) {
     return numberTooLarge?.call(failedValue, max);
   }
@@ -878,6 +910,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     TResult Function(T failedValue)? empty,
     TResult Function(T failedValue)? multiline,
     TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (numberTooLarge != null) {
@@ -894,6 +927,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     required TResult Function(ValueEmpty<T> value) empty,
     required TResult Function(ValueMultiline<T> value) multiline,
     required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
   }) {
     return numberTooLarge(this);
   }
@@ -906,6 +940,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
   }) {
     return numberTooLarge?.call(this);
   }
@@ -918,6 +953,7 @@ class _$ValueNumberTooLarge<T> implements ValueNumberTooLarge<T> {
     TResult Function(ValueEmpty<T> value)? empty,
     TResult Function(ValueMultiline<T> value)? multiline,
     TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
     required TResult orElse(),
   }) {
     if (numberTooLarge != null) {
@@ -938,5 +974,171 @@ abstract class ValueNumberTooLarge<T> implements ValueFailure<T> {
   @override
   @JsonKey(ignore: true)
   _$$ValueNumberTooLargeCopyWith<T, _$ValueNumberTooLarge<T>> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ValueInvalidUniqueIdCopyWith<T, $Res>
+    implements $ValueFailureCopyWith<T, $Res> {
+  factory _$$ValueInvalidUniqueIdCopyWith(_$ValueInvalidUniqueId<T> value,
+          $Res Function(_$ValueInvalidUniqueId<T>) then) =
+      __$$ValueInvalidUniqueIdCopyWithImpl<T, $Res>;
+  @override
+  $Res call({T failedValue});
+}
+
+/// @nodoc
+class __$$ValueInvalidUniqueIdCopyWithImpl<T, $Res>
+    extends _$ValueFailureCopyWithImpl<T, $Res>
+    implements _$$ValueInvalidUniqueIdCopyWith<T, $Res> {
+  __$$ValueInvalidUniqueIdCopyWithImpl(_$ValueInvalidUniqueId<T> _value,
+      $Res Function(_$ValueInvalidUniqueId<T>) _then)
+      : super(_value, (v) => _then(v as _$ValueInvalidUniqueId<T>));
+
+  @override
+  _$ValueInvalidUniqueId<T> get _value =>
+      super._value as _$ValueInvalidUniqueId<T>;
+
+  @override
+  $Res call({
+    Object? failedValue = freezed,
+  }) {
+    return _then(_$ValueInvalidUniqueId<T>(
+      failedValue: failedValue == freezed
+          ? _value.failedValue
+          : failedValue // ignore: cast_nullable_to_non_nullable
+              as T,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ValueInvalidUniqueId<T> implements ValueInvalidUniqueId<T> {
+  const _$ValueInvalidUniqueId({required this.failedValue});
+
+  @override
+  final T failedValue;
+
+  @override
+  String toString() {
+    return 'ValueFailure<$T>.invalidUniqueId(failedValue: $failedValue)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ValueInvalidUniqueId<T> &&
+            const DeepCollectionEquality()
+                .equals(other.failedValue, failedValue));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(failedValue));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$ValueInvalidUniqueIdCopyWith<T, _$ValueInvalidUniqueId<T>> get copyWith =>
+      __$$ValueInvalidUniqueIdCopyWithImpl<T, _$ValueInvalidUniqueId<T>>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(T failedValue, int max) exceedingLength,
+    required TResult Function(T failedValue, int min) subceedingLength,
+    required TResult Function(T failedValue) empty,
+    required TResult Function(T failedValue) multiline,
+    required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue) invalidUniqueId,
+  }) {
+    return invalidUniqueId(failedValue);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function(T failedValue, int max)? exceedingLength,
+    TResult Function(T failedValue, int min)? subceedingLength,
+    TResult Function(T failedValue)? empty,
+    TResult Function(T failedValue)? multiline,
+    TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
+  }) {
+    return invalidUniqueId?.call(failedValue);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(T failedValue, int max)? exceedingLength,
+    TResult Function(T failedValue, int min)? subceedingLength,
+    TResult Function(T failedValue)? empty,
+    TResult Function(T failedValue)? multiline,
+    TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue)? invalidUniqueId,
+    required TResult orElse(),
+  }) {
+    if (invalidUniqueId != null) {
+      return invalidUniqueId(failedValue);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ValueExceedingLength<T> value) exceedingLength,
+    required TResult Function(ValueSubsceedingLength<T> value) subceedingLength,
+    required TResult Function(ValueEmpty<T> value) empty,
+    required TResult Function(ValueMultiline<T> value) multiline,
+    required TResult Function(ValueNumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ValueInvalidUniqueId<T> value) invalidUniqueId,
+  }) {
+    return invalidUniqueId(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(ValueExceedingLength<T> value)? exceedingLength,
+    TResult Function(ValueSubsceedingLength<T> value)? subceedingLength,
+    TResult Function(ValueEmpty<T> value)? empty,
+    TResult Function(ValueMultiline<T> value)? multiline,
+    TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
+  }) {
+    return invalidUniqueId?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ValueExceedingLength<T> value)? exceedingLength,
+    TResult Function(ValueSubsceedingLength<T> value)? subceedingLength,
+    TResult Function(ValueEmpty<T> value)? empty,
+    TResult Function(ValueMultiline<T> value)? multiline,
+    TResult Function(ValueNumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ValueInvalidUniqueId<T> value)? invalidUniqueId,
+    required TResult orElse(),
+  }) {
+    if (invalidUniqueId != null) {
+      return invalidUniqueId(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ValueInvalidUniqueId<T> implements ValueFailure<T> {
+  const factory ValueInvalidUniqueId({required final T failedValue}) =
+      _$ValueInvalidUniqueId<T>;
+
+  @override
+  T get failedValue;
+  @override
+  @JsonKey(ignore: true)
+  _$$ValueInvalidUniqueIdCopyWith<T, _$ValueInvalidUniqueId<T>> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -40,5 +40,40 @@ void main() {
         },
       );
     });
+
+    group('Validate Unique Id', () {
+      test(
+        'should return Value Failure when invalid UUID',
+        () async {
+          // arrange
+          const input = '10492';
+          // act
+          final validated = validateUniqueId(input);
+          final output = validated.getRight();
+          final failure = validated.getLeft();
+          // assert
+          expect(validated.isLeft(), isTrue);
+          expect(failure, isA<ValueInvalidUniqueId<String>>());
+          expect(output, isNull);
+        },
+      );
+
+      test(
+        'should return valid UUID String',
+        () async {
+          // arrange
+          const input = 'f398a930-77b3-4395-be13-4bc5b53cb2f9';
+          // act
+          final validated = validateUniqueId(input);
+          final output = validated.getRight();
+          final failure = validated.getLeft();
+          // assert
+          expect(validated.isRight(), isTrue);
+          expect(output, isA<String>());
+          expect(output, equals(input));
+          expect(failure, isNull);
+        },
+      );
+    });
   });
 }

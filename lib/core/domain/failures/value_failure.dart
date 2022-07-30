@@ -22,4 +22,7 @@ class ValueFailure<T> with _$ValueFailure<T> {
     required T failedValue,
     required num max,
   }) = ValueNumberTooLarge<T>;
+  const factory ValueFailure.invalidUniqueId({
+    required T failedValue,
+  }) = ValueInvalidUniqueId;
 }
