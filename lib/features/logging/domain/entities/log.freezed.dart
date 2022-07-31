@@ -26,6 +26,7 @@ mixin _$Log {
   Map<String, dynamic>? get responseData => throw _privateConstructorUsedError;
   String? get errorCode => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
+  String? get errorData => throw _privateConstructorUsedError;
   UniqueId? get nextExecutionId => throw _privateConstructorUsedError;
   int get retry => throw _privateConstructorUsedError;
 
@@ -48,6 +49,7 @@ abstract class $LogCopyWith<$Res> {
       Map<String, dynamic>? responseData,
       String? errorCode,
       String? errorMessage,
+      String? errorData,
       UniqueId? nextExecutionId,
       int retry});
 }
@@ -72,6 +74,7 @@ class _$LogCopyWithImpl<$Res> implements $LogCopyWith<$Res> {
     Object? responseData = freezed,
     Object? errorCode = freezed,
     Object? errorMessage = freezed,
+    Object? errorData = freezed,
     Object? nextExecutionId = freezed,
     Object? retry = freezed,
   }) {
@@ -116,6 +119,10 @@ class _$LogCopyWithImpl<$Res> implements $LogCopyWith<$Res> {
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      errorData: errorData == freezed
+          ? _value.errorData
+          : errorData // ignore: cast_nullable_to_non_nullable
+              as String?,
       nextExecutionId: nextExecutionId == freezed
           ? _value.nextExecutionId
           : nextExecutionId // ignore: cast_nullable_to_non_nullable
@@ -144,6 +151,7 @@ abstract class _$$_LogCopyWith<$Res> implements $LogCopyWith<$Res> {
       Map<String, dynamic>? responseData,
       String? errorCode,
       String? errorMessage,
+      String? errorData,
       UniqueId? nextExecutionId,
       int retry});
 }
@@ -169,6 +177,7 @@ class __$$_LogCopyWithImpl<$Res> extends _$LogCopyWithImpl<$Res>
     Object? responseData = freezed,
     Object? errorCode = freezed,
     Object? errorMessage = freezed,
+    Object? errorData = freezed,
     Object? nextExecutionId = freezed,
     Object? retry = freezed,
   }) {
@@ -213,6 +222,10 @@ class __$$_LogCopyWithImpl<$Res> extends _$LogCopyWithImpl<$Res>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      errorData: errorData == freezed
+          ? _value.errorData
+          : errorData // ignore: cast_nullable_to_non_nullable
+              as String?,
       nextExecutionId: nextExecutionId == freezed
           ? _value.nextExecutionId
           : nextExecutionId // ignore: cast_nullable_to_non_nullable
@@ -239,6 +252,7 @@ class _$_Log implements _Log {
       final Map<String, dynamic>? responseData,
       this.errorCode,
       this.errorMessage,
+      this.errorData,
       this.nextExecutionId,
       this.retry = 0})
       : _params = params,
@@ -277,6 +291,8 @@ class _$_Log implements _Log {
   @override
   final String? errorMessage;
   @override
+  final String? errorData;
+  @override
   final UniqueId? nextExecutionId;
   @override
   @JsonKey()
@@ -284,7 +300,7 @@ class _$_Log implements _Log {
 
   @override
   String toString() {
-    return 'Log(id: $id, action: $action, path: $path, params: $params, status: $status, responseCode: $responseCode, responseMessage: $responseMessage, responseData: $responseData, errorCode: $errorCode, errorMessage: $errorMessage, nextExecutionId: $nextExecutionId, retry: $retry)';
+    return 'Log(id: $id, action: $action, path: $path, params: $params, status: $status, responseCode: $responseCode, responseMessage: $responseMessage, responseData: $responseData, errorCode: $errorCode, errorMessage: $errorMessage, errorData: $errorData, nextExecutionId: $nextExecutionId, retry: $retry)';
   }
 
   @override
@@ -306,6 +322,7 @@ class _$_Log implements _Log {
             const DeepCollectionEquality().equals(other.errorCode, errorCode) &&
             const DeepCollectionEquality()
                 .equals(other.errorMessage, errorMessage) &&
+            const DeepCollectionEquality().equals(other.errorData, errorData) &&
             const DeepCollectionEquality()
                 .equals(other.nextExecutionId, nextExecutionId) &&
             const DeepCollectionEquality().equals(other.retry, retry));
@@ -324,6 +341,7 @@ class _$_Log implements _Log {
       const DeepCollectionEquality().hash(_responseData),
       const DeepCollectionEquality().hash(errorCode),
       const DeepCollectionEquality().hash(errorMessage),
+      const DeepCollectionEquality().hash(errorData),
       const DeepCollectionEquality().hash(nextExecutionId),
       const DeepCollectionEquality().hash(retry));
 
@@ -345,6 +363,7 @@ abstract class _Log implements Log {
       final Map<String, dynamic>? responseData,
       final String? errorCode,
       final String? errorMessage,
+      final String? errorData,
       final UniqueId? nextExecutionId,
       final int retry}) = _$_Log;
 
@@ -368,6 +387,8 @@ abstract class _Log implements Log {
   String? get errorCode;
   @override
   String? get errorMessage;
+  @override
+  String? get errorData;
   @override
   UniqueId? get nextExecutionId;
   @override

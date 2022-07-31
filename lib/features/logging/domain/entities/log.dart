@@ -15,6 +15,7 @@ class Log with _$Log {
     Map<String, dynamic>? responseData,
     String? errorCode,
     String? errorMessage,
+    String? errorData,
     UniqueId? nextExecutionId,
     @Default(0) int retry,
   }) = _Log;

@@ -10,6 +10,7 @@ environment:
 dependencies:
   bloc: ^8.0.3
   dartz: ^0.10.1
+  drift: ^1.7.1
   equatable: ^2.0.3
   flutter:
     sdk: flutter
@@ -25,13 +26,17 @@ dependencies:
   injectable: ^1.5.2
   intl: ^0.17.0
   json_annotation: ^4.5.0
+  path: ^1.8.1
+  path_provider: ^2.0.11
   recase: ^4.0.0
   sizer: ^2.0.15
+  sqlite3_flutter_libs: ^0.5.9
   uuid: ^3.0.6
 
 dev_dependencies:
   bloc_test: ^9.0.3
   build_runner: ^2.1.7
+  drift_dev: ^1.7.0
   flutter_gen_runner: ^4.1.6
   flutter_test:
     sdk: flutter
