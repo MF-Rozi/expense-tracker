@@ -8,7 +8,7 @@ mixin ErrorMessageHandler {
     final l10n = context.l10n;
     failure.when(
       //Change this in the future
-      connectivityFailure: () => context.displayFlash(l10n.counterAppBarTitle),
+      connectivityFailure: () => context.displayFlash(l10n.appName),
     );
   }
 }

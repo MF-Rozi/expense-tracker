@@ -1,7 +1,7 @@
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
+  "@@locale": "en",
+  "appName": "Expense Tracker",
+  "@appName": {
+    "description": "Application Name"
+  }
 }
