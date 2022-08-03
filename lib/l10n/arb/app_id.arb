@@ -1,7 +1,7 @@
 {
   "@@locale": "id",
-  "counterAppBarTitle": "Penghitung",
-  "@counterAppBarTitle": {
-    "description": "Teks yang tampil di AppBar"
+  "appName": "Pencatat Pengeluaran",
+  "@appName": {
+    "description": "Nama Aplikasi"
   }
 }
