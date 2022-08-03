@@ -1,6 +1,6 @@
 import 'package:expense_tracker/core/domain/failures/value_failure.dart';
 import 'package:expense_tracker/core/utils/extensions/dartz_extensions.dart';
-import 'package:expense_tracker/shared/categories/domain/entities/value_objects.dart';
+import 'package:expense_tracker/shared/enitites/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

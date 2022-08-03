@@ -1,5 +1,5 @@
 import 'package:expense_tracker/features/logging/domain/entities/log.dart';
-import 'package:expense_tracker/shared/categories/domain/entities/value_objects.dart';
+import 'package:expense_tracker/shared/enitites/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

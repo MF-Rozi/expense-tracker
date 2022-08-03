@@ -1,4 +1,4 @@
-import 'package:expense_tracker/shared/categories/domain/entities/value_objects.dart';
+import 'package:expense_tracker/shared/enitites/value_objects.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'log.freezed.dart';
 
