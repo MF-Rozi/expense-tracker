@@ -1,0 +1,36 @@
+ci/cd:
+  - any-glob-to-any-file: .github/workflows/*
+
+core:
+  - any-glob-to-any-file:  lib/core/**
+
+assets:
+  - any-glob-to-any-file: assets/**
+
+domain:
+  - any-glob-to-any-file: lib/features/**/domain/**
+
+data:
+  - any-glob-to-any-file: lib/features/**/data/**
+
+presentation:
+  - any-glob-to-any-file: lib/features/**/presentation/**
+
+feature:
+  - any-glob-to-any-file: lib/features/**
+
+shared:
+  - any-glob-to-any-file: lib/shared/**
+
+test:
+  - any-glob-to-any-file: test/**
+
+documentation:
+  - any-glob-to-any-file: [README.md, ./*.md]
+
+l10n:
+  - any-glob-to-any-file: l10n/**
+
+router:
+  - any-glob-to-any-file: lib/app/router/**
+
