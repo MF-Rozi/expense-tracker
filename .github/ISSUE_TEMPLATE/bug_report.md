@@ -1,38 +1,79 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+name: Bug Report
+about: Create a report to help us improve the Expense Tracker app
+title: "[BUG] "
+labels: "bug"
+assignees: ""
 ---
 
-**Describe the bug**
+## 🐛 Bug Description
+
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+## 📋 Steps to Reproduce
+
 Steps to reproduce the behavior:
+
 1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+2. Click on '...'
+3. Scroll down to '...'
 4. See error
 
-**Expected behavior**
+## ✅ Expected Behavior
+
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## ❌ Actual Behavior
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+A clear and concise description of what actually happened.
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+## 📸 Screenshots / Screen Recording
 
-**Additional context**
-Add any other context about the problem here.
+If applicable, add screenshots or screen recordings to help explain your problem.
+
+## 📱 Environment
+
+**Device Information:**
+
+- Device: [e.g. Pixel 6, iPhone 14 Pro, Samsung Galaxy S23]
+- OS: [e.g. Android 13, iOS 17.0]
+- App Version: [e.g. 1.0.0+1]
+- Build Flavor: [e.g. development, staging, production]
+
+**Development Environment (if applicable):**
+
+- Flutter Version: [e.g. 3.24.0]
+- Dart Version: [e.g. 3.5.0]
+- IDE: [e.g. VS Code, Android Studio]
+
+## 📝 Logs
+
+<details>
+<summary>Click to expand error logs</summary>
+
+```
+Paste your error logs here
+```
+
+</details>
+
+## 🔄 Frequency
+
+How often does this bug occur?
+
+- [ ] Always
+- [ ] Sometimes
+- [ ] Rarely
+- [ ] Only once
+
+## 💡 Possible Solution
+
+If you have suggestions on how to fix the bug, please describe them here.
+
+## 🔗 Related Issues
+
+Link any related issues here (e.g., #123)
+
+## ➕ Additional Context
+
+Add any other context about the problem here (e.g., recent changes, specific conditions, workarounds).
