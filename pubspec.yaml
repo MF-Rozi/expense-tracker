@@ -28,7 +28,7 @@ dependencies:
   injectable: ^2.6.0
   intl: ^0.20.2
   json_annotation: ^4.9.0
-  meta: ^1.16.0
+  meta: ^1.17.0
   rxdart: ^0.28.0
   shared_preferences: ^2.5.3
   uuid: ^4.5.2
