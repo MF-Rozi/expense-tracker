@@ -1,4 +1,4 @@
-# Flutter Clean Architecture Project Template: Basic Template
+# Expense Tracker
 
 ***A Very Opinionated Flutter Project Template***
 
