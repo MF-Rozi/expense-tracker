@@ -2,7 +2,7 @@
 
 ***A Very Opinionated Flutter Project Template***
 
-Made Using flutter-mobile-clean-architecture-template by Adryanev [https://github.com/adryanev/flutter-mobile-clean-architecture-template]
+Made Using flutter-mobile-clean-architecture-template by [Adryanev] (https://github.com/adryanev/flutter-mobile-clean-architecture-template)
 
 ![coverage][coverage_badge]
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
