@@ -1,8 +1,8 @@
 # Expense Tracker
 
-***A Very Opinionated Flutter Project Template***
+**_A Very Opinionated Flutter Project Template_**
 
-Made Using flutter-mobile-clean-architecture-template by [Adryanev] (https://github.com/adryanev/flutter-mobile-clean-architecture-template)
+Made Using flutter-mobile-clean-architecture-template by [Adryanev](https://github.com/adryanev/flutter-mobile-clean-architecture-template)
 
 ![coverage][coverage_badge]
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
@@ -59,7 +59,7 @@ $ flutter run --flavor staging --target lib/main_staging.dart
 $ flutter run --flavor production --target lib/main_production.dart
 ```
 
-*\*Template works on iOS, Android, Web, Linux, and Windows.*
+_\*Template works on iOS, Android, Web, Linux, and Windows._
 
 ---
 
@@ -120,38 +120,38 @@ $ open coverage/index.html
 
 The project is already included some library to speed up the development process.
 
-| Category | Library Name | Link |
-|--|--|--|
-| **State management** | `bloc` | <https://pub.dev/packages/bloc> |
-| | `flutter_bloc` | <https://pub.dev/packages/flutter_bloc> |
-| | `bloc_concurrency` | <https://pub.dev/packages/bloc_concurrency> |
-| **Router** | `go_router`  | <https://pub.dev/packages/go_router> |
-| **Code Generator** | `build_runner` | <https://pub.dev/packages/build_runner> |
-| | `flutter_gen_runner`* | <https://pub.dev/packages/flutter_gen_runner> |
-| | `flutter_native_splash` | <https://pub.dev/packages/flutter_native_splash> |
-| **Languange Feature** | `dartz` | <https://pub.dev/packages/dartz>|
-| | `rxdart` | <https://pub.dev/packages/rxdart> |
-| | `equatable` | <https://pub.dev/packages/equatable> |
-| | `change_case` | <https://pub.dev/packages/change_case> |
-| | `intl` | <https://pub.dev/packages/intl>|
-| | `uuid` | <https://pub.dev/packages/uuid> |
-| | `crypto` | <https://pub.dev/packages/crypto> |
-| **Dependency Injection** | `get_it` | <https://pub.dev/packages/get_it> |
-| | `injectable` | <https://pub.dev/packages/injectable> |
-| | `injectable_generator` | <https://pub.dev/packages/injectable_generator> |
-| **Local Storage** | `shared_preferences` | <https://pub.dev/packages/shared_preferences> |
-| **Logging** | `logging` | <https://pub.dev/packages/logging> |
-| **Form Validation** | `formz` | <https://pub.dev/packages/formz/versions/0.5.0-dev.1> |
-| **Widgets** | `flutter_hooks` | <https://pub.dev/packages/flutter_hooks> |
-| | `flutter_screenutil` | <https://pub.dev/packages/flutter_screenutil> |
-| | `flutter_svg` | <https://pub.dev/packages/flutter_svg>  |
-| | `google_fonts` | <https://pub.dev/packages/google_fonts> |
-| **Testing** | `mocktail` | <https://pub.dev/packages/mocktail> |
-| | `bloc_test` | <https://pub.dev/packages/bloc_test> |
+| Category                 | Library Name            | Link                                                  |
+| ------------------------ | ----------------------- | ----------------------------------------------------- |
+| **State management**     | `bloc`                  | <https://pub.dev/packages/bloc>                       |
+|                          | `flutter_bloc`          | <https://pub.dev/packages/flutter_bloc>               |
+|                          | `bloc_concurrency`      | <https://pub.dev/packages/bloc_concurrency>           |
+| **Router**               | `go_router`             | <https://pub.dev/packages/go_router>                  |
+| **Code Generator**       | `build_runner`          | <https://pub.dev/packages/build_runner>               |
+|                          | `flutter_gen_runner`\*  | <https://pub.dev/packages/flutter_gen_runner>         |
+|                          | `flutter_native_splash` | <https://pub.dev/packages/flutter_native_splash>      |
+| **Languange Feature**    | `dartz`                 | <https://pub.dev/packages/dartz>                      |
+|                          | `rxdart`                | <https://pub.dev/packages/rxdart>                     |
+|                          | `equatable`             | <https://pub.dev/packages/equatable>                  |
+|                          | `change_case`           | <https://pub.dev/packages/change_case>                |
+|                          | `intl`                  | <https://pub.dev/packages/intl>                       |
+|                          | `uuid`                  | <https://pub.dev/packages/uuid>                       |
+|                          | `crypto`                | <https://pub.dev/packages/crypto>                     |
+| **Dependency Injection** | `get_it`                | <https://pub.dev/packages/get_it>                     |
+|                          | `injectable`            | <https://pub.dev/packages/injectable>                 |
+|                          | `injectable_generator`  | <https://pub.dev/packages/injectable_generator>       |
+| **Local Storage**        | `shared_preferences`    | <https://pub.dev/packages/shared_preferences>         |
+| **Logging**              | `logging`               | <https://pub.dev/packages/logging>                    |
+| **Form Validation**      | `formz`                 | <https://pub.dev/packages/formz/versions/0.5.0-dev.1> |
+| **Widgets**              | `flutter_hooks`         | <https://pub.dev/packages/flutter_hooks>              |
+|                          | `flutter_screenutil`    | <https://pub.dev/packages/flutter_screenutil>         |
+|                          | `flutter_svg`           | <https://pub.dev/packages/flutter_svg>                |
+|                          | `google_fonts`          | <https://pub.dev/packages/google_fonts>               |
+| **Testing**              | `mocktail`              | <https://pub.dev/packages/mocktail>                   |
+|                          | `bloc_test`             | <https://pub.dev/packages/bloc_test>                  |
 
 All the libraries above are compatible with Flutter 3.
 
-Notes: **need to install [flutter_gen](https://pub.dev/packages/flutter_gen)*
+Notes: \*_need to install [flutter_gen](https://pub.dev/packages/flutter_gen)_
 
 ---
 
