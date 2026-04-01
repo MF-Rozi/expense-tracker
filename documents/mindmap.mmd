@@ -1,20 +1,43 @@
 mindmap
-  root((Expense Tracker Tech Stack))
-     Flutter
-      ::icon(fab fa-flutter)
-     Firebase
-      ::icon(fa fa-fire)
-        firebase_auth
-         ::icon(fa fa-user-lock)
-        cloud_firestore
-         ::icon(fa fa-database)
-        google_sign_in
-         ::icon(fab fa-google)
-     Bloc State Management
-      ::icon(fa fa-diagram-project)
-     go_router Routing
-      ::icon(fa fa-route)
-     ishar local database
-      ::icon(fa fa-hard-drive)
-
-     
+  root((Expense Tracker))
+    Features
+      Dashboard
+        Total Balance
+        Daily Logging Streak
+        Recent Transactions
+        Quick Add FAB
+      Transactions
+        Add / Edit / Delete
+        Input Amount
+        Select Category & Date
+        Optional Notes
+      Analytics
+        Category Pie Chart
+        Daily/Weekly Bar Chart
+        Time Filters
+      Settings
+        Manage Categories & Icons
+        Currency Selection
+        Data Export
+    Architecture
+      Presentation Layer
+        Flutter UI
+        flutter_bloc
+      Domain Layer
+        Entities
+        Use Cases
+        Repository Interfaces
+      Data Layer
+        Models
+        Repository Implementations
+    Sync Engine
+      Local First
+        Isar Database
+        Instant UI Updates
+        UUID Generation
+      Cloud Backup
+        Firebase Firestore
+        Background Sync Logic
+      Authentication
+        Google Sign-In
+        User Data Isolation
