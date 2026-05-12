@@ -1,18 +1,18 @@
 # Expense Tracker
 
-Expense Tracker is a Flutter app for recording daily income/expenses, monitoring spending habits, and reviewing financial trends.
+**_A Flutter Expense Tracking Application_**
+
+Expense Tracker is designed as a **local-first personal finance app** for tracking transactions, analyzing spending behavior, and securely syncing user data.
 
 ![coverage][coverage_badge]
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
 [![License: MIT][license_badge]][license_link]
 
-## Project Status
-
-This repository is currently using a clean-architecture Flutter foundation and still includes starter feature code (`counter`) while Expense Tracker features are being built.
+---
 
 ## Product Scope
 
-Based on the project documentation (`documents/mindmap.mmd`), the app scope includes:
+Based on `documents/mindmap.mmd`, the **final product** includes:
 
 - **Dashboard**
   - Total balance
@@ -33,29 +33,43 @@ Based on the project documentation (`documents/mindmap.mmd`), the app scope incl
   - Currency selection
   - Data export
 
+---
+
+## Sync Engine 🔄
+
+- **Local-first**
+  - Isar Database
+  - Instant UI updates
+  - UUID generation
+- **Cloud backup**
+  - Firebase Firestore
+  - Background sync logic
+- **Authentication**
+  - Google Sign-In
+  - User data isolation
+
+---
+
 ## Architecture
 
-The project follows a clean architecture structure:
+The app follows a clean architecture structure:
 
 - **Presentation layer**: Flutter UI + `flutter_bloc`
 - **Domain layer**: entities, repository contracts, and use cases
 - **Data layer**: models and repository implementations
 
-Current app modules are organized under:
-
-- `lib/app` for app bootstrapping and routing
-- `lib/core` for shared architecture components
-- `lib/features` for feature modules
-- `lib/shared` for reusable models/widgets/services
+---
 
 ## Tech Stack
 
-- Flutter + Dart (SDK `>=3.6.0 <4.0.0`)
-- State management: `bloc`, `flutter_bloc`
-- Navigation: `go_router`
-- Dependency injection: `get_it`, `injectable`
-- Local persistence utilities: `shared_preferences`
-- Tooling: `build_runner`, `flutter_gen_runner`
+- Flutter + Dart
+- `flutter_bloc` for state management
+- Clean Architecture pattern
+- Isar (local database)
+- Firebase Firestore (cloud backup/sync)
+- Google Sign-In (authentication)
+
+---
 
 ## Getting Started
 
@@ -78,6 +92,8 @@ flutter run --flavor staging --target lib/main_staging.dart
 flutter run --flavor production --target lib/main_production.dart
 ```
 
+---
+
 ## Development Commands
 
 You can use [Makefile][makefile_link] shortcuts:
@@ -96,6 +112,8 @@ make build
 make fix
 make check-fix
 ```
+
+---
 
 ## Testing
 
