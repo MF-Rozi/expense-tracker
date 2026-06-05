@@ -7,3 +7,4 @@ final getIt = GetIt.instance;
 @InjectableInit(generateForDir: ['lib', 'test'])
 Future<void> configureDependencies({required String environment}) async =>
     getIt.init(environment: environment);
+
