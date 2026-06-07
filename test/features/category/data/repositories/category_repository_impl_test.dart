@@ -56,8 +56,7 @@ void main() {
 
     test(
         'should return Right(unit) when saving a child category with '
-        'existing parent',
-        () async {
+        'existing parent', () async {
       when(() => mockDataSource.getCategoryByUuid(any()))
           .thenAnswer((_) async => CategoryModel());
       when(() => mockDataSource.saveCategory(any()))
@@ -73,8 +72,7 @@ void main() {
 
     test(
         'should return Left(Failure) when saving a child category with '
-        'missing parent',
-        () async {
+        'missing parent', () async {
       when(() => mockDataSource.getCategoryByUuid(any()))
           .thenAnswer((_) async => null);
 
