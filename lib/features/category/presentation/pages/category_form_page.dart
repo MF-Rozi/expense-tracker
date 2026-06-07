@@ -94,7 +94,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                     'Record Entry'.toUpperCase(),
                     style: GoogleFonts.manrope(
                       fontSize: 32,
-                      fontWeight: FontWeight.extrabold,
+                      fontWeight: FontWeight.w800,
                       color: const Color(0xFF00113A),
                       letterSpacing: -1,
                     ),
@@ -179,7 +179,8 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                       elevation: 8,
-                      shadowColor: const Color(0xFF00113A).withOpacity(0.4),
+                      shadowColor:
+                          const Color(0xFF00113A).withValues(alpha: 0.4),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -199,7 +200,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: TextButton.fromStyle(
+                    style: TextButton.styleFrom(
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100),
@@ -209,7 +210,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                       'Discard Changes',
                       style: GoogleFonts.manrope(
                         fontSize: 14,
-                        fontWeight: FontWeight.semibold,
+                        fontWeight: FontWeight.w600,
                         color: const Color(0xFF444650),
                       ),
                     ),
@@ -253,25 +254,30 @@ class _BentoInputCell extends StatelessWidget {
           ),
         ),
         Focus(
-          child: Builder(builder: (context) {
-            final isFocused = Focus.of(context).hasFocus;
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              decoration: BoxDecoration(
-                color: isReadOnly
-                    ? const Color(0xFFEDEEEF) // surface-container
-                    : const Color(0xFFF3F4F5), // surface-container-low
-                border: Border(
-                  bottom: BorderSide(
-                    color: isFocused ? const Color(0xFF00113A) : Colors.transparent,
-                    width: 2,
+          child: Builder(
+            builder: (context) {
+              final isFocused = Focus.of(context).hasFocus;
+              return Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                decoration: BoxDecoration(
+                  color: isReadOnly
+                      ? const Color(0xFFEDEEEF) // surface-container
+                      : const Color(0xFFF3F4F5), // surface-container-low
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isFocused
+                          ? const Color(0xFF00113A)
+                          : Colors.transparent,
+                      width: 2,
+                    ),
                   ),
                 ),
-              ),
-              child: child,
-            );
-          }),
+                child: child,
+              );
+            },
+          ),
         ),
       ],
     );

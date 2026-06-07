@@ -1,5 +1,5 @@
-import 'package:isar_community/isar.dart';
 import 'package:injectable/injectable.dart';
+import 'package:isar_community/isar.dart';
 import 'package:template/features/category/data/models/category_model.dart';
 
 abstract class CategoryLocalDataSource {
@@ -31,19 +31,24 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
   Future<void> deleteCategoryWithDescendants(String uuid) async {
     await _isar.writeTxn(() async {
       // Find the category to delete
-      final category = await _isar.categoryModels.filter().uuidEqualTo(uuid).findFirst();
+      final category =
+          await _isar.categoryModels.filter().uuidEqualTo(uuid).findFirst();
       if (category == null) return;
 
-      // Find all descendants recursively (or just by parentUuid since it's hierarchical)
+      // Find all descendants recursively (or just by parentUuid since it's
+      // hierarchical)
       // Note: If we have multiple levels, we need a recursive delete or a loop.
       // For now, let's assume we might have multiple levels.
-      
+
       final uuidsToDelete = <String>{uuid};
       final toProcess = <String>[uuid];
 
       while (toProcess.isNotEmpty) {
         final currentUuid = toProcess.removeAt(0);
-        final children = await _isar.categoryModels.filter().parentUuidEqualTo(currentUuid).findAll();
+        final children = await _isar.categoryModels
+            .filter()
+            .parentUuidEqualTo(currentUuid)
+            .findAll();
         for (final child in children) {
           if (!uuidsToDelete.contains(child.uuid)) {
             uuidsToDelete.add(child.uuid);
@@ -53,7 +58,10 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
       }
 
       for (final uuidToDelete in uuidsToDelete) {
-        await _isar.categoryModels.filter().uuidEqualTo(uuidToDelete).deleteAll();
+        await _isar.categoryModels
+            .filter()
+            .uuidEqualTo(uuidToDelete)
+            .deleteAll();
       }
     });
   }

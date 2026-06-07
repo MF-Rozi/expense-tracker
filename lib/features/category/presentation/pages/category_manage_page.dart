@@ -32,9 +32,9 @@ class CategoryManagePage extends StatelessWidget {
                 // Top App Bar Area
                 SliverAppBar(
                   expandedHeight: 120,
-                  floating: false,
                   pinned: true,
-                  backgroundColor: Colors.slate.shade50.withOpacity(0.8),
+                  backgroundColor:
+                      const Color(0xFFF8FAFC).withValues(alpha: 0.8),
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
                     titlePadding: const EdgeInsets.symmetric(
@@ -44,7 +44,7 @@ class CategoryManagePage extends StatelessWidget {
                     title: Text(
                       activeCategory?.name.getOrCrash() ?? 'Root Categories',
                       style: GoogleFonts.manrope(
-                        fontWeight: FontWeight.extrabold,
+                        fontWeight: FontWeight.w800,
                         fontSize: 24,
                         color: const Color(0xFF00113A), // primary
                         letterSpacing: -0.5,
@@ -73,7 +73,7 @@ class CategoryManagePage extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 2.0,
+                          letterSpacing: 2,
                           color: const Color(0xFF757682), // outline
                         ),
                       ),
@@ -157,7 +157,7 @@ class _PortfolioDistributionCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00113A).withOpacity(0.1),
+            color: const Color(0xFF00113A).withValues(alpha: 0.1),
             blurRadius: 48,
             offset: const Offset(0, 32),
           ),
@@ -171,8 +171,8 @@ class _PortfolioDistributionCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              letterSpacing: 2.0,
-              color: Colors.white.withOpacity(0.6),
+              letterSpacing: 2,
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 16),
@@ -184,7 +184,7 @@ class _PortfolioDistributionCard extends StatelessWidget {
                 '$activeEnvelopesCount',
                 style: GoogleFonts.manrope(
                   fontSize: 48,
-                  fontWeight: FontWeight.extrabold,
+                  fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
               ),
@@ -194,7 +194,7 @@ class _PortfolioDistributionCard extends StatelessWidget {
                 style: GoogleFonts.manrope(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -206,24 +206,31 @@ class _PortfolioDistributionCard extends StatelessWidget {
             child: Container(
               height: 8,
               width: double.infinity,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               child: Row(
                 children: [
                   Expanded(
                     flex: 40,
-                    child: Container(color: const Color(0xFFA0F399)), // secondary-container
+                    child: Container(
+                      color: const Color(0xFFA0F399),
+                    ), // secondary-container
                   ),
                   Expanded(
                     flex: 25,
-                    child: Container(color: const Color(0xFFFFB3AC)), // tertiary-fixed-dim
+                    child: Container(
+                      color: const Color(0xFFFFB3AC),
+                    ), // tertiary-fixed-dim
                   ),
                   Expanded(
                     flex: 20,
-                    child: Container(color: const Color(0xFFB3C5FF)), // inverse-primary
+                    child: Container(
+                      color: const Color(0xFFB3C5FF),
+                    ), // inverse-primary
                   ),
                   Expanded(
                     flex: 15,
-                    child: Container(color: Colors.white.withOpacity(0.3)),
+                    child:
+                        Container(color: Colors.white.withValues(alpha: 0.3)),
                   ),
                 ],
               ),

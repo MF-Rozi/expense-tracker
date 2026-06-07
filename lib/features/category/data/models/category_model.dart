@@ -6,6 +6,17 @@ part 'category_model.g.dart';
 
 @collection
 class CategoryModel {
+  CategoryModel();
+
+  factory CategoryModel.fromEntity(Category entity) {
+    return CategoryModel()
+      ..uuid = entity.uuid.getOrCrash()
+      ..name = entity.name.getOrCrash()
+      ..isSynced = entity.isSynced
+      ..updatedAt = entity.updatedAt
+      ..parentUuid = entity.parentUuid?.getOrCrash();
+  }
+
   Id id = Isar.autoIncrement;
 
   @Index(unique: true, replace: true)
@@ -28,14 +39,5 @@ class CategoryModel {
       updatedAt: updatedAt,
       parentUuid: parentUuid != null ? UniqueId(parentUuid!) : null,
     );
-  }
-
-  static CategoryModel fromEntity(Category entity) {
-    return CategoryModel()
-      ..uuid = entity.uuid.getOrCrash()
-      ..name = entity.name.getOrCrash()
-      ..isSynced = entity.isSynced
-      ..updatedAt = entity.updatedAt
-      ..parentUuid = entity.parentUuid?.getOrCrash();
   }
 }

@@ -13,9 +13,9 @@ class CategoryList extends StatelessWidget {
   });
 
   final List<Category> categories;
-  final Function(Category) onCategoryTap;
+  final void Function(Category) onCategoryTap;
   final VoidCallback onAddTap;
-  final Function(Category)? onEditTap;
+  final void Function(Category)? onEditTap;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class _NewCategoryCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(100),
       child: CustomPaint(
         painter: _DashedBorderPainter(
-          color: const Color(0xFF757682).withOpacity(0.3),
+          color: const Color(0xFF757682).withValues(alpha: 0.3),
           radius: 100,
         ),
         child: Container(
@@ -116,10 +116,12 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Radius.circular(radius),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          Radius.circular(radius),
+        ),
+      );
 
     const dashWidth = 10.0;
     const dashSpace = 5.0;

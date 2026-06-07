@@ -8,7 +8,7 @@ void main() {
     final tUuid = UniqueId('550e8400-e29b-41d4-a716-446655440000');
     final tParentUuid = UniqueId('550e8400-e29b-41d4-a716-446655440001');
     final tDate = DateTime(2026, 6, 3);
-    
+
     final tCategory = Category(
       uuid: tUuid,
       name: StringSingleLine('Food'),
@@ -46,7 +46,6 @@ void main() {
         name: StringSingleLine('Root'),
         isSynced: true,
         updatedAt: tDate,
-        parentUuid: null,
       );
 
       final model = CategoryModel.fromEntity(rootCategory);

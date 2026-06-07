@@ -48,7 +48,7 @@ class CategoryListItem extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: typeData.primaryColor.withOpacity(0.1),
+                    color: typeData.primaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -60,7 +60,7 @@ class CategoryListItem extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: Alignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         categoryName,

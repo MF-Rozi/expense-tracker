@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:template/core/domain/failures/failure.dart';
 import 'package:template/core/domain/usecases/use_case.dart';
 import 'package:template/features/category/domain/entities/category.dart';
 import 'package:template/features/category/domain/usecases/delete_category_usecase.dart';
@@ -24,21 +26,24 @@ class CategoryCubit extends Cubit<CategoryState> {
   final SaveCategoryUseCase _saveCategory;
   final DeleteCategoryUseCase _deleteCategory;
 
-  StreamSubscription? _categoriesSubscription;
+  StreamSubscription<Either<Failure, List<Category>>>? _categoriesSubscription;
 
   void _init() {
     emit(state.copyWith(isLoading: true));
     _categoriesSubscription = _watchCategories(NoParams()).listen((result) {
       result.fold(
-        (failure) => emit(state.copyWith(
-          isLoading: false,
-          error: failure.toString(),
-        )),
-        (categories) => emit(state.copyWith(
-          isLoading: false,
-          allCategories: categories,
-          error: null,
-        )),
+        (failure) => emit(
+          state.copyWith(
+            isLoading: false,
+            error: failure.toString(),
+          ),
+        ),
+        (categories) => emit(
+          state.copyWith(
+            isLoading: false,
+            allCategories: categories,
+          ),
+        ),
       );
     });
   }
@@ -59,10 +64,12 @@ class CategoryCubit extends Cubit<CategoryState> {
     emit(state.copyWith(isLoading: true));
     final result = await _saveCategory(SaveCategoryParams(category));
     result.fold(
-      (failure) => emit(state.copyWith(
-        isLoading: false,
-        error: failure.toString(),
-      )),
+      (failure) => emit(
+        state.copyWith(
+          isLoading: false,
+          error: failure.toString(),
+        ),
+      ),
       (_) => emit(state.copyWith(isLoading: false)),
     );
   }
@@ -73,10 +80,12 @@ class CategoryCubit extends Cubit<CategoryState> {
       DeleteCategoryParams(UniqueId(uuid)),
     );
     result.fold(
-      (failure) => emit(state.copyWith(
-        isLoading: false,
-        error: failure.toString(),
-      )),
+      (failure) => emit(
+        state.copyWith(
+          isLoading: false,
+          error: failure.toString(),
+        ),
+      ),
       (_) => emit(state.copyWith(isLoading: false)),
     );
   }
