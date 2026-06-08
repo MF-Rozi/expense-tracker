@@ -33,3 +33,20 @@ class StringSingleLine extends ValueObject<String> {
   @override
   final Either<ValueFailure<String>, String> value;
 }
+
+class Amount extends ValueObject<double> {
+  factory Amount(double input) {
+    return Amount._(
+      validateNumberRange(
+        minimum: 0,
+        maximum: double.infinity,
+        number: input,
+      ),
+    );
+  }
+
+  const Amount._(this.value);
+
+  @override
+  final Either<ValueFailure<double>, double> value;
+}
