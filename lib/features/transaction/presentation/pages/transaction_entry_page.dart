@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:template/features/category/presentation/blocs/category_cubit.dart';
+import 'package:template/features/category/presentation/blocs/category_state.dart';
+import 'package:template/features/category/presentation/widgets/category_list_item.dart';
 import 'package:template/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:template/features/transaction/presentation/widgets/calculator_pad.dart';
+import 'package:template/injector.dart';
 
 class TransactionEntryPage extends StatefulWidget {
   const TransactionEntryPage({super.key});
@@ -26,6 +30,94 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  void _showCategoryPicker(BuildContext context) {
+    final transactionCubit = context.read<TransactionCubit>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BlocProvider.value(
+        value: getIt<CategoryCubit>(),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: const BoxDecoration(
+            color: Color(0xFFF8F9FA),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00113A).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Select Ledger Category',
+                style: GoogleFonts.manrope(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF00113A),
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Assign this transaction to an envelope.',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: const Color(0xFF444650),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Expanded(
+                child: BlocBuilder<CategoryCubit, CategoryState>(
+                  builder: (context, state) {
+                    if (state.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final categories = state.allCategories;
+                    if (categories.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No categories found.',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF444650),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                      itemCount: categories.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        return CategoryListItem(
+                          category: category,
+                          onTap: () {
+                            transactionCubit.selectCategory(category);
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -104,9 +196,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       _BentoInputCell(
                         label: 'Category',
                         child: InkWell(
-                          onTap: () {
-                            // TODO(mfrozi): Show category picker bottom sheet.
-                          },
+                          onTap: () => _showCategoryPicker(context),
                           child: Row(
                             children: [
                               Expanded(
