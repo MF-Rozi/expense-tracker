@@ -2,10 +2,12 @@ class ExpressionEvaluator {
   const ExpressionEvaluator();
 
   double evaluate(String expression) {
-    if (expression.isEmpty || expression == '0') return 0.0;
+    if (expression.isEmpty || expression == '0') {
+      return 0;
+    }
 
     // 1. Sanitize
-    String sanitized = expression
+    var sanitized = expression
         .replaceAll('x', '*')
         .replaceAll('÷', '/')
         .replaceAll(' ', '');
@@ -16,12 +18,14 @@ class ExpressionEvaluator {
       sanitized = sanitized.substring(0, sanitized.length - 1);
     }
 
-    if (sanitized.isEmpty) return 0.0;
+    if (sanitized.isEmpty) {
+      return 0;
+    }
 
     try {
       return _Parser(sanitized).parse();
     } catch (e) {
-      return 0.0;
+      return 0;
     }
   }
 }
@@ -50,7 +54,9 @@ class _Parser {
   double parse() {
     nextChar();
     final x = parseExpression();
-    if (pos < input.length) throw Exception('Unexpected: ${String.fromCharCode(ch)}');
+    if (pos < input.length) {
+      throw Exception('Unexpected: ${String.fromCharCode(ch)}');
+    }
     return x;
   }
 
@@ -81,15 +87,21 @@ class _Parser {
   }
 
   double parseFactor() {
-    if (eat(43)) return parseFactor(); // unary +
-    if (eat(45)) return -parseFactor(); // unary -
+    if (eat(43)) {
+      return parseFactor(); // unary +
+    }
+    if (eat(45)) {
+      return -parseFactor(); // unary -
+    }
 
     double x;
     final startPos = pos;
-    if (eat(40)) { // (
+    if (eat(40)) {
+      // (
       x = parseExpression();
       eat(41); // )
-    } else if ((ch >= 48 && ch <= 57) || ch == 46) { // numbers
+    } else if ((ch >= 48 && ch <= 57) || ch == 46) {
+      // numbers
       while ((ch >= 48 && ch <= 57) || ch == 46) {
         nextChar();
       }

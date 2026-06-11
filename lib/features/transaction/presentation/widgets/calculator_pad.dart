@@ -38,7 +38,6 @@ class CalculatorPad extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                flex: 1,
                 child: _SubmitButton(onPressed: onSubmit),
               ),
             ],
@@ -86,9 +85,8 @@ class _CalcButton extends StatelessWidget {
     final bgColor = isOperator || isAction
         ? const Color(0xFFEDEEEF)
         : const Color(0xFFFFFFFF);
-    final textColor = isOperator
-        ? const Color(0xFF00113A)
-        : const Color(0xFF191C1D);
+    final textColor =
+        isOperator ? const Color(0xFF00113A) : const Color(0xFF191C1D);
 
     return Material(
       color: bgColor,
@@ -103,7 +101,6 @@ class _CalcButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(100),
             border: Border.all(
               color: const Color(0xFFE0E0E0),
-              width: 1,
             ),
           ),
           child: label == 'BACKSPACE'

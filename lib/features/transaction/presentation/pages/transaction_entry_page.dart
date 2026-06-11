@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:template/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:template/features/transaction/presentation/widgets/calculator_pad.dart';
-import 'package:template/core/di/app_module.dart'; // Assuming getIt is here or use context.read if injected properly.
 
 class TransactionEntryPage extends StatefulWidget {
   const TransactionEntryPage({super.key});
@@ -59,7 +58,8 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
           }
         },
         builder: (context, state) {
-          final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+          final isKeyboardVisible =
+              MediaQuery.of(context).viewInsets.bottom > 0;
 
           return Column(
             children: [
@@ -82,7 +82,9 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Description',
                         child: TextFormField(
                           controller: _descriptionController,
-                          onChanged: (val) => context.read<TransactionCubit>().updateDescription(val),
+                          onChanged: (val) => context
+                              .read<TransactionCubit>()
+                              .updateDescription(val),
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -103,13 +105,14 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Category',
                         child: InkWell(
                           onTap: () {
-                            // TODO: Show category picker bottom sheet
+                            // TODO(mfrozi): Show category picker bottom sheet.
                           },
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
-                                  state.selectedCategory?.name.getOrCrash() ?? 'Select Category',
+                                  state.selectedCategory?.name.getOrCrash() ??
+                                      'Select Category',
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -128,27 +131,30 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Date
-                       _BentoInputCell(
+                      _BentoInputCell(
                         label: 'Date',
                         child: InkWell(
                           onTap: () async {
-                             final selected = await showDatePicker(
-                                context: context,
-                                initialDate: state.date ?? DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2100),
-                             );
-                             if (selected != null && context.mounted) {
-                               context.read<TransactionCubit>().updateDate(selected);
-                             }
+                            final selected = await showDatePicker(
+                              context: context,
+                              initialDate: state.date ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (selected != null && context.mounted) {
+                              context
+                                  .read<TransactionCubit>()
+                                  .updateDate(selected);
+                            }
                           },
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
-                                  DateFormat('MMM d, yyyy').format(state.date ?? DateTime.now()),
+                                  DateFormat('MMM d, yyyy')
+                                      .format(state.date ?? DateTime.now()),
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -190,8 +196,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                   child: SizedBox(
                     height: 350,
                     child: CalculatorPad(
-                      onKeyPress: (key) => context.read<TransactionCubit>().updateExpression(key),
-                      onSubmit: () => context.read<TransactionCubit>().submitTransaction(),
+                      onKeyPress: (key) => context
+                          .read<TransactionCubit>()
+                          .updateExpression(key),
+                      onSubmit: () =>
+                          context.read<TransactionCubit>().submitTransaction(),
                     ),
                   ),
                 ),
@@ -296,7 +305,8 @@ class _BentoInputCell extends StatelessWidget {
               final isFocused = Focus.of(context).hasFocus;
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular(24),

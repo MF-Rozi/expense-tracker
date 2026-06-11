@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:template/features/category/domain/entities/category.dart';
 import 'package:template/features/transaction/domain/entities/transaction.dart';
+import 'package:template/features/transaction/domain/entities/transaction_type.dart';
 import 'package:template/features/transaction/domain/usecases/save_transaction_use_case.dart';
 import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:template/features/transaction/presentation/utils/expression_evaluator.dart';
@@ -16,7 +17,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   final ExpressionEvaluator _evaluator = const ExpressionEvaluator();
 
   void updateExpression(String key) {
-    String current = state.rawExpression;
+    var current = state.rawExpression;
 
     if (key == 'BACKSPACE') {
       if (current.length <= 1) {
@@ -37,9 +38,8 @@ class TransactionCubit extends Cubit<TransactionState> {
           if (current.isNotEmpty) {
             current = current.substring(0, current.length - 1) + key;
           } else if (key == '-') {
-             current = key;
-          }
-           else {
+            current = key;
+          } else {
             return;
           }
         } else {
@@ -55,11 +55,13 @@ class TransactionCubit extends Cubit<TransactionState> {
     }
 
     final parsed = _evaluator.evaluate(current);
-    emit(state.copyWith(
-      rawExpression: current,
-      parsedAmount: parsed,
-      status: TransactionFormStatus.initial,
-    ));
+    emit(
+      state.copyWith(
+        rawExpression: current,
+        parsedAmount: parsed,
+        status: TransactionFormStatus.initial,
+      ),
+    );
   }
 
   bool _isOperator(String char) {
@@ -74,16 +76,22 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(description: description));
   }
 
+  void updateType(TransactionType type) {
+    emit(state.copyWith(type: type));
+  }
+
   void updateDate(DateTime date) {
     emit(state.copyWith(date: date));
   }
 
   Future<void> submitTransaction() async {
     if (state.selectedCategory == null) {
-      emit(state.copyWith(
-        status: TransactionFormStatus.failure,
-        errorMessage: 'Please select a category',
-      ));
+      emit(
+        state.copyWith(
+          status: TransactionFormStatus.failure,
+          errorMessage: 'Please select a category',
+        ),
+      );
       return;
     }
 
@@ -95,17 +103,18 @@ class TransactionCubit extends Cubit<TransactionState> {
       description: StringSingleLine(state.description),
       date: state.date ?? DateTime.now(),
       categoryUuid: state.selectedCategory!.uuid,
-      isSynced: false,
-      updatedAt: DateTime.now(),
+      type: state.type,
     );
 
     final result = await _saveTransactionUseCase(transaction);
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: TransactionFormStatus.failure,
-        errorMessage: failure.toString(),
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: TransactionFormStatus.failure,
+          errorMessage: failure.toString(),
+        ),
+      ),
       (_) => emit(state.copyWith(status: TransactionFormStatus.success)),
     );
   }

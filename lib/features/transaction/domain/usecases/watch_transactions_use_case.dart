@@ -6,7 +6,8 @@ import 'package:template/features/transaction/domain/entities/transaction.dart';
 import 'package:template/features/transaction/domain/repositories/transaction_repository.dart';
 
 @lazySingleton
-class WatchTransactionsUseCase extends StreamUseCase<List<Transaction>, NoParams> {
+class WatchTransactionsUseCase
+    extends StreamUseCase<List<Transaction>, NoParams> {
   WatchTransactionsUseCase(this._repository);
 
   final TransactionRepository _repository;

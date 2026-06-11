@@ -38,7 +38,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       if (category == null) {
         return const Left(
           Failure.localFailure(
-            message: "Referenced category structure does not exist.",
+            message: 'Referenced category structure does not exist.',
           ),
         );
       }
