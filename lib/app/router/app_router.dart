@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
-import 'package:template/features/counter/counter.dart';
+import 'package:template/features/category/presentation/pages/category_manage_page.dart';
 
 class AppRouter extends Equatable {
-  static const home = 'counter';
+  static const home = 'categories';
 
   @override
   List<Object?> get props => [home];
@@ -17,7 +17,7 @@ GoRouter router([String? initialLocation]) => GoRouter(
         GoRoute(
           path: '/',
           name: AppRouter.home,
-          builder: (context, state) => const CounterPage(),
+          builder: (context, state) => const CategoryManagePage(),
         ),
       ],
     );
