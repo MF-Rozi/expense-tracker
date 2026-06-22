@@ -12,7 +12,7 @@ class CategoryManagePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryCubit, CategoryState>(
-      builder: (context, state) {
+      builder: (blocContext, state) {
         final activeCategory = state.activeParentUuid != null
             ? state.allCategories.firstWhere(
                 (c) => c.uuid.getOrCrash() == state.activeParentUuid,
@@ -23,7 +23,7 @@ class CategoryManagePage extends StatelessWidget {
           canPop: state.navigationStack.isEmpty,
           onPopInvokedWithResult: (didPop, result) {
             if (didPop) return;
-            context.read<CategoryCubit>().goBack();
+            blocContext.read<CategoryCubit>().goBack();
           },
           child: Scaffold(
             backgroundColor: const Color(0xFFF8F9FA), // surface
@@ -97,8 +97,11 @@ class CategoryManagePage extends StatelessWidget {
                         onAddTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => CategoryFormPage(
-                                activeParentUuid: state.activeParentUuid,
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                ),
                               ),
                             ),
                           );
@@ -117,8 +120,11 @@ class CategoryManagePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => CategoryFormPage(
-                      activeParentUuid: state.activeParentUuid,
+                    builder: (_) => BlocProvider<CategoryCubit>.value(
+                      value: blocContext.read<CategoryCubit>(),
+                      child: CategoryFormPage(
+                        activeParentUuid: state.activeParentUuid,
+                      ),
                     ),
                   ),
                 );
