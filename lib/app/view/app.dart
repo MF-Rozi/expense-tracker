@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:template/app/router/app_router.dart';
 import 'package:template/core/extensions/context_extensions.dart';
 import 'package:template/core/utils/constants.dart';
+import 'package:template/features/category/presentation/blocs/category_cubit.dart';
 import 'package:template/injector.dart';
 import 'package:template/l10n/l10n.dart';
 import 'package:template/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
@@ -26,6 +27,9 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => getIt<FlashCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<CategoryCubit>(),
         ),
       ],
       child: MultiBlocListener(

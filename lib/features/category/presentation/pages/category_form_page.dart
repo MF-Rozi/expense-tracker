@@ -23,6 +23,7 @@ class CategoryFormPage extends StatefulWidget {
 class _CategoryFormPageState extends State<CategoryFormPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -50,8 +51,10 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
             : widget.categoryToEdit?.parentUuid,
       );
 
+      setState(() {
+        _isSaving = true;
+      });
       context.read<CategoryCubit>().saveCategory(category);
-      Navigator.of(context).pop();
     }
   }
 
@@ -74,8 +77,26 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
           ),
         ),
       ),
-      body: BlocBuilder<CategoryCubit, CategoryState>(
-        builder: (context, state) {
+      body: BlocListener<CategoryCubit, CategoryState>(
+        listener: (context, state) {
+          if (!_isSaving) return;
+          if (state.error != null && state.error!.isNotEmpty) {
+            setState(() {
+              _isSaving = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to save category: ${state.error}')),
+            );
+          } else if (!state.isLoading && state.error == null) {
+            setState(() {
+              _isSaving = false;
+            });
+            // Success! Pop ONLY after the async operation completes successfully
+            Navigator.of(context).pop();
+          }
+        },
+        child: BlocBuilder<CategoryCubit, CategoryState>(
+          builder: (context, state) {
           final parentCategory = widget.activeParentUuid != null
               ? state.allCategories.firstWhere(
                   (c) => c.uuid.getOrCrash() == widget.activeParentUuid,
@@ -170,7 +191,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
 
                   // Action Buttons
                   ElevatedButton(
-                    onPressed: _onSave,
+                    onPressed: state.isLoading || _isSaving ? null : _onSave,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00113A),
                       foregroundColor: Colors.white,
@@ -221,8 +242,9 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _BentoInputCell extends StatelessWidget {
