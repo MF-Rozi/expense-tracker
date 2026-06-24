@@ -5,12 +5,14 @@ import 'package:template/features/category/domain/entities/category.dart';
 class CategoryListItem extends StatelessWidget {
   const CategoryListItem({
     required this.category,
+    this.childCount,
     this.onTap,
     this.onEdit,
     super.key,
   });
 
   final Category category;
+  final int? childCount;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
@@ -73,17 +75,23 @@ class CategoryListItem extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: typeData.primaryColor,
-                              shape: BoxShape.circle,
+                          if (childCount == null) ...[
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: typeData.primaryColor,
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
-                            typeData.label.toUpperCase(),
+                            childCount != null
+                                ? (childCount! > 0
+                                    ? '● $childCount Sub-envelopes'.toUpperCase()
+                                    : '● Empty'.toUpperCase())
+                                : typeData.label.toUpperCase(),
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,

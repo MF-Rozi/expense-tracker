@@ -31,15 +31,17 @@ extension PumpApp on WidgetTester {
     bool isConnected = true,
   }) {
     return pumpWidget(
-      MaterialApp.router(
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        routeInformationProvider: router(location).routeInformationProvider,
-        routeInformationParser: router(location).routeInformationParser,
-        routerDelegate: router(location).routerDelegate,
+      builder(
+        MaterialApp.router(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          routeInformationProvider: router(location).routeInformationProvider,
+          routeInformationParser: router(location).routeInformationParser,
+          routerDelegate: router(location).routerDelegate,
+        ),
       ),
     );
   }

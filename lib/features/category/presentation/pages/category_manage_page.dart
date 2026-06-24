@@ -107,7 +107,17 @@ class CategoryManagePage extends StatelessWidget {
                           );
                         },
                         onEditTap: (category) {
-                          // Handle edit if needed
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                  categoryToEdit: category,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 100), // Space for bottom nav/FAB
