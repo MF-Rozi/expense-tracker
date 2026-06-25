@@ -1,6 +1,6 @@
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
-import 'package:template/features/category/data/models/category_model.dart';
 
 abstract class CategoryLocalDataSource {
   Stream<List<CategoryModel>> watchCategories();

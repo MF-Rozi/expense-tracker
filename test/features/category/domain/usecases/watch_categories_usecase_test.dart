@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/core/extensions/dartz_extensions.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/repositories/category_repository.dart';
+import 'package:expense_tracker/features/category/domain/usecases/watch_categories_usecase.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/domain/usecases/use_case.dart';
-import 'package:template/core/extensions/dartz_extensions.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/domain/repositories/category_repository.dart';
-import 'package:template/features/category/domain/usecases/watch_categories_usecase.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 class FakeCategoryRepository implements CategoryRepository {
   FakeCategoryRepository(this._stream);

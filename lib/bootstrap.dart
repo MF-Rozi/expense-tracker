@@ -9,8 +9,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/widgets.dart';
-import 'package:template/injector.dart';
 
 class AppBlocObserver extends BlocObserver {
   @override

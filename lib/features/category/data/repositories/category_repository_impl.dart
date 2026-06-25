@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/features/category/data/datasources/category_local_data_source.dart';
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/repositories/category_repository.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:injectable/injectable.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/features/category/data/datasources/category_local_data_source.dart';
-import 'package:template/features/category/data/models/category_model.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/domain/repositories/category_repository.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 @LazySingleton(as: CategoryRepository)
 class CategoryRepositoryImpl implements CategoryRepository {

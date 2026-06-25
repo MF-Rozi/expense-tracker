@@ -1,7 +1,7 @@
+import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:isar_community/isar.dart';
-import 'package:template/features/transaction/domain/entities/transaction.dart';
-import 'package:template/features/transaction/domain/entities/transaction_type.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 part 'transaction_model.g.dart';
 

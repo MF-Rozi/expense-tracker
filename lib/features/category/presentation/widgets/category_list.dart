@@ -1,9 +1,9 @@
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/widgets/category_list_item.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({
@@ -46,8 +46,11 @@ class CategoryList extends StatelessWidget {
             if (index < categories.length) {
               final category = categories[index];
               final childCount = allCategories
-                  .where((c) =>
-                      c.parentUuid?.getOrCrash() == category.uuid.getOrCrash())
+                  .where(
+                    (c) =>
+                        c.parentUuid?.getOrCrash() ==
+                        category.uuid.getOrCrash(),
+                  )
                   .length;
               return CategoryListItem(
                 category: category,

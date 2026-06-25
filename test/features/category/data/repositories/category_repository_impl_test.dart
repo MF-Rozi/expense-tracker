@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/features/category/data/datasources/category_local_data_source.dart';
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
+import 'package:expense_tracker/features/category/data/repositories/category_repository_impl.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/features/category/data/datasources/category_local_data_source.dart';
-import 'package:template/features/category/data/models/category_model.dart';
-import 'package:template/features/category/data/repositories/category_repository_impl.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 class MockCategoryLocalDataSource extends Mock
     implements CategoryLocalDataSource {}

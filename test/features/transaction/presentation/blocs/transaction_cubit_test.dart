@@ -1,14 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/save_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/transaction/domain/entities/transaction.dart';
-import 'package:template/features/transaction/domain/usecases/save_transaction_use_case.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_cubit.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 class MockSaveTransactionUseCase extends Mock
     implements SaveTransactionUseCase {}

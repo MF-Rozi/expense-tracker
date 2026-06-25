@@ -1,14 +1,14 @@
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
+import 'package:expense_tracker/features/transaction/presentation/widgets/calculator_pad.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/features/category/presentation/widgets/category_list_item.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_cubit.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
-import 'package:template/features/transaction/presentation/widgets/calculator_pad.dart';
-import 'package:template/injector.dart';
 
 class TransactionEntryPage extends StatefulWidget {
   const TransactionEntryPage({super.key});

@@ -5,18 +5,18 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'package:expense_tracker/app/router/app_router.dart';
+import 'package:expense_tracker/core/extensions/context_extensions.dart';
+import 'package:expense_tracker/core/utils/constants.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/injector.dart';
+import 'package:expense_tracker/l10n/l10n.dart';
+import 'package:expense_tracker/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/app/router/app_router.dart';
-import 'package:template/core/extensions/context_extensions.dart';
-import 'package:template/core/utils/constants.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/injector.dart';
-import 'package:template/l10n/l10n.dart';
-import 'package:template/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
 
 class App extends StatelessWidget {
   const App({super.key});

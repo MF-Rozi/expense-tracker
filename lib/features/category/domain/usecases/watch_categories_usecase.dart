@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/repositories/category_repository.dart';
 import 'package:injectable/injectable.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/domain/usecases/use_case.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/domain/repositories/category_repository.dart';
 
 @injectable
 class WatchCategoriesUseCase extends StreamUseCase<List<Category>, NoParams> {

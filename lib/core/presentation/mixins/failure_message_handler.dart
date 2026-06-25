@@ -1,7 +1,7 @@
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/extensions/context_extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/extensions/context_extensions.dart';
-// import 'package:template/l10n/l10n.dart';
+// import 'package:expense_tracker/l10n/l10n.dart';
 
 mixin FailureMessageHandler {
   void handleFailure(BuildContext context, Failure failure) {

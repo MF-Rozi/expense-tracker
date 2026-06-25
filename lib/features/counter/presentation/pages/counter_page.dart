@@ -5,12 +5,12 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'package:expense_tracker/core/extensions/context_extensions.dart';
+import 'package:expense_tracker/core/presentation/mixins/failure_message_handler.dart';
+import 'package:expense_tracker/features/counter/counter.dart';
+import 'package:expense_tracker/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template/core/extensions/context_extensions.dart';
-import 'package:template/core/presentation/mixins/failure_message_handler.dart';
-import 'package:template/features/counter/counter.dart';
-import 'package:template/l10n/l10n.dart';
 
 class CounterPage extends StatelessWidget with FailureMessageHandler {
   const CounterPage({super.key});

@@ -2,15 +2,15 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/usecases/delete_category_usecase.dart';
+import 'package:expense_tracker/features/category/domain/usecases/save_category_usecase.dart';
+import 'package:expense_tracker/features/category/domain/usecases/watch_categories_usecase.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:injectable/injectable.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/domain/usecases/use_case.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/domain/usecases/delete_category_usecase.dart';
-import 'package:template/features/category/domain/usecases/save_category_usecase.dart';
-import 'package:template/features/category/domain/usecases/watch_categories_usecase.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 @lazySingleton
 class CategoryCubit extends Cubit<CategoryState> {
@@ -29,7 +29,9 @@ class CategoryCubit extends Cubit<CategoryState> {
   StreamSubscription<Either<Failure, List<Category>>>? _categoriesSubscription;
 
   void _init() {
-    print('[DEBUG INJECTION] 🌀 Establishing Watch Categories Stream listener...');
+    print(
+      '[DEBUG INJECTION] 🌀 Establishing Watch Categories Stream listener...',
+    );
     emit(state.copyWith(isLoading: true));
     _categoriesSubscription = _watchCategories(NoParams()).listen((result) {
       result.fold(
@@ -38,7 +40,9 @@ class CategoryCubit extends Cubit<CategoryState> {
           emit(state.copyWith(isLoading: false, error: failure.toString()));
         },
         (categories) {
-          print('[DEBUG INJECTION] 🌀 Watch Stream Received Broadcast. Count: ${categories.length}');
+          print(
+            '[DEBUG INJECTION] 🌀 Watch Stream Received Broadcast. Count: ${categories.length}',
+          );
           emit(state.copyWith(isLoading: false, allCategories: categories));
         },
       );
@@ -58,7 +62,9 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   Future<void> saveCategory(Category category) async {
-    print('[DEBUG INJECTION] 1. Initiating Save Category: ${category.name.getOrCrash()}');
+    print(
+      '[DEBUG INJECTION] 1. Initiating Save Category: ${category.name.getOrCrash()}',
+    );
     emit(state.copyWith(isLoading: true, error: null));
 
     print('[DEBUG INJECTION] 2. Awaiting _saveCategory Usecase...');

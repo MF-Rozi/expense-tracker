@@ -1,6 +1,6 @@
+import 'package:expense_tracker/features/transaction/data/models/transaction_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
-import 'package:template/features/transaction/data/models/transaction_model.dart';
 
 abstract class TransactionLocalDataSource {
   Stream<List<TransactionModel>> watchTransactions();

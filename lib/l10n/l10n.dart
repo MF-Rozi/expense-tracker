@@ -5,10 +5,10 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'package:expense_tracker/l10n/arb/app_localizations.dart';
 import 'package:flutter/widgets.dart';
-import 'package:template/l10n/arb/app_localizations.dart';
 
-export 'package:template/l10n/arb/app_localizations.dart';
+export 'package:expense_tracker/l10n/arb/app_localizations.dart';
 
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);

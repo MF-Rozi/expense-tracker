@@ -1,7 +1,7 @@
 // Import the necessary packages
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/extensions/dartz_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:template/core/extensions/dartz_extensions.dart';
 
 void main() {
   // Test the getRight method

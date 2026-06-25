@@ -1,8 +1,8 @@
+import 'package:expense_tracker/core/utils/constants.dart' as c;
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:template/core/utils/constants.dart' as c;
-import 'package:template/features/category/data/models/category_model.dart';
 
 @module
 abstract class IsarModule {

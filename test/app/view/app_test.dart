@@ -5,15 +5,15 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/injector.dart';
 
 import '../../helpers/helpers.dart';
 

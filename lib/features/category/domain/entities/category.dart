@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 
 class Category extends Equatable {
   const Category({

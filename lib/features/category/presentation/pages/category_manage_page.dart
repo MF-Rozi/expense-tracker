@@ -1,10 +1,10 @@
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/features/category/presentation/pages/category_form_page.dart';
-import 'package:template/features/category/presentation/widgets/category_list.dart';
 
 class CategoryManagePage extends StatelessWidget {
   const CategoryManagePage({super.key});

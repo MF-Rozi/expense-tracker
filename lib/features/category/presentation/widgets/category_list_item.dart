@@ -1,6 +1,6 @@
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/features/category/domain/entities/category.dart';
 
 class CategoryListItem extends StatelessWidget {
   const CategoryListItem({
@@ -89,7 +89,8 @@ class CategoryListItem extends StatelessWidget {
                           Text(
                             childCount != null
                                 ? (childCount! > 0
-                                    ? '● $childCount Sub-envelopes'.toUpperCase()
+                                    ? '● $childCount Sub-envelopes'
+                                        .toUpperCase()
                                     : '● Empty'.toUpperCase())
                                 : typeData.label.toUpperCase(),
                             style: GoogleFonts.inter(
