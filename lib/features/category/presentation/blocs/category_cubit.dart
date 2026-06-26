@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
@@ -29,19 +30,20 @@ class CategoryCubit extends Cubit<CategoryState> {
   StreamSubscription<Either<Failure, List<Category>>>? _categoriesSubscription;
 
   void _init() {
-    print(
+    log(
       '[DEBUG INJECTION] 🌀 Establishing Watch Categories Stream listener...',
     );
     emit(state.copyWith(isLoading: true));
     _categoriesSubscription = _watchCategories(NoParams()).listen((result) {
       result.fold(
         (failure) {
-          print('[DEBUG INJECTION] 🌀 Watch Stream Error: $failure');
+          log('[DEBUG INJECTION] 🌀 Watch Stream Error: $failure');
           emit(state.copyWith(isLoading: false, error: failure.toString()));
         },
         (categories) {
-          print(
-            '[DEBUG INJECTION] 🌀 Watch Stream Received Broadcast. Count: ${categories.length}',
+          log(
+            '[DEBUG INJECTION] 🌀 Watch Stream Received Broadcast. '
+            'Count: ${categories.length}',
           );
           emit(state.copyWith(isLoading: false, allCategories: categories));
         },
@@ -62,22 +64,23 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   Future<void> saveCategory(Category category) async {
-    print(
-      '[DEBUG INJECTION] 1. Initiating Save Category: ${category.name.getOrCrash()}',
+    log(
+      '[DEBUG INJECTION] 1. Initiating Save Category: '
+      '${category.name.getOrCrash()}',
     );
     emit(state.copyWith(isLoading: true, error: null));
 
-    print('[DEBUG INJECTION] 2. Awaiting _saveCategory Usecase...');
+    log('[DEBUG INJECTION] 2. Awaiting _saveCategory Usecase...');
     final result = await _saveCategory(SaveCategoryParams(category));
 
-    print('[DEBUG INJECTION] 3. Usecase execution returned.');
+    log('[DEBUG INJECTION] 3. Usecase execution returned.');
     result.fold(
       (failure) {
-        print('[DEBUG INJECTION] ❌ FAILURE DETECTED: $failure');
+        log('[DEBUG INJECTION] ❌ FAILURE DETECTED: $failure');
         emit(state.copyWith(isLoading: false, error: failure.toString()));
       },
       (_) {
-        print('[DEBUG INJECTION] ✅ SUCCESS DETECTED. Transaction committed.');
+        log('[DEBUG INJECTION] ✅ SUCCESS DETECTED. Transaction committed.');
         emit(state.copyWith(isLoading: false, error: null));
       },
     );

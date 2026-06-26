@@ -93,7 +93,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
             setState(() {
               _isSaving = false;
             });
-            // Success! Pop ONLY after the async operation completes successfully
+            // Success! Pop ONLY after async operation completes successfully
             Navigator.of(context).pop();
           }
         },
