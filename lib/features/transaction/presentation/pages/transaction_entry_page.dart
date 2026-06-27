@@ -19,16 +19,24 @@ class TransactionEntryPage extends StatefulWidget {
 
 class _TransactionEntryPageState extends State<TransactionEntryPage> {
   late final TextEditingController _descriptionController;
+  late final TextEditingController _amountController;
+  final FocusNode _noteFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _descriptionController = TextEditingController();
+    _amountController = TextEditingController(text: '0');
+    _noteFocusNode.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _descriptionController.dispose();
+    _amountController.dispose();
+    _noteFocusNode.dispose();
     super.dispose();
   }
 
@@ -123,6 +131,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -148,11 +157,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
               SnackBar(content: Text(state.errorMessage ?? 'Error')),
             );
           }
+          if (_amountController.text != state.rawExpression) {
+            _amountController.text = state.rawExpression;
+          }
         },
         builder: (context, state) {
-          final isKeyboardVisible =
-              MediaQuery.of(context).viewInsets.bottom > 0;
-
           return Column(
             children: [
               Expanded(
@@ -165,7 +174,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       // Master Display Card
                       _MasterDisplayCard(
                         amount: state.parsedAmount,
-                        expression: state.rawExpression,
+                        controller: _amountController,
                       ),
                       const SizedBox(height: 32),
 
@@ -174,6 +183,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Description',
                         child: TextFormField(
                           controller: _descriptionController,
+                          focusNode: _noteFocusNode,
                           onChanged: (val) => context
                               .read<TransactionCubit>()
                               .updateDescription(val),
@@ -267,7 +277,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
               ),
 
               // Calculator Pad (hide if system keyboard is up)
-              if (!isKeyboardVisible)
+              if (!_noteFocusNode.hasFocus)
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   decoration: BoxDecoration(
@@ -305,11 +315,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
 class _MasterDisplayCard extends StatelessWidget {
   const _MasterDisplayCard({
     required this.amount,
-    required this.expression,
+    required this.controller,
   });
 
   final double amount;
-  final String expression;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -335,13 +345,21 @@ class _MasterDisplayCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            expression.isEmpty ? '0' : expression,
+          TextFormField(
+            controller: controller,
+            readOnly: true,
+            showCursor: true,
+            textAlign: TextAlign.end,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: const Color(0xFF444650),
               letterSpacing: 2,
+            ),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
           const SizedBox(height: 8),
