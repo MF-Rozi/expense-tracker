@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter extends Equatable {
-  static const home = 'categories';
+  static const home = 'home';
 
   @override
   List<Object?> get props => [home];
@@ -25,6 +25,11 @@ GoRouter router([String? initialLocation]) => GoRouter(
             create: (context) => getIt<TransactionCubit>(),
             child: const TransactionEntryPage(),
           ),
+        ),
+        GoRoute(
+          path: '/categories',
+          name: 'categories',
+          builder: (context, state) => const CategoryManagePage(),
         ),
       ],
     );

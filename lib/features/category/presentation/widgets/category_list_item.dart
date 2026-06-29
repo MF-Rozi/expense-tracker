@@ -6,6 +6,7 @@ class CategoryListItem extends StatelessWidget {
   const CategoryListItem({
     required this.category,
     this.childCount,
+    this.subtitle,
     this.onTap,
     this.onEdit,
     super.key,
@@ -13,6 +14,7 @@ class CategoryListItem extends StatelessWidget {
 
   final Category category;
   final int? childCount;
+  final String? subtitle;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
@@ -87,12 +89,13 @@ class CategoryListItem extends StatelessWidget {
                             const SizedBox(width: 8),
                           ],
                           Text(
-                            childCount != null
-                                ? (childCount! > 0
-                                    ? '● $childCount Sub-envelopes'
-                                        .toUpperCase()
-                                    : '● Empty'.toUpperCase())
-                                : typeData.label.toUpperCase(),
+                            (subtitle ??
+                                    (childCount != null
+                                        ? (childCount! > 0
+                                            ? '● $childCount Sub-envelopes'
+                                            : '● Empty')
+                                        : typeData.label))
+                                .toUpperCase(),
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
