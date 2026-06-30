@@ -348,9 +348,7 @@ class _MasterDisplayCard extends StatelessWidget {
     ).format(amount);
 
     return GestureDetector(
-      onTap: () {
-        focusNode.requestFocus();
-      },
+      onTap: focusNode.requestFocus,
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
