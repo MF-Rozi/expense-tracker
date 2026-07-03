@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 
 enum TransactionFormStatus { initial, loading, success, failure }
 

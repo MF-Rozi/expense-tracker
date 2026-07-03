@@ -1,6 +1,6 @@
 // ignore_for_file: strict_raw_type
 
-import 'package:template/core/domain/failures/value_failure.dart';
+import 'package:expense_tracker/core/domain/failures/value_failure.dart';
 
 class UnexpectedValueError extends Error {
   UnexpectedValueError(this.valueFailure);

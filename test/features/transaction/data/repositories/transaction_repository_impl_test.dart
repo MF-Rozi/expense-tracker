@@ -1,15 +1,15 @@
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/features/category/data/datasources/category_local_data_source.dart';
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
+import 'package:expense_tracker/features/transaction/data/datasources/transaction_local_data_source.dart';
+import 'package:expense_tracker/features/transaction/data/models/transaction_model.dart';
+import 'package:expense_tracker/features/transaction/data/repositories/transaction_repository_impl.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/features/category/data/datasources/category_local_data_source.dart';
-import 'package:template/features/category/data/models/category_model.dart';
-import 'package:template/features/transaction/data/datasources/transaction_local_data_source.dart';
-import 'package:template/features/transaction/data/models/transaction_model.dart';
-import 'package:template/features/transaction/data/repositories/transaction_repository_impl.dart';
-import 'package:template/features/transaction/domain/entities/transaction.dart';
-import 'package:template/features/transaction/domain/entities/transaction_type.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 class MockTransactionLocalDataSource extends Mock
     implements TransactionLocalDataSource {}

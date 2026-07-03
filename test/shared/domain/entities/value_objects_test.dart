@@ -1,7 +1,7 @@
+import 'package:expense_tracker/core/domain/failures/value_failure.dart';
+import 'package:expense_tracker/core/extensions/dartz_extensions.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:template/core/domain/failures/value_failure.dart';
-import 'package:template/core/extensions/dartz_extensions.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 void main() {
   group('StringSingleLine', () {

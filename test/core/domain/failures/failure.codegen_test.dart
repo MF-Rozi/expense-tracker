@@ -1,6 +1,6 @@
 // Import the test and freezed_test packages
+import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:template/core/domain/failures/failure.dart';
 
 void main() {
   // Define a group of tests for the Failure class

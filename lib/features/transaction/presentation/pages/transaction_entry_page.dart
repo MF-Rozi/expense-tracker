@@ -1,14 +1,14 @@
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
+import 'package:expense_tracker/features/transaction/presentation/widgets/calculator_pad.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/features/category/presentation/widgets/category_list_item.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_cubit.dart';
-import 'package:template/features/transaction/presentation/blocs/transaction_state.dart';
-import 'package:template/features/transaction/presentation/widgets/calculator_pad.dart';
-import 'package:template/injector.dart';
 
 class TransactionEntryPage extends StatefulWidget {
   const TransactionEntryPage({super.key});
@@ -19,16 +19,26 @@ class TransactionEntryPage extends StatefulWidget {
 
 class _TransactionEntryPageState extends State<TransactionEntryPage> {
   late final TextEditingController _descriptionController;
+  late final TextEditingController _amountController;
+  final FocusNode _noteFocusNode = FocusNode();
+  final FocusNode _amountFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _descriptionController = TextEditingController();
+    _amountController = TextEditingController(text: '0');
+    _noteFocusNode.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _descriptionController.dispose();
+    _amountController.dispose();
+    _noteFocusNode.dispose();
+    _amountFocusNode.dispose();
     super.dispose();
   }
 
@@ -101,8 +111,22 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                           const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final category = categories[index];
+                        final String subtitle;
+                        if (category.parentUuid != null) {
+                          final parent = categories.firstWhere(
+                            (c) =>
+                                c.uuid.getOrCrash() ==
+                                category.parentUuid!.getOrCrash(),
+                            orElse: () => category,
+                          );
+                          subtitle = parent.name.getOrCrash();
+                        } else {
+                          subtitle = 'Root Category';
+                        }
+
                         return CategoryListItem(
                           category: category,
+                          subtitle: subtitle,
                           onTap: () {
                             transactionCubit.selectCategory(category);
                             Navigator.of(context).pop();
@@ -123,6 +147,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -148,11 +173,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
               SnackBar(content: Text(state.errorMessage ?? 'Error')),
             );
           }
+          if (_amountController.text != state.rawExpression) {
+            _amountController.text = state.rawExpression;
+          }
         },
         builder: (context, state) {
-          final isKeyboardVisible =
-              MediaQuery.of(context).viewInsets.bottom > 0;
-
           return Column(
             children: [
               Expanded(
@@ -165,7 +190,8 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       // Master Display Card
                       _MasterDisplayCard(
                         amount: state.parsedAmount,
-                        expression: state.rawExpression,
+                        controller: _amountController,
+                        focusNode: _amountFocusNode,
                       ),
                       const SizedBox(height: 32),
 
@@ -174,6 +200,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Description',
                         child: TextFormField(
                           controller: _descriptionController,
+                          focusNode: _noteFocusNode,
                           onChanged: (val) => context
                               .read<TransactionCubit>()
                               .updateDescription(val),
@@ -267,7 +294,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
               ),
 
               // Calculator Pad (hide if system keyboard is up)
-              if (!isKeyboardVisible)
+              if (!_noteFocusNode.hasFocus)
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   decoration: BoxDecoration(
@@ -305,11 +332,13 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
 class _MasterDisplayCard extends StatelessWidget {
   const _MasterDisplayCard({
     required this.amount,
-    required this.expression,
+    required this.controller,
+    required this.focusNode,
   });
 
   final double amount;
-  final String expression;
+  final TextEditingController controller;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -318,46 +347,59 @@ class _MasterDisplayCard extends StatelessWidget {
       decimalDigits: 0, // Since it's IDR, usually no decimals for display
     ).format(amount);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00113A).withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            expression.isEmpty ? '0' : expression,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF444650),
-              letterSpacing: 2,
+    return GestureDetector(
+      onTap: focusNode.requestFocus,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF00113A).withValues(alpha: 0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
-          ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              formattedAmount,
-              style: GoogleFonts.manrope(
-                fontSize: 48,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF00113A),
-                letterSpacing: -1.5,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextFormField(
+              controller: controller,
+              focusNode: focusNode,
+              readOnly: true,
+              showCursor: true,
+              textAlign: TextAlign.end,
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF444650),
+                letterSpacing: 2,
+              ),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                formattedAmount,
+                style: GoogleFonts.manrope(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF00113A),
+                  letterSpacing: -1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

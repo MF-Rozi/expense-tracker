@@ -1,16 +1,20 @@
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/features/category/domain/entities/category.dart';
 
 class CategoryListItem extends StatelessWidget {
   const CategoryListItem({
     required this.category,
+    this.childCount,
+    this.subtitle,
     this.onTap,
     this.onEdit,
     super.key,
   });
 
   final Category category;
+  final int? childCount;
+  final String? subtitle;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
@@ -73,17 +77,25 @@ class CategoryListItem extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: typeData.primaryColor,
-                              shape: BoxShape.circle,
+                          if (childCount == null) ...[
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: typeData.primaryColor,
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
-                            typeData.label.toUpperCase(),
+                            (subtitle ??
+                                    (childCount != null
+                                        ? (childCount! > 0
+                                            ? '● $childCount Sub-envelopes'
+                                            : '● Empty')
+                                        : typeData.label))
+                                .toUpperCase(),
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,

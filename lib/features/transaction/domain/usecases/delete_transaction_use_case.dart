@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:injectable/injectable.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/domain/usecases/use_case.dart';
-import 'package:template/features/transaction/domain/repositories/transaction_repository.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 @lazySingleton
 class DeleteTransactionUseCase extends UseCase<Unit, DeleteTransactionParams> {

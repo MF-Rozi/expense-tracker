@@ -1,10 +1,14 @@
 import 'package:equatable/equatable.dart';
+import 'package:expense_tracker/features/category/presentation/pages/category_manage_page.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
+import 'package:expense_tracker/features/transaction/presentation/pages/transaction_entry_page.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:template/features/counter/counter.dart';
 
 class AppRouter extends Equatable {
-  static const home = 'counter';
+  static const home = 'home';
 
   @override
   List<Object?> get props => [home];
@@ -17,7 +21,15 @@ GoRouter router([String? initialLocation]) => GoRouter(
         GoRoute(
           path: '/',
           name: AppRouter.home,
-          builder: (context, state) => const CounterPage(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => getIt<TransactionCubit>(),
+            child: const TransactionEntryPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/categories',
+          name: 'categories',
+          builder: (context, state) => const CategoryManagePage(),
         ),
       ],
     );

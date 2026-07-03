@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:template/core/domain/entities/value_object.dart';
-import 'package:template/core/domain/entities/value_validators.dart';
-import 'package:template/core/domain/failures/value_failure.dart';
+import 'package:expense_tracker/core/domain/entities/value_object.dart';
+import 'package:expense_tracker/core/domain/entities/value_validators.dart';
+import 'package:expense_tracker/core/domain/failures/value_failure.dart';
 import 'package:uuid/uuid.dart';
 
 class UniqueId extends ValueObject<String> {

@@ -1,10 +1,10 @@
+import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:template/features/category/presentation/blocs/category_cubit.dart';
-import 'package:template/features/category/presentation/blocs/category_state.dart';
-import 'package:template/features/category/presentation/pages/category_form_page.dart';
-import 'package:template/features/category/presentation/widgets/category_list.dart';
 
 class CategoryManagePage extends StatelessWidget {
   const CategoryManagePage({super.key});
@@ -12,7 +12,7 @@ class CategoryManagePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryCubit, CategoryState>(
-      builder: (context, state) {
+      builder: (blocContext, state) {
         final activeCategory = state.activeParentUuid != null
             ? state.allCategories.firstWhere(
                 (c) => c.uuid.getOrCrash() == state.activeParentUuid,
@@ -23,7 +23,7 @@ class CategoryManagePage extends StatelessWidget {
           canPop: state.navigationStack.isEmpty,
           onPopInvokedWithResult: (didPop, result) {
             if (didPop) return;
-            context.read<CategoryCubit>().goBack();
+            blocContext.read<CategoryCubit>().goBack();
           },
           child: Scaffold(
             backgroundColor: const Color(0xFFF8F9FA), // surface
@@ -97,14 +97,27 @@ class CategoryManagePage extends StatelessWidget {
                         onAddTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => CategoryFormPage(
-                                activeParentUuid: state.activeParentUuid,
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                ),
                               ),
                             ),
                           );
                         },
                         onEditTap: (category) {
-                          // Handle edit if needed
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                  categoryToEdit: category,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 100), // Space for bottom nav/FAB
@@ -117,8 +130,11 @@ class CategoryManagePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => CategoryFormPage(
-                      activeParentUuid: state.activeParentUuid,
+                    builder: (_) => BlocProvider<CategoryCubit>.value(
+                      value: blocContext.read<CategoryCubit>(),
+                      child: CategoryFormPage(
+                        activeParentUuid: state.activeParentUuid,
+                      ),
                     ),
                   ),
                 );

@@ -1,6 +1,6 @@
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:isar_community/isar.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/shared/domain/entities/value_objects.dart';
 
 part 'category_model.g.dart';
 

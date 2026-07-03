@@ -1,10 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:template/core/domain/failures/failure.dart';
-import 'package:template/core/domain/usecases/use_case.dart';
-import 'package:template/features/category/domain/entities/category.dart';
-import 'package:template/features/category/domain/repositories/category_repository.dart';
+import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/repositories/category_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class SaveCategoryUseCase extends UseCase<Unit, SaveCategoryParams> {
   const SaveCategoryUseCase(this._repository);
 

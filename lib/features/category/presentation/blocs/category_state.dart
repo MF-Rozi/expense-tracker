@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:template/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
 
 class CategoryState extends Equatable {
   const CategoryState({
@@ -34,13 +34,13 @@ class CategoryState extends Equatable {
     List<Category>? allCategories,
     List<String>? navigationStack,
     bool? isLoading,
-    String? error,
+    Object? error = const Object(),
   }) {
     return CategoryState(
       allCategories: allCategories ?? this.allCategories,
       navigationStack: navigationStack ?? this.navigationStack,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: error == const Object() ? this.error : (error as String?),
     );
   }
 
