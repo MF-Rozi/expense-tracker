@@ -4,6 +4,7 @@ import 'package:expense_tracker/features/category/data/datasources/category_loca
 import 'package:expense_tracker/features/transaction/data/datasources/transaction_local_data_source.dart';
 import 'package:expense_tracker/features/transaction/data/models/transaction_model.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_flow_type.dart';
 import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:injectable/injectable.dart';
@@ -62,5 +63,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
     } catch (e) {
       return Left(Failure.localFailure(message: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, List<Transaction>>> getTransactions({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? searchQuery,
+    String? categoryId,
+    TransactionFlowType flowType = TransactionFlowType.all,
+  }) {
+    throw UnimplementedError();
   }
 }
