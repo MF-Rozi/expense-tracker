@@ -72,7 +72,19 @@ class TransactionRepositoryImpl implements TransactionRepository {
     String? searchQuery,
     String? categoryId,
     TransactionFlowType flowType = TransactionFlowType.all,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    try {
+      final models = await _localDataSource.getTransactions(
+        startDate: startDate,
+        endDate: endDate,
+        searchQuery: searchQuery,
+        categoryId: categoryId,
+        flowType: flowType.name,
+      );
+      final transactions = models.map((m) => m.toEntity()).toList();
+      return Right(transactions);
+    } catch (e) {
+      return Left(Failure.localFailure(message: e.toString()));
+    }
   }
 }
