@@ -1,3 +1,4 @@
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
 import 'package:expense_tracker/features/transaction/data/models/transaction_model.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:injectable/injectable.dart';
@@ -27,13 +28,27 @@ class IsarTransactionLocalDataSource implements TransactionLocalDataSource {
     return _isar.transactionModels
         .where()
         .sortByDateDesc()
-        .watch(fireImmediately: true);
+        .watch(fireImmediately: true)
+        .asyncMap((list) async {
+      for (final t in list) {
+        await t.category.load();
+      }
+      return list;
+    });
   }
 
   @override
   Future<void> saveTransaction(TransactionModel transaction) async {
     await _isar.writeTxn(() async {
+      final categoryModel = await _isar.categoryModels
+          .filter()
+          .uuidEqualTo(transaction.categoryUuid)
+          .findFirst();
+      if (categoryModel != null) {
+        transaction.category.value = categoryModel;
+      }
       await _isar.transactionModels.put(transaction);
+      await transaction.category.save();
     });
   }
 
@@ -52,37 +67,40 @@ class IsarTransactionLocalDataSource implements TransactionLocalDataSource {
     String? searchQuery,
     String? categoryId,
   }) async {
-    var query = _isar.transactionModels.filter();
+    final list = await _isar.transactionModels
+        .filter()
+        .optional(
+          startDate != null && endDate != null,
+          (q) => q.dateBetween(startDate!, endDate!),
+        )
+        .optional(
+          searchQuery != null && searchQuery.isNotEmpty,
+          (q) => q.group(
+            (q2) => q2
+                .descriptionContains(searchQuery!, caseSensitive: false)
+                .or()
+                .noteContains(searchQuery!, caseSensitive: false),
+          ),
+        )
+        .optional(
+          categoryId != null && categoryId.isNotEmpty,
+          (q) => q.categoryUuidEqualTo(categoryId!),
+        )
+        .optional(
+          flowType != 'all',
+          (q) {
+            final type = TransactionType.values.firstWhere(
+              (e) => e.name == flowType,
+            );
+            return q.typeEqualTo(type);
+          },
+        )
+        .sortByDateDesc()
+        .findAll();
 
-    if (startDate != null && endDate != null) {
-      query = query.dateBetween(startDate, endDate)
-          as QueryBuilder<TransactionModel, TransactionModel, QFilterCondition>;
+    for (final t in list) {
+      await t.category.load();
     }
-
-    if (searchQuery != null && searchQuery.isNotEmpty) {
-      query = query.group(
-        (q) => q
-            .descriptionContains(searchQuery, caseSensitive: false)
-            .or()
-            .noteContains(searchQuery, caseSensitive: false),
-      ) as QueryBuilder<TransactionModel, TransactionModel, QFilterCondition>;
-    }
-
-    if (categoryId != null && categoryId.isNotEmpty) {
-      query = query.categoryUuidEqualTo(categoryId)
-          as QueryBuilder<TransactionModel, TransactionModel, QFilterCondition>;
-    }
-
-    if (flowType != 'all') {
-      final type = TransactionType.values.firstWhere(
-        (e) => e.name == flowType,
-      );
-      query = query.typeEqualTo(type)
-          as QueryBuilder<TransactionModel, TransactionModel, QFilterCondition>;
-    }
-
-    final sortQuery =
-        query as QueryBuilder<TransactionModel, TransactionModel, QSortBy>;
-    return sortQuery.sortByDateDesc().findAll();
+    return list;
   }
 }
