@@ -26,7 +26,7 @@ void main() {
 
   final tTransactionToday = Transaction(
     uuid: UniqueId.generate(),
-    amount: Amount(50.0),
+    amount: Amount(50),
     description: StringSingleLine('Starbucks'),
     date: DateTime.now(),
     categoryUuid: UniqueId.generate(),
@@ -35,7 +35,7 @@ void main() {
 
   final tTransactionYesterday = Transaction(
     uuid: UniqueId.generate(),
-    amount: Amount(100.0),
+    amount: Amount(100),
     description: StringSingleLine('Salary'),
     date: DateTime.now().subtract(const Duration(days: 1)),
     categoryUuid: UniqueId.generate(),
@@ -44,7 +44,7 @@ void main() {
 
   final tTransactionMay14 = Transaction(
     uuid: UniqueId.generate(),
-    amount: Amount(30.0),
+    amount: Amount(30),
     description: StringSingleLine('Uber'),
     date: DateTime(2024, 5, 14),
     categoryUuid: UniqueId.generate(),
@@ -61,7 +61,10 @@ void main() {
   });
 
   test('initial state should have correct default values', () {
-    expect(cubit.state.groupedTransactions, const <String, List<Transaction>>{});
+    expect(
+      cubit.state.groupedTransactions,
+      const <String, List<Transaction>>{},
+    );
     expect(cubit.state.activeFlow, TransactionFlowType.all);
     expect(cubit.state.searchQuery, isNull);
     expect(cubit.state.activeCategoryId, isNull);
@@ -162,11 +165,17 @@ void main() {
       expect: () => [
         isA<TransactionHistoryState>()
             .having(
-                (s) => s.activeFlow, 'activeFlow', TransactionFlowType.expense)
+              (s) => s.activeFlow,
+              'activeFlow',
+              TransactionFlowType.expense,
+            )
             .having((s) => s.isLoading, 'isLoading', isTrue),
         isA<TransactionHistoryState>()
             .having(
-                (s) => s.activeFlow, 'activeFlow', TransactionFlowType.expense)
+              (s) => s.activeFlow,
+              'activeFlow',
+              TransactionFlowType.expense,
+            )
             .having((s) => s.isLoading, 'isLoading', isFalse),
       ],
     );
@@ -175,22 +184,28 @@ void main() {
       'applyFilters should update date filters/category and trigger fetch',
       build: () => cubit,
       act: (cubit) => cubit.applyFilters(
-        DateTime(2026, 7, 1),
+        DateTime(2026, 7),
         DateTime(2026, 7, 5),
         'category-uuid',
       ),
       expect: () => [
         isA<TransactionHistoryState>()
-            .having((s) => s.startDate, 'startDate', DateTime(2026, 7, 1))
+            .having((s) => s.startDate, 'startDate', DateTime(2026, 7))
             .having((s) => s.endDate, 'endDate', DateTime(2026, 7, 5))
             .having(
-                (s) => s.activeCategoryId, 'activeCategoryId', 'category-uuid')
+              (s) => s.activeCategoryId,
+              'activeCategoryId',
+              'category-uuid',
+            )
             .having((s) => s.isLoading, 'isLoading', isTrue),
         isA<TransactionHistoryState>()
-            .having((s) => s.startDate, 'startDate', DateTime(2026, 7, 1))
+            .having((s) => s.startDate, 'startDate', DateTime(2026, 7))
             .having((s) => s.endDate, 'endDate', DateTime(2026, 7, 5))
             .having(
-                (s) => s.activeCategoryId, 'activeCategoryId', 'category-uuid')
+              (s) => s.activeCategoryId,
+              'activeCategoryId',
+              'category-uuid',
+            )
             .having((s) => s.isLoading, 'isLoading', isFalse),
       ],
     );

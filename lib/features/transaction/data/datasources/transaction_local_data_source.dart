@@ -79,7 +79,7 @@ class IsarTransactionLocalDataSource implements TransactionLocalDataSource {
             (q2) => q2
                 .descriptionContains(searchQuery!, caseSensitive: false)
                 .or()
-                .noteContains(searchQuery!, caseSensitive: false),
+                .noteContains(searchQuery, caseSensitive: false),
           ),
         )
         .optional(

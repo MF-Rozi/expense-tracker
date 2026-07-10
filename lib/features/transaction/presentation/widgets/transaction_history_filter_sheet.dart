@@ -18,13 +18,16 @@ class TransactionHistoryFilterSheet extends StatefulWidget {
   final String? initialCategoryId;
   final DateTime? initialStartDate;
   final DateTime? initialEndDate;
-  final void Function(DateTime? start, DateTime? end, String? categoryId) onApply;
+  final void Function(DateTime? start, DateTime? end, String? categoryId)
+      onApply;
 
   @override
-  State<TransactionHistoryFilterSheet> createState() => _TransactionHistoryFilterSheetState();
+  State<TransactionHistoryFilterSheet> createState() =>
+      _TransactionHistoryFilterSheetState();
 }
 
-class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilterSheet> {
+class _TransactionHistoryFilterSheetState
+    extends State<TransactionHistoryFilterSheet> {
   String? _selectedCategoryId;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -52,7 +55,6 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF00113A),
-              onPrimary: Colors.white,
               surface: Color(0xFFF8F9FA),
               onSurface: Color(0xFF00113A),
             ),
@@ -156,7 +158,7 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
                   if (state.isLoading) {
                     return const Center(
                       child: Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(16),
                         child: CircularProgressIndicator(),
                       ),
                     );
@@ -175,7 +177,8 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
                       spacing: 8,
                       runSpacing: 8,
                       children: categories.map((category) {
-                        final isSelected = _selectedCategoryId == category.uuid.getOrCrash();
+                        final isSelected =
+                            _selectedCategoryId == category.uuid.getOrCrash();
                         return _buildCategoryChip(category, isSelected);
                       }).toList(),
                     ),
@@ -219,7 +222,8 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
   Widget _buildDateRangeSelector() {
     final hasDates = _startDate != null && _endDate != null;
     final dateText = hasDates
-        ? '${DateFormat('MMM d, yyyy').format(_startDate!)} - ${DateFormat('MMM d, yyyy').format(_endDate!)}'
+        ? '${DateFormat('MMM d, yyyy').format(_startDate!)} - '
+            '${DateFormat('MMM d, yyyy').format(_endDate!)}'
         : 'Select custom date range';
 
     return Container(
@@ -245,7 +249,9 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: hasDates ? const Color(0xFF00113A) : const Color(0xFF757682),
+                  color: hasDates
+                      ? const Color(0xFF00113A)
+                      : const Color(0xFF757682),
                 ),
               ),
             ),
@@ -278,15 +284,10 @@ class _TransactionHistoryFilterSheetState extends State<TransactionHistoryFilter
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF00113A) 
-              : const Color(0xFFF3F4F5),
+          color: isSelected ? const Color(0xFF00113A) : const Color(0xFFF3F4F5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF00113A) 
-                : Colors.transparent,
-            width: 1,
+            color: isSelected ? const Color(0xFF00113A) : Colors.transparent,
           ),
         ),
         child: Text(

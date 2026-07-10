@@ -22,7 +22,8 @@ class TransactionHistoryPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<TransactionHistoryCubit>(
-          create: (context) => getIt<TransactionHistoryCubit>()..fetchTransactions(),
+          create: (context) =>
+              getIt<TransactionHistoryCubit>()..fetchTransactions(),
         ),
         BlocProvider<CategoryCubit>.value(
           value: getIt<CategoryCubit>(),
@@ -47,7 +48,8 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
   @override
   void initState() {
     super.initState();
-    final initialQuery = context.read<TransactionHistoryCubit>().state.searchQuery ?? '';
+    final initialQuery =
+        context.read<TransactionHistoryCubit>().state.searchQuery ?? '';
     _searchController = TextEditingController(text: initialQuery);
   }
 
@@ -79,11 +81,16 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
             BlocProvider.value(value: context.read<CategoryCubit>()),
           ],
           child: TransactionHistoryFilterSheet(
-            initialCategoryId: context.read<TransactionHistoryCubit>().state.activeCategoryId,
-            initialStartDate: context.read<TransactionHistoryCubit>().state.startDate,
-            initialEndDate: context.read<TransactionHistoryCubit>().state.endDate,
+            initialCategoryId:
+                context.read<TransactionHistoryCubit>().state.activeCategoryId,
+            initialStartDate:
+                context.read<TransactionHistoryCubit>().state.startDate,
+            initialEndDate:
+                context.read<TransactionHistoryCubit>().state.endDate,
             onApply: (start, end, categoryId) {
-              context.read<TransactionHistoryCubit>().applyFilters(start, end, categoryId);
+              context
+                  .read<TransactionHistoryCubit>()
+                  .applyFilters(start, end, categoryId);
             },
           ),
         );
@@ -192,7 +199,7 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.all(24),
                       child: Text(
                         state.error!,
                         style: GoogleFonts.inter(
@@ -211,14 +218,15 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(32),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.receipt_long_outlined,
                             size: 64,
-                            color: const Color(0xFF757682).withValues(alpha: 0.5),
+                            color:
+                                const Color(0xFF757682).withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -247,54 +255,52 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
             } else {
               for (final dateKey in grouped.keys) {
                 final transactions = grouped[dateKey] ?? [];
-                
-                // Date Group Header
-                slivers.add(
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-                      child: Row(
-                        children: [
-                          Text(
-                            dateKey.toUpperCase(),
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.5,
-                              color: const Color(0xFF757682),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Divider(
-                              color: Color(0x1F757682),
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
 
-                // Date Group Transactions List
-                slivers.add(
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final transaction = transactions[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _TransactionCard(transaction: transaction),
-                          );
-                        },
-                        childCount: transactions.length,
+                slivers
+                  ..add(
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              dateKey.toUpperCase(),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.5,
+                                color: const Color(0xFF757682),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Divider(
+                                color: Color(0x1F757682),
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  )
+                  ..add(
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final transaction = transactions[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _TransactionCard(transaction: transaction),
+                            );
+                          },
+                          childCount: transactions.length,
+                        ),
+                      ),
+                    ),
+                  );
               }
               // Add a bit of space at the bottom
               slivers.add(
@@ -332,13 +338,16 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: GestureDetector(
-                onTap: () => context.read<TransactionHistoryCubit>().updateFlowType(flow.$1),
+                onTap: () => context
+                    .read<TransactionHistoryCubit>()
+                    .updateFlowType(flow.$1),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected 
-                        ? const Color(0xFF00113A) 
+                    color: isSelected
+                        ? const Color(0xFF00113A)
                         : const Color(0xFFF3F4F5),
                     borderRadius: BorderRadius.circular(100),
                   ),
@@ -348,7 +357,8 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : const Color(0xFF444650),
+                        color:
+                            isSelected ? Colors.white : const Color(0xFF444650),
                       ),
                     ),
                   ),
@@ -399,7 +409,8 @@ class _TransactionCard extends StatelessWidget {
     final iconColor = _getCategoryColor(categoryName);
 
     final isCredit = transaction.type == TransactionType.income;
-    final amountColor = isCredit ? const Color(0xFF1B6D24) : const Color(0xFFBA1A1A);
+    final amountColor =
+        isCredit ? const Color(0xFF1B6D24) : const Color(0xFFBA1A1A);
     final prefix = isCredit ? '+' : '-';
     final formattedAmount = NumberFormat.currency(
       symbol: 'IDR ',
@@ -441,6 +452,8 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.description.getOrCrash(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.manrope(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -449,7 +462,10 @@ class _TransactionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$categoryName • ${DateFormat('h:mm a').format(transaction.date.toLocal())}',
+                  '$categoryName • '
+                  '${DateFormat('h:mm a').format(transaction.date.toLocal())}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: const Color(0xFF444650),

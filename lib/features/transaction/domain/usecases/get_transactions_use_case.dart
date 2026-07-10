@@ -15,7 +15,9 @@ class GetTransactionsUseCase
   final TransactionRepository _repository;
 
   @override
-  Future<Either<Failure, List<Transaction>>> call(GetTransactionsParams params) {
+  Future<Either<Failure, List<Transaction>>> call(
+    GetTransactionsParams params,
+  ) {
     return _repository.getTransactions(
       startDate: params.startDate,
       endDate: params.endDate,

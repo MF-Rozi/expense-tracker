@@ -45,9 +45,10 @@ void main() {
 
   group('GetTransactionsUseCase', () {
     test(
-      'should delegate parameter filtering to repository and return the transactions',
+      'should delegate parameter filtering to repository '
+      'and return the transactions',
       () async {
-        final tStartDate = DateTime(2026, 1, 1);
+        final tStartDate = DateTime(2026);
         final tEndDate = DateTime(2026, 1, 31);
         const tSearchQuery = 'Test';
         const tCategoryId = 'cat-123';
@@ -76,7 +77,7 @@ void main() {
         final result = await useCase(params);
 
         // assert
-        expect(result, Right(tTransactionsList));
+        expect(result, Right<Failure, List<Transaction>>(tTransactionsList));
         verify(
           () => mockRepository.getTransactions(
             startDate: tStartDate,
@@ -91,14 +92,12 @@ void main() {
     );
 
     test('should support equality comparison for params', () {
-      final tStartDate = DateTime(2026, 1, 1);
+      final tStartDate = DateTime(2026);
       final params1 = GetTransactionsParams(
         startDate: tStartDate,
-        flowType: TransactionFlowType.all,
       );
       final params2 = GetTransactionsParams(
         startDate: tStartDate,
-        flowType: TransactionFlowType.all,
       );
 
       expect(params1, equals(params2));
