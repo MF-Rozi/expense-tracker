@@ -112,7 +112,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       (failure) => emit(
         state.copyWith(
           status: TransactionFormStatus.failure,
-          errorMessage: failure.toString(),
+          errorMessage: failure.message,
         ),
       ),
       (_) => emit(state.copyWith(status: TransactionFormStatus.success)),

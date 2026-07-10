@@ -1,3 +1,4 @@
+import 'package:expense_tracker/features/category/data/models/category_model.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
@@ -39,6 +40,8 @@ class TransactionModel {
   late TransactionType type;
 
   String? note;
+
+  final category = IsarLink<CategoryModel>();
 
   Transaction toEntity() {
     return Transaction(

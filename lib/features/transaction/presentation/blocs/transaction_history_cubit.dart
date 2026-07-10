@@ -34,7 +34,7 @@ class TransactionHistoryCubit extends Cubit<TransactionHistoryState> {
       (failure) => emit(
         state.copyWith(
           isLoading: false,
-          error: failure.toString(),
+          error: failure.message,
         ),
       ),
       (transactions) {

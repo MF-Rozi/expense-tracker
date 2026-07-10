@@ -129,7 +129,7 @@ void main() {
             .having((s) => s.error, 'error', isNull),
         isA<TransactionHistoryState>()
             .having((s) => s.isLoading, 'isLoading', isFalse)
-            .having((s) => s.error, 'error', contains('ServerFailure')),
+            .having((s) => s.error, 'error', 'Database error'),
       ],
     );
   });
