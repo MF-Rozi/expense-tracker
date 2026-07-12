@@ -54,6 +54,31 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> updateTransaction(Transaction transaction) async {
+    try {
+      // Crucial Integrity Rule: Check if the referenced category exists
+      final category = await _categoryDataSource.getCategoryByUuid(
+        transaction.categoryUuid.getOrCrash(),
+      );
+
+      if (category == null) {
+        return const Left(
+          Failure.localFailure(
+            message: 'Referenced category structure does not exist.',
+          ),
+        );
+      }
+
+      await _localDataSource.updateTransaction(
+        TransactionModel.fromEntity(transaction),
+      );
+      return const Right(unit);
+    } catch (e) {
+      return Left(Failure.localFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> deleteTransaction(
     UniqueId transactionUuid,
   ) async {

@@ -1,7 +1,8 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
-import 'package:expense_tracker/features/transaction/domain/usecases/save_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/create_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/update_transaction_use_case.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:expense_tracker/features/transaction/presentation/utils/expression_evaluator.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
@@ -10,10 +11,13 @@ import 'package:injectable/injectable.dart';
 
 @injectable
 class TransactionCubit extends Cubit<TransactionState> {
-  TransactionCubit(this._saveTransactionUseCase)
-      : super(TransactionState(date: DateTime.now()));
+  TransactionCubit(
+    this._createTransactionUseCase,
+    this._updateTransactionUseCase,
+  ) : super(TransactionState(date: DateTime.now()));
 
-  final SaveTransactionUseCase _saveTransactionUseCase;
+  final CreateTransactionUseCase _createTransactionUseCase;
+  final UpdateTransactionUseCase _updateTransactionUseCase;
   final ExpressionEvaluator _evaluator = const ExpressionEvaluator();
 
   void updateExpression(String key) {
@@ -84,6 +88,27 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(date: date));
   }
 
+  void loadExistingTransaction(Transaction transaction, Category? category) {
+    // Format amount with no decimal digits if it is a whole number, otherwise show decimals.
+    final amount = transaction.amount.getOrCrash();
+    final rawExpr = amount == amount.toInt()
+        ? amount.toInt().toString()
+        : amount.toString();
+
+    emit(
+      state.copyWith(
+        existingTransactionId: transaction.uuid,
+        rawExpression: rawExpr,
+        parsedAmount: amount,
+        selectedCategory: category,
+        type: transaction.type,
+        description: transaction.description.getOrCrash(),
+        date: transaction.date,
+        status: TransactionFormStatus.initial,
+      ),
+    );
+  }
+
   Future<void> submitTransaction() async {
     if (state.selectedCategory == null) {
       emit(
@@ -98,7 +123,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(status: TransactionFormStatus.loading));
 
     final transaction = Transaction(
-      uuid: UniqueId.generate(),
+      uuid: state.existingTransactionId ?? UniqueId.generate(),
       amount: Amount(state.parsedAmount),
       description: StringSingleLine(state.description),
       date: state.date ?? DateTime.now(),
@@ -106,7 +131,9 @@ class TransactionCubit extends Cubit<TransactionState> {
       type: state.type,
     );
 
-    final result = await _saveTransactionUseCase(transaction);
+    final result = state.existingTransactionId != null
+        ? await _updateTransactionUseCase(transaction)
+        : await _createTransactionUseCase(transaction);
 
     result.fold(
       (failure) => emit(

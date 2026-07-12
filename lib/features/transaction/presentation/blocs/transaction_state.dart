@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 
 enum TransactionFormStatus { initial, loading, success, failure }
 
@@ -14,6 +15,7 @@ class TransactionState extends Equatable {
     this.date,
     this.status = TransactionFormStatus.initial,
     this.errorMessage,
+    this.existingTransactionId,
   });
 
   final String rawExpression;
@@ -24,6 +26,7 @@ class TransactionState extends Equatable {
   final DateTime? date;
   final TransactionFormStatus status;
   final String? errorMessage;
+  final UniqueId? existingTransactionId;
 
   TransactionState copyWith({
     String? rawExpression,
@@ -34,6 +37,7 @@ class TransactionState extends Equatable {
     DateTime? date,
     TransactionFormStatus? status,
     String? errorMessage,
+    UniqueId? existingTransactionId,
   }) {
     return TransactionState(
       rawExpression: rawExpression ?? this.rawExpression,
@@ -44,6 +48,7 @@ class TransactionState extends Equatable {
       date: date ?? this.date,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
+      existingTransactionId: existingTransactionId ?? this.existingTransactionId,
     );
   }
 
@@ -57,5 +62,6 @@ class TransactionState extends Equatable {
         date,
         status,
         errorMessage,
+        existingTransactionId,
       ];
 }

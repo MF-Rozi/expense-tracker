@@ -7,6 +7,7 @@ import 'package:isar_community/isar.dart';
 abstract class TransactionLocalDataSource {
   Stream<List<TransactionModel>> watchTransactions();
   Future<void> saveTransaction(TransactionModel transaction);
+  Future<void> updateTransaction(TransactionModel transaction);
   Future<void> deleteTransaction(String uuid);
   Future<List<TransactionModel>> getTransactions({
     required String flowType,
@@ -40,6 +41,28 @@ class IsarTransactionLocalDataSource implements TransactionLocalDataSource {
   @override
   Future<void> saveTransaction(TransactionModel transaction) async {
     await _isar.writeTxn(() async {
+      final categoryModel = await _isar.categoryModels
+          .filter()
+          .uuidEqualTo(transaction.categoryUuid)
+          .findFirst();
+      if (categoryModel != null) {
+        transaction.category.value = categoryModel;
+      }
+      await _isar.transactionModels.put(transaction);
+      await transaction.category.save();
+    });
+  }
+
+  @override
+  Future<void> updateTransaction(TransactionModel transaction) async {
+    await _isar.writeTxn(() async {
+      final existing = await _isar.transactionModels
+          .filter()
+          .uuidEqualTo(transaction.uuid)
+          .findFirst();
+      if (existing != null) {
+        transaction.id = existing.id;
+      }
       final categoryModel = await _isar.categoryModels
           .filter()
           .uuidEqualTo(transaction.categoryUuid)

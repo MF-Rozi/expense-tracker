@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:go_router/go_router.dart';
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
@@ -418,7 +419,6 @@ class _TransactionCard extends StatelessWidget {
     ).format(transaction.amount.getOrCrash());
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -430,59 +430,69 @@ class _TransactionCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.push('/', extra: transaction),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        transaction.description.getOrCrash(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.manrope(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: const Color(0xFF00113A),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$categoryName • '
+                        '${DateFormat('h:mm a').format(transaction.date.toLocal())}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xFF444650),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Text(
-                  transaction.description.getOrCrash(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  '$prefix$formattedAmount',
                   style: GoogleFonts.manrope(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: const Color(0xFF00113A),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$categoryName • '
-                  '${DateFormat('h:mm a').format(transaction.date.toLocal())}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xFF444650),
+                    color: amountColor,
                   ),
                 ),
               ],
             ),
           ),
-          Text(
-            '$prefix$formattedAmount',
-            style: GoogleFonts.manrope(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: amountColor,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

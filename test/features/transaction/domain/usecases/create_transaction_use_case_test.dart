@@ -3,14 +3,13 @@ import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
-import 'package:expense_tracker/features/transaction/domain/usecases/save_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/create_transaction_use_case.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTransactionRepository extends Mock implements TransactionRepository {}
 
-// Fallback for mocktail
 class FakeTransaction extends Fake implements Transaction {}
 
 void main() {
@@ -18,12 +17,12 @@ void main() {
     registerFallbackValue(FakeTransaction());
   });
 
-  late SaveTransactionUseCase useCase;
+  late CreateTransactionUseCase useCase;
   late MockTransactionRepository mockRepository;
 
   setUp(() {
     mockRepository = MockTransactionRepository();
-    useCase = SaveTransactionUseCase(mockRepository);
+    useCase = CreateTransactionUseCase(mockRepository);
   });
 
   final tTransaction = Transaction(
@@ -36,17 +35,13 @@ void main() {
   );
 
   test(
-    'should call saveTransaction on the repository with the provided '
-    'transaction',
+    'should call saveTransaction on the repository with the provided transaction',
     () async {
-      // arrange
       when(() => mockRepository.saveTransaction(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));
 
-      // act
       final result = await useCase(tTransaction);
 
-      // assert
       expect(result, const Right<Failure, Unit>(unit));
       verify(() => mockRepository.saveTransaction(tTransaction)).called(1);
       verifyNoMoreInteractions(mockRepository);

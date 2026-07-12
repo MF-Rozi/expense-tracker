@@ -1,6 +1,8 @@
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:expense_tracker/features/transaction/presentation/widgets/calculator_pad.dart';
@@ -11,7 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TransactionEntryPage extends StatefulWidget {
-  const TransactionEntryPage({super.key});
+  const TransactionEntryPage({super.key, this.existingTransaction});
+
+  final Transaction? existingTransaction;
 
   @override
   State<TransactionEntryPage> createState() => _TransactionEntryPageState();
@@ -26,8 +30,34 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   @override
   void initState() {
     super.initState();
-    _descriptionController = TextEditingController();
-    _amountController = TextEditingController(text: '0');
+    final existing = widget.existingTransaction;
+    if (existing != null) {
+      _descriptionController =
+          TextEditingController(text: existing.description.getOrCrash());
+      final amountVal = existing.amount.getOrCrash();
+      _amountController = TextEditingController(
+        text: amountVal == amountVal.toInt()
+            ? amountVal.toInt().toString()
+            : amountVal.toString(),
+      );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Category? category;
+          try {
+            category = getIt<CategoryCubit>().state.allCategories.firstWhere(
+                  (c) => c.uuid == existing.categoryUuid,
+                );
+          } catch (_) {}
+          context
+              .read<TransactionCubit>()
+              .loadExistingTransaction(existing, category);
+        }
+      });
+    } else {
+      _descriptionController = TextEditingController();
+      _amountController = TextEditingController(text: '0');
+    }
     _noteFocusNode.addListener(() {
       setState(() {});
     });
@@ -157,7 +187,9 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'New Transaction',
+          widget.existingTransaction != null
+              ? 'Edit Transaction'
+              : 'New Transaction',
           style: GoogleFonts.manrope(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF00113A),

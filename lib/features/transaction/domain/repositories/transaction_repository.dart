@@ -9,6 +9,8 @@ abstract class TransactionRepository {
 
   Future<Either<Failure, Unit>> saveTransaction(Transaction transaction);
 
+  Future<Either<Failure, Unit>> updateTransaction(Transaction transaction);
+
   Future<Either<Failure, Unit>> deleteTransaction(UniqueId transactionUuid);
 
   Future<Either<Failure, List<Transaction>>> getTransactions({
