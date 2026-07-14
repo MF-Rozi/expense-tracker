@@ -50,7 +50,8 @@ void main() {
   });
 
   blocTest<TransactionCubit, TransactionState>(
-    'should update rawExpression and parsedAmount when updateExpression is called',
+    'should update rawExpression and parsedAmount when '
+    'updateExpression is called',
     build: () => cubit,
     act: (cubit) => cubit.updateExpression('5'),
     expect: () => [
@@ -89,7 +90,8 @@ void main() {
   );
 
   blocTest<TransactionCubit, TransactionState>(
-    'should emit loading and success when submitTransaction (create) is successful',
+    'should emit loading and success when submitTransaction (create) '
+    'is successful',
     build: () {
       when(() => mockCreateTransactionUseCase(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));
@@ -126,7 +128,8 @@ void main() {
   );
 
   blocTest<TransactionCubit, TransactionState>(
-    'should load existing transaction into state and submitTransaction (update) successfully',
+    'should load existing transaction into state and '
+    'submitTransaction (update) successfully',
     build: () {
       when(() => mockUpdateTransactionUseCase(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));
@@ -137,7 +140,11 @@ void main() {
       ..submitTransaction(),
     expect: () => [
       isA<TransactionState>()
-          .having((s) => s.existingTransactionId, 'existingTransactionId', tExistingTransaction.uuid)
+          .having(
+            (s) => s.existingTransactionId,
+            'existingTransactionId',
+            tExistingTransaction.uuid,
+          )
           .having((s) => s.rawExpression, 'rawExpression', '250')
           .having((s) => s.parsedAmount, 'parsedAmount', 250.0)
           .having((s) => s.selectedCategory, 'category', tCategory)

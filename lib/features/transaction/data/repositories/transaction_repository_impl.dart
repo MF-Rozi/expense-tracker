@@ -54,7 +54,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateTransaction(Transaction transaction) async {
+  Future<Either<Failure, Unit>> updateTransaction(
+    Transaction transaction,
+  ) async {
     try {
       // Crucial Integrity Rule: Check if the referenced category exists
       final category = await _categoryDataSource.getCategoryByUuid(

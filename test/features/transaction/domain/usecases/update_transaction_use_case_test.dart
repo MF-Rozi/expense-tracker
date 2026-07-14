@@ -35,7 +35,8 @@ void main() {
   );
 
   test(
-    'should call updateTransaction on the repository with the provided transaction',
+    'should call updateTransaction on the repository with the '
+    'provided transaction',
     () async {
       when(() => mockRepository.updateTransaction(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));

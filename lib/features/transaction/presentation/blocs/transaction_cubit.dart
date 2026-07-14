@@ -89,7 +89,8 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   void loadExistingTransaction(Transaction transaction, Category? category) {
-    // Format amount with no decimal digits if it is a whole number, otherwise show decimals.
+    // Format amount with no decimal digits if it is a whole number,
+    // otherwise show decimals.
     final amount = transaction.amount.getOrCrash();
     final rawExpr = amount == amount.toInt()
         ? amount.toInt().toString()
@@ -135,14 +136,13 @@ class TransactionCubit extends Cubit<TransactionState> {
         ? await _updateTransactionUseCase(transaction)
         : await _createTransactionUseCase(transaction);
 
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          status: TransactionFormStatus.failure,
-          errorMessage: failure.message,
-        ),
+    final newState = result.fold(
+      (failure) => state.copyWith(
+        status: TransactionFormStatus.failure,
+        errorMessage: failure.message,
       ),
-      (_) => emit(state.copyWith(status: TransactionFormStatus.success)),
+      (_) => state.copyWith(status: TransactionFormStatus.success),
     );
+    emit(newState);
   }
 }

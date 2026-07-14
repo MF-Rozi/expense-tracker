@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:go_router/go_router.dart';
+
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
@@ -12,6 +12,7 @@ import 'package:expense_tracker/injector.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -470,7 +471,9 @@ class _TransactionCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '$categoryName • '
-                        '${DateFormat('h:mm a').format(transaction.date.toLocal())}',
+                        '${DateFormat('h:mm a').format(
+                          transaction.date.toLocal(),
+                        )}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(

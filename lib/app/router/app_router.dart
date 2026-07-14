@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_manage_page.dart';
-import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/pages/transaction_entry_page.dart';
 import 'package:expense_tracker/features/transaction/presentation/pages/transaction_history_page.dart';
 import 'package:expense_tracker/injector.dart';

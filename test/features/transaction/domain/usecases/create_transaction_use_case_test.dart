@@ -35,7 +35,8 @@ void main() {
   );
 
   test(
-    'should call saveTransaction on the repository with the provided transaction',
+    'should call saveTransaction on the repository with the '
+    'provided transaction',
     () async {
       when(() => mockRepository.saveTransaction(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));

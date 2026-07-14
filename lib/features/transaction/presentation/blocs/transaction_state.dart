@@ -48,7 +48,8 @@ class TransactionState extends Equatable {
       date: date ?? this.date,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
-      existingTransactionId: existingTransactionId ?? this.existingTransactionId,
+      existingTransactionId:
+          existingTransactionId ?? this.existingTransactionId,
     );
   }
 
