@@ -26,6 +26,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   late final TextEditingController _amountController;
   final FocusNode _noteFocusNode = FocusNode();
   final FocusNode _amountFocusNode = FocusNode();
+  bool _isCalculatorVisible = true;
 
   @override
   void initState() {
@@ -224,6 +225,12 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         amount: state.parsedAmount,
                         controller: _amountController,
                         focusNode: _amountFocusNode,
+                        isCalculatorVisible: _isCalculatorVisible,
+                        onTap: () => setState(
+                          () => _isCalculatorVisible = true,
+                        ),
+                        onHideCalculator: () =>
+                            setState(() => _isCalculatorVisible = false),
                       ),
                       const SizedBox(height: 32),
 
@@ -233,6 +240,8 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         child: TextFormField(
                           controller: _descriptionController,
                           focusNode: _noteFocusNode,
+                          onTap: () =>
+                              setState(() => _isCalculatorVisible = false),
                           onChanged: (val) => context
                               .read<TransactionCubit>()
                               .updateDescription(val),
@@ -255,7 +264,10 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       _BentoInputCell(
                         label: 'Category',
                         child: InkWell(
-                          onTap: () => _showCategoryPicker(context),
+                          onTap: () {
+                            setState(() => _isCalculatorVisible = false);
+                            _showCategoryPicker(context);
+                          },
                           child: Row(
                             children: [
                               Expanded(
@@ -286,6 +298,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Date',
                         child: InkWell(
                           onTap: () async {
+                            setState(() => _isCalculatorVisible = false);
                             final selected = await showDatePicker(
                               context: context,
                               initialDate: state.date ?? DateTime.now(),
@@ -327,31 +340,38 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
 
               // Calculator Pad (hide if system keyboard is up)
               if (!_noteFocusNode.hasFocus)
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(32),
-                    ),
-                  ),
-                  child: SizedBox(
-                    height: 350,
-                    child: CalculatorPad(
-                      onKeyPress: (key) => context
-                          .read<TransactionCubit>()
-                          .updateExpression(key),
-                      onSubmit: () =>
-                          context.read<TransactionCubit>().submitTransaction(),
-                    ),
-                  ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.fastOutSlowIn,
+                  child: _isCalculatorVisible
+                      ? Container(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 20,
+                                offset: const Offset(0, -5),
+                              ),
+                            ],
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(32),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: 350,
+                            child: CalculatorPad(
+                              onKeyPress: (key) => context
+                                  .read<TransactionCubit>()
+                                  .updateExpression(key),
+                              onSubmit: () => context
+                                  .read<TransactionCubit>()
+                                  .submitTransaction(),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
             ],
           );
@@ -366,11 +386,17 @@ class _MasterDisplayCard extends StatelessWidget {
     required this.amount,
     required this.controller,
     required this.focusNode,
+    required this.isCalculatorVisible,
+    this.onTap,
+    this.onHideCalculator,
   });
 
   final double amount;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final VoidCallback? onTap;
+  final bool isCalculatorVisible;
+  final VoidCallback? onHideCalculator;
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +406,10 @@ class _MasterDisplayCard extends StatelessWidget {
     ).format(amount);
 
     return GestureDetector(
-      onTap: focusNode.requestFocus,
+      onTap: () {
+        focusNode.requestFocus();
+        onTap?.call();
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
@@ -418,17 +447,34 @@ class _MasterDisplayCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                formattedAmount,
-                style: GoogleFonts.manrope(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF00113A),
-                  letterSpacing: -1.5,
+            Row(
+              children: [
+                if (isCalculatorVisible)
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_hide),
+                    onPressed: onHideCalculator,
+                  ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: onTap,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          formattedAmount,
+                          style: GoogleFonts.manrope(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF00113A),
+                            letterSpacing: -1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
