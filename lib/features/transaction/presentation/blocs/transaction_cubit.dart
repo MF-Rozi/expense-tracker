@@ -88,6 +88,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(date: date));
   }
 
+  void updateNote(String note) {
+    emit(state.copyWith(note: note));
+  }
+
   void loadExistingTransaction(Transaction transaction, Category? category) {
     // Format amount with no decimal digits if it is a whole number,
     // otherwise show decimals.
@@ -106,6 +110,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         description: transaction.description.getOrCrash(),
         date: transaction.date,
         status: TransactionFormStatus.initial,
+        note: transaction.note ?? '',
       ),
     );
   }
@@ -130,6 +135,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       date: state.date ?? DateTime.now(),
       categoryUuid: state.selectedCategory!.uuid,
       type: state.type,
+      note: state.note.isNotEmpty ? state.note : null,
     );
 
     final result = state.existingTransactionId != null

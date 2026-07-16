@@ -16,6 +16,7 @@ class TransactionState extends Equatable {
     this.status = TransactionFormStatus.initial,
     this.errorMessage,
     this.existingTransactionId,
+    this.note = '',
   });
 
   final String rawExpression;
@@ -27,6 +28,7 @@ class TransactionState extends Equatable {
   final TransactionFormStatus status;
   final String? errorMessage;
   final UniqueId? existingTransactionId;
+  final String note;
 
   TransactionState copyWith({
     String? rawExpression,
@@ -38,6 +40,7 @@ class TransactionState extends Equatable {
     TransactionFormStatus? status,
     String? errorMessage,
     UniqueId? existingTransactionId,
+    String? note,
   }) {
     return TransactionState(
       rawExpression: rawExpression ?? this.rawExpression,
@@ -50,6 +53,7 @@ class TransactionState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       existingTransactionId:
           existingTransactionId ?? this.existingTransactionId,
+      note: note ?? this.note,
     );
   }
 
@@ -64,5 +68,6 @@ class TransactionState extends Equatable {
         status,
         errorMessage,
         existingTransactionId,
+        note,
       ];
 }

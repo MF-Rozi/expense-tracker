@@ -82,6 +82,16 @@ void main() {
     ],
   );
 
+  blocTest<TransactionCubit, TransactionState>(
+    'should update note when updateNote is called',
+    build: () => cubit,
+    act: (cubit) => cubit.updateNote('Some private note'),
+    expect: () => [
+      isA<TransactionState>()
+          .having((s) => s.note, 'note', 'Some private note'),
+    ],
+  );
+
   final tCategory = Category(
     uuid: UniqueId.generate(),
     name: StringSingleLine('Food'),
@@ -125,6 +135,7 @@ void main() {
     date: DateTime.now(),
     categoryUuid: tCategory.uuid,
     type: TransactionType.expense,
+    note: 'Rent payment for July',
   );
 
   blocTest<TransactionCubit, TransactionState>(
@@ -149,7 +160,8 @@ void main() {
           .having((s) => s.parsedAmount, 'parsedAmount', 250.0)
           .having((s) => s.selectedCategory, 'category', tCategory)
           .having((s) => s.description, 'description', 'Rent')
-          .having((s) => s.type, 'type', TransactionType.expense),
+          .having((s) => s.type, 'type', TransactionType.expense)
+          .having((s) => s.note, 'note', 'Rent payment for July'),
       isA<TransactionState>()
           .having((s) => s.status, 'status', TransactionFormStatus.loading),
       isA<TransactionState>()
