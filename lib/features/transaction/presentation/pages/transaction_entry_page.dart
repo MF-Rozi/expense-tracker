@@ -24,6 +24,7 @@ class TransactionEntryPage extends StatefulWidget {
 class _TransactionEntryPageState extends State<TransactionEntryPage> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _amountController;
+  late final TextEditingController _noteController;
   final FocusNode _noteFocusNode = FocusNode();
   final FocusNode _amountFocusNode = FocusNode();
   bool _isCalculatorVisible = true;
@@ -32,6 +33,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   void initState() {
     super.initState();
     final existing = widget.existingTransaction;
+    _noteController = TextEditingController(text: existing?.note ?? '');
     if (existing != null) {
       _descriptionController =
           TextEditingController(text: existing.description.getOrCrash());
@@ -68,6 +70,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   void dispose() {
     _descriptionController.dispose();
     _amountController.dispose();
+    _noteController.dispose();
     _noteFocusNode.dispose();
     _amountFocusNode.dispose();
     super.dispose();
@@ -333,6 +336,78 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      // Internal Note
+                      _BentoInputCell(
+                        label: 'Internal Note',
+                        child: TextFormField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          onTap: () =>
+                              setState(() => _isCalculatorVisible = false),
+                          onChanged: (val) =>
+                              context.read<TransactionCubit>().updateNote(val),
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF191C1D),
+                          ),
+                          decoration: const InputDecoration(
+                            hintText:
+                                'Add a private note about this transaction...',
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      // Save Transaction Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => context
+                              .read<TransactionCubit>()
+                              .submitTransaction(),
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          label: Text(
+                            'Save Transaction',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00113A),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Discard Draft Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text(
+                            'Discard Draft',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: const Color(0xFF444650),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
