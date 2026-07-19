@@ -435,7 +435,12 @@ class _TransactionCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.push('/', extra: transaction),
+          onTap: () async {
+            await context.push('/transactions', extra: transaction);
+            if (context.mounted) {
+              await context.read<TransactionHistoryCubit>().fetchTransactions();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
