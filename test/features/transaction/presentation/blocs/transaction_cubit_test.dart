@@ -3,15 +3,20 @@ import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
-import 'package:expense_tracker/features/transaction/domain/usecases/save_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/create_transaction_use_case.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/update_transaction_use_case.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockSaveTransactionUseCase extends Mock
-    implements SaveTransactionUseCase {}
+class MockCreateTransactionUseCase extends Mock
+    implements CreateTransactionUseCase {}
+
+class MockUpdateTransactionUseCase extends Mock
+    implements UpdateTransactionUseCase {}
 
 // Fallback for mocktail
 class FakeTransaction extends Fake implements Transaction {}
@@ -22,11 +27,16 @@ void main() {
   });
 
   late TransactionCubit cubit;
-  late MockSaveTransactionUseCase mockSaveTransactionUseCase;
+  late MockCreateTransactionUseCase mockCreateTransactionUseCase;
+  late MockUpdateTransactionUseCase mockUpdateTransactionUseCase;
 
   setUp(() {
-    mockSaveTransactionUseCase = MockSaveTransactionUseCase();
-    cubit = TransactionCubit(mockSaveTransactionUseCase);
+    mockCreateTransactionUseCase = MockCreateTransactionUseCase();
+    mockUpdateTransactionUseCase = MockUpdateTransactionUseCase();
+    cubit = TransactionCubit(
+      mockCreateTransactionUseCase,
+      mockUpdateTransactionUseCase,
+    );
   });
 
   tearDown(() {
@@ -72,6 +82,16 @@ void main() {
     ],
   );
 
+  blocTest<TransactionCubit, TransactionState>(
+    'should update note when updateNote is called',
+    build: () => cubit,
+    act: (cubit) => cubit.updateNote('Some private note'),
+    expect: () => [
+      isA<TransactionState>()
+          .having((s) => s.note, 'note', 'Some private note'),
+    ],
+  );
+
   final tCategory = Category(
     uuid: UniqueId.generate(),
     name: StringSingleLine('Food'),
@@ -80,9 +100,10 @@ void main() {
   );
 
   blocTest<TransactionCubit, TransactionState>(
-    'should emit loading and success when submitTransaction is successful',
+    'should emit loading and success when submitTransaction (create) '
+    'is successful',
     build: () {
-      when(() => mockSaveTransactionUseCase(any()))
+      when(() => mockCreateTransactionUseCase(any()))
           .thenAnswer((_) async => const Right<Failure, Unit>(unit));
       return cubit;
     },
@@ -101,5 +122,54 @@ void main() {
       isA<TransactionState>()
           .having((s) => s.status, 'status', TransactionFormStatus.success),
     ],
+    verify: (_) {
+      verify(() => mockCreateTransactionUseCase(any())).called(1);
+      verifyZeroInteractions(mockUpdateTransactionUseCase);
+    },
+  );
+
+  final tExistingTransaction = Transaction(
+    uuid: UniqueId.generate(),
+    amount: Amount(250),
+    description: StringSingleLine('Rent'),
+    date: DateTime.now(),
+    categoryUuid: tCategory.uuid,
+    type: TransactionType.expense,
+    note: 'Rent payment for July',
+  );
+
+  blocTest<TransactionCubit, TransactionState>(
+    'should load existing transaction into state and '
+    'submitTransaction (update) successfully',
+    build: () {
+      when(() => mockUpdateTransactionUseCase(any()))
+          .thenAnswer((_) async => const Right<Failure, Unit>(unit));
+      return cubit;
+    },
+    act: (cubit) => cubit
+      ..loadExistingTransaction(tExistingTransaction, tCategory)
+      ..submitTransaction(),
+    expect: () => [
+      isA<TransactionState>()
+          .having(
+            (s) => s.existingTransactionId,
+            'existingTransactionId',
+            tExistingTransaction.uuid,
+          )
+          .having((s) => s.rawExpression, 'rawExpression', '250')
+          .having((s) => s.parsedAmount, 'parsedAmount', 250.0)
+          .having((s) => s.selectedCategory, 'category', tCategory)
+          .having((s) => s.description, 'description', 'Rent')
+          .having((s) => s.type, 'type', TransactionType.expense)
+          .having((s) => s.note, 'note', 'Rent payment for July'),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.loading),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.success),
+    ],
+    verify: (_) {
+      verify(() => mockUpdateTransactionUseCase(any())).called(1);
+      verifyZeroInteractions(mockCreateTransactionUseCase);
+    },
   );
 }

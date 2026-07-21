@@ -1,6 +1,8 @@
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:expense_tracker/features/transaction/presentation/widgets/calculator_pad.dart';
@@ -11,7 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TransactionEntryPage extends StatefulWidget {
-  const TransactionEntryPage({super.key});
+  const TransactionEntryPage({super.key, this.existingTransaction});
+
+  final Transaction? existingTransaction;
 
   @override
   State<TransactionEntryPage> createState() => _TransactionEntryPageState();
@@ -20,14 +24,43 @@ class TransactionEntryPage extends StatefulWidget {
 class _TransactionEntryPageState extends State<TransactionEntryPage> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _amountController;
+  late final TextEditingController _noteController;
   final FocusNode _noteFocusNode = FocusNode();
   final FocusNode _amountFocusNode = FocusNode();
+  bool _isCalculatorVisible = true;
 
   @override
   void initState() {
     super.initState();
-    _descriptionController = TextEditingController();
-    _amountController = TextEditingController(text: '0');
+    final existing = widget.existingTransaction;
+    _noteController = TextEditingController(text: existing?.note ?? '');
+    if (existing != null) {
+      _descriptionController =
+          TextEditingController(text: existing.description.getOrCrash());
+      final amountVal = existing.amount.getOrCrash();
+      _amountController = TextEditingController(
+        text: amountVal == amountVal.toInt()
+            ? amountVal.toInt().toString()
+            : amountVal.toString(),
+      );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Category? category;
+          try {
+            category = getIt<CategoryCubit>().state.allCategories.firstWhere(
+                  (c) => c.uuid == existing.categoryUuid,
+                );
+          } catch (_) {}
+          context
+              .read<TransactionCubit>()
+              .loadExistingTransaction(existing, category);
+        }
+      });
+    } else {
+      _descriptionController = TextEditingController();
+      _amountController = TextEditingController(text: '0');
+    }
     _noteFocusNode.addListener(() {
       setState(() {});
     });
@@ -37,6 +70,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
   void dispose() {
     _descriptionController.dispose();
     _amountController.dispose();
+    _noteController.dispose();
     _noteFocusNode.dispose();
     _amountFocusNode.dispose();
     super.dispose();
@@ -157,7 +191,9 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'New Transaction',
+          widget.existingTransaction != null
+              ? 'Edit Transaction'
+              : 'New Transaction',
           style: GoogleFonts.manrope(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF00113A),
@@ -192,6 +228,12 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         amount: state.parsedAmount,
                         controller: _amountController,
                         focusNode: _amountFocusNode,
+                        isCalculatorVisible: _isCalculatorVisible,
+                        onTap: () => setState(
+                          () => _isCalculatorVisible = true,
+                        ),
+                        onHideCalculator: () =>
+                            setState(() => _isCalculatorVisible = false),
                       ),
                       const SizedBox(height: 32),
 
@@ -201,6 +243,8 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         child: TextFormField(
                           controller: _descriptionController,
                           focusNode: _noteFocusNode,
+                          onTap: () =>
+                              setState(() => _isCalculatorVisible = false),
                           onChanged: (val) => context
                               .read<TransactionCubit>()
                               .updateDescription(val),
@@ -223,7 +267,10 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       _BentoInputCell(
                         label: 'Category',
                         child: InkWell(
-                          onTap: () => _showCategoryPicker(context),
+                          onTap: () {
+                            setState(() => _isCalculatorVisible = false);
+                            _showCategoryPicker(context);
+                          },
                           child: Row(
                             children: [
                               Expanded(
@@ -254,6 +301,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                         label: 'Date',
                         child: InkWell(
                           onTap: () async {
+                            setState(() => _isCalculatorVisible = false);
                             final selected = await showDatePicker(
                               context: context,
                               initialDate: state.date ?? DateTime.now(),
@@ -288,6 +336,78 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      // Internal Note
+                      _BentoInputCell(
+                        label: 'Internal Note',
+                        child: TextFormField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          onTap: () =>
+                              setState(() => _isCalculatorVisible = false),
+                          onChanged: (val) =>
+                              context.read<TransactionCubit>().updateNote(val),
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF191C1D),
+                          ),
+                          decoration: const InputDecoration(
+                            hintText:
+                                'Add a private note about this transaction...',
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      // Save Transaction Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => context
+                              .read<TransactionCubit>()
+                              .submitTransaction(),
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          label: Text(
+                            'Save Transaction',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00113A),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Discard Draft Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text(
+                            'Discard Draft',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: const Color(0xFF444650),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -295,31 +415,38 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
 
               // Calculator Pad (hide if system keyboard is up)
               if (!_noteFocusNode.hasFocus)
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(32),
-                    ),
-                  ),
-                  child: SizedBox(
-                    height: 350,
-                    child: CalculatorPad(
-                      onKeyPress: (key) => context
-                          .read<TransactionCubit>()
-                          .updateExpression(key),
-                      onSubmit: () =>
-                          context.read<TransactionCubit>().submitTransaction(),
-                    ),
-                  ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.fastOutSlowIn,
+                  child: _isCalculatorVisible
+                      ? Container(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 20,
+                                offset: const Offset(0, -5),
+                              ),
+                            ],
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(32),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: 350,
+                            child: CalculatorPad(
+                              onKeyPress: (key) => context
+                                  .read<TransactionCubit>()
+                                  .updateExpression(key),
+                              onSubmit: () => context
+                                  .read<TransactionCubit>()
+                                  .submitTransaction(),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
             ],
           );
@@ -334,11 +461,17 @@ class _MasterDisplayCard extends StatelessWidget {
     required this.amount,
     required this.controller,
     required this.focusNode,
+    required this.isCalculatorVisible,
+    this.onTap,
+    this.onHideCalculator,
   });
 
   final double amount;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final VoidCallback? onTap;
+  final bool isCalculatorVisible;
+  final VoidCallback? onHideCalculator;
 
   @override
   Widget build(BuildContext context) {
@@ -348,7 +481,10 @@ class _MasterDisplayCard extends StatelessWidget {
     ).format(amount);
 
     return GestureDetector(
-      onTap: focusNode.requestFocus,
+      onTap: () {
+        focusNode.requestFocus();
+        onTap?.call();
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
@@ -386,17 +522,34 @@ class _MasterDisplayCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                formattedAmount,
-                style: GoogleFonts.manrope(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF00113A),
-                  letterSpacing: -1.5,
+            Row(
+              children: [
+                if (isCalculatorVisible)
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_hide),
+                    onPressed: onHideCalculator,
+                  ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: onTap,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          formattedAmount,
+                          style: GoogleFonts.manrope(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF00113A),
+                            letterSpacing: -1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

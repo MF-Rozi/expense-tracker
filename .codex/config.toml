@@ -1,0 +1,4 @@
+[mcp_servers.dart-mcp-server]
+command = "fvm"
+args = ["dart", "mcp-server", "--flutter-sdk", ".fvm/flutter_sdk"]
+enabled = true

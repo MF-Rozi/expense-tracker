@@ -6,8 +6,8 @@ import 'package:expense_tracker/features/transaction/domain/repositories/transac
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
-class SaveTransactionUseCase extends UseCase<Unit, Transaction> {
-  SaveTransactionUseCase(this._repository);
+class CreateTransactionUseCase extends UseCase<Unit, Transaction> {
+  CreateTransactionUseCase(this._repository);
 
   final TransactionRepository _repository;
 

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "dart-mcp-server": {
+      "type": "stdio",
+      "command": "fvm",
+      "args": [
+        "dart",
+        "mcp-server",
+        "--flutter-sdk",
+        ".fvm/flutter_sdk"
+      ],
+      "env": {}
+    }
+  }
+}
