@@ -1,6 +1,8 @@
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
+import 'package:expense_tracker/features/dashboard/presentation/widgets/record_entry_card.dart';
 import 'package:expense_tracker/features/dashboard/presentation/widgets/summary_card.dart';
+import 'package:expense_tracker/features/dashboard/presentation/widgets/wealth_trajectory_chart.dart';
 import 'package:expense_tracker/features/transaction/presentation/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +48,38 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Padding(
+                      padding: EdgeInsets.zero,
+                      child: Row(
+                        children: [
+                          const CircleAvatar(
+                            backgroundColor: Color(0xFFE5E7EB),
+                            child: Icon(
+                              Icons.person,
+                              color: Color(0xFF00113A),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'mfrozi',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF00113A),
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_none,
+                              color: Color(0xFF00113A),
+                            ),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -79,6 +113,10 @@ class _HomePageState extends State<HomePage> {
                       totalIncome: state.totalIncome,
                       totalExpense: state.totalExpense,
                     ),
+                    const SizedBox(height: 24),
+                    const WealthTrajectoryChart(),
+                    const SizedBox(height: 24),
+                    const RecordEntryCard(),
                     const SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -168,23 +206,6 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await context.push('/transaction/new');
-          if (context.mounted) {
-            await context.read<DashboardCubit>().loadDashboardData();
-          }
-        },
-        backgroundColor: const Color(0xFF00113A),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(
-          Icons.add,
-          size: 28,
         ),
       ),
     );
