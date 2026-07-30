@@ -3,6 +3,7 @@ import 'package:expense_tracker/app/view/main_layout.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_manage_page.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/pages/home_page.dart';
+import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/pages/transaction_entry_page.dart';
@@ -52,11 +53,7 @@ GoRouter router([String? initialLocation]) => GoRouter(
             GoRoute(
               path: '/settings',
               name: 'settings',
-              builder: (context, state) => const Scaffold(
-                body: Center(
-                  child: Text('Coming Soon'),
-                ),
-              ),
+              builder: (context, state) => const SettingsPage(),
             ),
           ],
         ),
