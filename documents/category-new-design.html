@@ -1,0 +1,1177 @@
+<!-- Add New Income Category (Perfectly Aligned) -->
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Add Category | Ledge Ledger</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-dim": "#d9dadb",
+                        "on-primary-fixed-variant": "#2a4386",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-fixed": "#ffdad6",
+                        "surface-tint": "#435b9f",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-container": "#ff524c",
+                        "surface": "#f8f9fa",
+                        "on-secondary-fixed": "#002204",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#00174a",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-surface-variant": "#444650",
+                        "on-secondary-fixed-variant": "#005312",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#88d982",
+                        "on-primary-container": "#758dd5",
+                        "tertiary-container": "#5a0006",
+                        "on-surface": "#191c1d",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "tertiary-fixed-dim": "#ffb3ac",
+                        "secondary": "#1b6d24",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#a0f399",
+                        "primary": "#00113a",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "primary-container": "#002366",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-container": "#217128",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#b3c5ff",
+                        "on-background": "#191c1d",
+                        "outline": "#757682",
+                        "tertiary": "#330002",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c5c6d2",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-tertiary-fixed": "#410003",
+                        "secondary-fixed": "#a3f69c"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "display": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .active-pill {
+            background: linear-gradient(135deg, #00113a 0%, #002366 100%);
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface min-h-screen pb-24">
+    <!-- Top App Bar -->
+    <header class="fixed top-0 w-full z-50 bg-surface h-16 flex justify-between items-center px-6">
+        <div class="flex items-center gap-4">
+            <button
+                class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95">close</button>
+            <h1 class="font-headline text-xl font-extrabold text-primary tracking-tight">Ledge Ledger</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <button
+                class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full">more_vert</button>
+        </div>
+    </header>
+    <main class="max-w-2xl mx-auto px-6 pt-24 space-y-12">
+        <!-- Editorial Header Section -->
+        <section class="space-y-4">
+            <div class="flex flex-col gap-1">
+                <span class="font-label text-[10px] uppercase tracking-widest text-outline">Atelier Registry</span>
+                <h2 class="font-display text-4xl font-extrabold text-primary tracking-tight">New Category</h2>
+                <p class="text-on-surface-variant text-sm max-w-md">Define the architecture of your wealth. Assign a new
+                    envelope to your financial hierarchy.</p>
+            </div>
+        </section>
+        <!-- Category Nature Toggle -->
+        <section class="bg-surface-container-low p-1.5 rounded-full flex gap-1">
+            <button
+                class="flex-1 py-3 px-6 rounded-full font-headline font-bold text-sm transition-all text-on-surface-variant hover:bg-surface-container"
+                id="expenseToggle">
+                Expense
+            </button>
+            <button
+                class="flex-1 py-3 px-6 rounded-full font-headline font-bold text-sm transition-all active-pill text-on-primary"
+                id="incomeToggle">
+                Income
+            </button>
+        </section>
+        <!-- The 3-Level Hierarchy Path Visualization -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="bg-primary-container text-on-primary-container font-headline font-bold text-xs px-4 py-2 rounded-full whitespace-nowrap">
+                        Primary Pillar
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+                    <div
+                        class="bg-surface-container-high text-on-surface-variant font-headline font-bold text-xs px-4 py-2 rounded-full whitespace-nowrap">
+                        Sub-Parent
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+                    <div
+                        class="bg-surface-container-highest text-primary font-headline font-bold text-xs px-4 py-2 rounded-full border-2 border-primary/10 whitespace-nowrap">
+                        Child Envelope
+                    </div>
+                </div>
+            </div>
+            <!-- Parent Selection Flow (Level 1 & 2) -->
+            <div class="grid grid-cols-1 gap-4 space-y-4">
+                <!-- Level 1: Primary Pillar -->
+                <div class="space-y-2"><label
+                        class="font-label text-xs uppercase tracking-widest text-outline px-1">Income Pillar</label>
+                    <div class="grid grid-cols-3 gap-3 mt-2"><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary text-on-primary ring-2 ring-primary/10 transition-all relative"><span
+                                class="material-symbols-outlined"
+                                style="font-variation-settings: 'FILL' 1;">account_balance</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Primary
+                                Revenue</span><span
+                                class="material-symbols-outlined absolute top-1 right-1 text-xs">check_circle</span></button><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all"><span
+                                class="material-symbols-outlined">show_chart</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Secondary
+                                Income</span></button><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all"><span
+                                class="material-symbols-outlined">trending_up</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Portfolio
+                                Growth</span></button></div>
+                </div>
+                <!-- Level 2: Sub-Parent Category -->
+                <div class="space-y-2">
+                    <label class="font-label text-[10px] uppercase tracking-[0.2em] text-outline px-1">Parent
+                        Source</label>
+                    <div class="relative group cursor-pointer">
+                        <div
+                            class="w-full bg-surface-container-low rounded-xl px-6 py-5 flex items-center justify-between transition-all hover:bg-surface-container-high">
+                            <span class="font-headline font-semibold text-primary text-lg">Consulting Fees</span>
+                            <span class="material-symbols-outlined text-outline">expand_more</span>
+                        </div>
+                        <select class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none">
+                            <option>Salary - Main Job</option>
+                            <option selected="">Consulting Fees</option>
+                            <option>Freelance Design</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- New Category Details -->
+        <section class="space-y-8">
+            <div class="space-y-6">
+                <!-- Name Field -->
+                <div class="group relative">
+                    <label
+                        class="font-label text-[10px] uppercase tracking-[0.2em] text-outline absolute left-0 -top-6">Category
+                        Name</label>
+                    <input
+                        class="w-full bg-transparent border-b-2 border-outline-variant focus:border-primary text-2xl font-headline font-bold py-4 outline-none transition-all placeholder:text-surface-dim"
+                        placeholder="e.g. Project Alpha" type="text" />
+                </div>
+                <!-- Numerical Analysis (Expected Amount) -->
+                <div class="bg-surface-container-lowest p-6 rounded-xl space-y-4"><label
+                        class="block text-xs font-bold text-outline uppercase tracking-widest">Expected Monthly
+                        Amount</label>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-baseline gap-2"><span
+                                class="text-3xl font-headline font-bold text-outline-variant">$</span><input
+                                class="w-full bg-transparent border-none text-5xl font-headline font-extrabold text-primary placeholder:text-surface-container-highest focus:ring-0 p-0"
+                                placeholder="0.00" type="number" value="0.00" /></div>
+                        <div class="flex flex-col text-outline-variant"><span
+                                class="material-symbols-outlined cursor-pointer hover:text-primary">expand_less</span><span
+                                class="material-symbols-outlined cursor-pointer hover:text-primary">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-surface-container"></div>
+                    <p class="text-xs text-outline italic">This figure serves as your baseline for liquidity
+                        projections.</p>
+                </div>
+                <!-- Behavioral Configuration -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary-container text-on-primary-container ring-2 ring-primary/10 transition-all">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Active</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined">waves</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Passive</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined">autorenew</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Recurring</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Icon Gallery / Visual Anchor -->
+            <div class="space-y-3">
+                <label class="font-label text-xs uppercase tracking-widest text-outline px-1">Visual Anchor</label>
+                <div class="grid grid-cols-6 gap-3">
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary cursor-pointer active:scale-90 transition-transform">
+                        <span class="material-symbols-outlined">storefront</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">account_balance</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">monitoring</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">diamond</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">more_horiz</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Final CTA -->
+        <div
+            class="bg-surface-container-lowest/80 glass-nav p-6 rounded-2xl shadow-xl shadow-black/5 border border-white/40 mb-8">
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-10 h-10 rounded-full active-pill flex items-center justify-center text-on-primary shrink-0">
+                    <span class="material-symbols-outlined text-sm">hub</span>
+                </div>
+                <div>
+                    <h4 class="font-headline font-bold text-sm text-primary">Hierarchy Insight</h4>
+                    <p class="text-xs text-on-surface-variant leading-relaxed mt-1">
+                        'Project Alpha' will be nested under <span class="font-bold text-primary">Primary Revenue &gt;
+                            Consulting Fees</span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <section class="pt-8 pb-20">
+            <button
+                class="w-full active-pill text-on-primary font-headline font-extrabold py-5 rounded-full shadow-2xl shadow-primary/20 active:scale-[0.98] transition-transform text-lg flex items-center justify-center gap-3">
+                Establish Category
+                <span class="material-symbols-outlined">arrow_right_alt</span>
+            </button>
+        </section>
+    </main>
+    <!-- Contextual Visualization Card (Editorial Element) -->
+    <!-- Bottom Nav Bar -->
+    <nav
+        class="fixed bottom-0 w-full z-50 pb-safe bg-surface/70 backdrop-blur-xl h-20 flex justify-around items-center px-4 shadow-[0_-4px_32px_rgba(25,28,29,0.04)]">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Dashboard</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1.5 active:scale-90 transition-transform"
+            href="#">
+            <span class="material-symbols-outlined"
+                style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Ledger</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">insights</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Streaks</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Account</span>
+        </a>
+    </nav>
+    <script>
+        {
+            const expenseBtn = document.getElementById('expenseToggle');
+            const incomeBtn = document.getElementById('incomeToggle');
+
+            expenseBtn.addEventListener('click', () => {
+                expenseBtn.classList.add('active-pill', 'text-on-primary');
+                expenseBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container');
+                incomeBtn.classList.remove('active-pill', 'text-on-primary');
+                incomeBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container');
+            });
+
+            incomeBtn.addEventListener('click', () => {
+                incomeBtn.classList.add('active-pill', 'text-on-primary');
+                incomeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container');
+                expenseBtn.classList.remove('active-pill', 'text-on-primary');
+                expenseBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container');
+            });
+
+            // Small Micro-interactions for inputs
+            document.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('focus', () => {
+                    el.closest('div').classList.add('scale-[1.01]');
+                });
+                el.addEventListener('blur', () => {
+                    el.closest('div').classList.remove('scale-[1.01]');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- Full Page Add Category Layout -->
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Add Category | Ledge Ledger</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-dim": "#d9dadb",
+                        "on-primary-fixed-variant": "#2a4386",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-fixed": "#ffdad6",
+                        "surface-tint": "#435b9f",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-container": "#ff524c",
+                        "surface": "#f8f9fa",
+                        "on-secondary-fixed": "#002204",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#00174a",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-surface-variant": "#444650",
+                        "on-secondary-fixed-variant": "#005312",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#88d982",
+                        "on-primary-container": "#758dd5",
+                        "tertiary-container": "#5a0006",
+                        "on-surface": "#191c1d",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "tertiary-fixed-dim": "#ffb3ac",
+                        "secondary": "#1b6d24",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#a0f399",
+                        "primary": "#00113a",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "primary-container": "#002366",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-container": "#217128",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#b3c5ff",
+                        "on-background": "#191c1d",
+                        "outline": "#757682",
+                        "tertiary": "#330002",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c5c6d2",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-tertiary-fixed": "#410003",
+                        "secondary-fixed": "#a3f69c"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "display": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .active-pill {
+            background: linear-gradient(135deg, #00113a 0%, #002366 100%);
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface min-h-screen pb-24">
+    <!-- Top App Bar -->
+    <header class="fixed top-0 w-full z-50 bg-surface h-16 flex justify-between items-center px-6">
+        <div class="flex items-center gap-4">
+            <button
+                class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95">close</button>
+            <h1 class="font-headline text-xl font-extrabold text-primary tracking-tight">Ledge Ledger</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <button
+                class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full">more_vert</button>
+        </div>
+    </header>
+    <main class="max-w-2xl mx-auto px-6 pt-24 space-y-12">
+        <!-- Editorial Header Section -->
+        <section class="space-y-4">
+            <div class="flex flex-col gap-1">
+                <span class="font-label text-[10px] uppercase tracking-widest text-outline">Atelier Registry</span>
+                <h2 class="font-display text-4xl font-extrabold text-primary tracking-tight">New Category</h2>
+                <p class="text-on-surface-variant text-sm max-w-md">Define the architecture of your wealth. Assign a new
+                    envelope to your financial hierarchy.</p>
+            </div>
+        </section>
+        <!-- Category Nature Toggle -->
+        <section class="bg-surface-container-low p-1.5 rounded-full flex gap-1">
+            <button
+                class="flex-1 py-3 px-6 rounded-full font-headline font-bold text-sm transition-all active-pill text-on-primary"
+                id="expenseToggle">
+                Expense
+            </button>
+            <button
+                class="flex-1 py-3 px-6 rounded-full font-headline font-bold text-sm transition-all text-on-surface-variant hover:bg-surface-container"
+                id="incomeToggle">
+                Income
+            </button>
+        </section>
+        <!-- The 3-Level Hierarchy Path Visualization -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="bg-primary-container text-on-primary-container font-headline font-bold text-xs px-4 py-2 rounded-full whitespace-nowrap">
+                        Primary Pillar
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+                    <div
+                        class="bg-surface-container-high text-on-surface-variant font-headline font-bold text-xs px-4 py-2 rounded-full whitespace-nowrap">
+                        Sub-Parent
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+                    <div
+                        class="bg-surface-container-highest text-primary font-headline font-bold text-xs px-4 py-2 rounded-full border-2 border-primary/10 whitespace-nowrap">
+                        Child Envelope
+                    </div>
+                </div>
+            </div>
+            <!-- Parent Selection Flow (Level 1 & 2) -->
+            <div class="grid grid-cols-1 gap-4 space-y-4">
+                <!-- Level 1: Primary Pillar -->
+                <div class="space-y-2"><label
+                        class="font-label text-xs uppercase tracking-widest text-outline px-1">Envelope Type</label>
+                    <div class="grid grid-cols-3 gap-3 mt-2"><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all"><span
+                                class="material-symbols-outlined">shield</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Essential</span></button><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary text-on-primary ring-2 ring-primary/10 transition-all relative"><span
+                                class="material-symbols-outlined"
+                                style="font-variation-settings: 'FILL' 1;">auto_awesome</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Lifestyle</span><span
+                                class="material-symbols-outlined absolute top-1 right-1 text-xs">check_circle</span></button><button
+                            class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all"><span
+                                class="material-symbols-outlined">trending_up</span><span
+                                class="font-label text-[10px] font-bold uppercase tracking-tighter">Growth</span></button>
+                    </div>
+                </div>
+                <!-- Level 2: Sub-Parent Category -->
+                <div class="space-y-2">
+                    <label class="font-label text-[10px] uppercase tracking-[0.2em] text-outline px-1">Parent
+                        Architecture</label>
+                    <div class="relative group cursor-pointer">
+                        <div
+                            class="w-full bg-surface-container-low rounded-xl px-6 py-5 flex items-center justify-between transition-all hover:bg-surface-container-high">
+                            <span class="font-headline font-semibold text-primary text-lg">Dining</span>
+                            <span class="material-symbols-outlined text-outline">expand_more</span>
+                        </div>
+                        <select class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none">
+                            <option>Housing</option>
+                            <option selected="">Dining</option>
+                            <option>Entertainment</option>
+                            <option>Transport</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- New Category Details -->
+        <section class="space-y-8">
+            <div class="space-y-6">
+                <!-- Name Field -->
+                <div class="group relative">
+                    <label
+                        class="font-label text-[10px] uppercase tracking-[0.2em] text-outline absolute left-0 -top-6">Category
+                        Name</label>
+                    <input
+                        class="w-full bg-transparent border-b-2 border-outline-variant focus:border-primary text-2xl font-headline font-bold py-4 outline-none transition-all placeholder:text-surface-dim"
+                        placeholder="Artisanal Coffee" type="text" />
+                </div>
+                <!-- Numerical Analysis (Expected Amount) -->
+                <div class="bg-surface-container-lowest p-6 rounded-xl space-y-4"><label
+                        class="block text-xs font-bold text-outline uppercase tracking-widest">Expected Monthly
+                        Budget</label>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-baseline gap-2"><span
+                                class="text-3xl font-headline font-bold text-outline-variant">$</span><input
+                                class="w-full bg-transparent border-none text-5xl font-headline font-extrabold text-primary placeholder:text-surface-container-highest focus:ring-0 p-0"
+                                placeholder="120.00" type="number" value="120.00" /></div>
+                        <div class="flex flex-col text-outline-variant"><span
+                                class="material-symbols-outlined cursor-pointer hover:text-primary">expand_less</span><span
+                                class="material-symbols-outlined cursor-pointer hover:text-primary">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-surface-container"></div>
+                    <p class="text-xs text-outline italic">This figure serves as your baseline for liquidity
+                        projections.</p>
+                </div>
+                <!-- Behavioral Configuration -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary-container text-on-primary-container ring-2 ring-primary/10 transition-all">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Active</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined">waves</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Passive</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined">autorenew</span>
+                        <span class="font-label text-[10px] font-bold uppercase tracking-tighter">Recurring</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Icon Gallery / Visual Anchor -->
+            <div class="space-y-3">
+                <label class="font-label text-xs uppercase tracking-widest text-outline px-1">Visual Anchor</label>
+                <div class="grid grid-cols-6 gap-3">
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary cursor-pointer active:scale-90 transition-transform">
+                        <span class="material-symbols-outlined">local_cafe</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">restaurant</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">fastfood</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">wine_bar</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">bakery_dining</span>
+                    </div>
+                    <div
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined">more_horiz</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Final CTA -->
+        <div
+            class="bg-surface-container-lowest/80 glass-nav p-6 rounded-2xl shadow-xl shadow-black/5 border border-white/40 mb-8">
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-10 h-10 rounded-full active-pill flex items-center justify-center text-on-primary shrink-0">
+                    <span class="material-symbols-outlined text-sm">hub</span>
+                </div>
+                <div>
+                    <h4 class="font-headline font-bold text-sm text-primary">Hierarchy Insight</h4>
+                    <p class="text-xs text-on-surface-variant leading-relaxed mt-1">
+                        'Artisanal Coffee' will be nested under <span class="font-bold text-primary">Lifestyle &gt;
+                            Dining</span>. It represents 12% of your planned discretionary spending.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <section class="pt-8 pb-20">
+            <button
+                class="w-full active-pill text-on-primary font-headline font-extrabold py-5 rounded-full shadow-2xl shadow-primary/20 active:scale-[0.98] transition-transform text-lg flex items-center justify-center gap-3">
+                Save Category
+                <span class="material-symbols-outlined">arrow_right_alt</span>
+            </button>
+        </section>
+    </main>
+    <!-- Contextual Visualization Card (Editorial Element) -->
+    <!-- Bottom Nav Bar -->
+    <nav
+        class="fixed bottom-0 w-full z-50 pb-safe bg-surface/70 backdrop-blur-xl h-20 flex justify-around items-center px-4 shadow-[0_-4px_32px_rgba(25,28,29,0.04)]">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Dashboard</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1.5 active:scale-90 transition-transform"
+            href="#">
+            <span class="material-symbols-outlined"
+                style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Ledger</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">insights</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Streaks</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary transition-all active:scale-90"
+            href="#">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label text-[10px] uppercase tracking-widest mt-1">Account</span>
+        </a>
+    </nav>
+    <script>
+        {
+            const expenseBtn = document.getElementById('expenseToggle');
+            const incomeBtn = document.getElementById('incomeToggle');
+
+            expenseBtn.addEventListener('click', () => {
+                expenseBtn.classList.add('active-pill', 'text-on-primary');
+                expenseBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container');
+                incomeBtn.classList.remove('active-pill', 'text-on-primary');
+                incomeBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container');
+            });
+
+            incomeBtn.addEventListener('click', () => {
+                incomeBtn.classList.add('active-pill', 'text-on-primary');
+                incomeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container');
+                expenseBtn.classList.remove('active-pill', 'text-on-primary');
+                expenseBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container');
+            });
+
+            // Small Micro-interactions for inputs
+            document.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('focus', () => {
+                    el.closest('div').classList.add('scale-[1.01]');
+                });
+                el.addEventListener('blur', () => {
+                    el.closest('div').classList.remove('scale-[1.01]');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- Category Architecture -->
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Category Architecture - Ledge Ledger</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@500;600;700;800&amp;display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary": "#330002",
+                        "on-surface": "#191c1d",
+                        "secondary-fixed": "#a3f69c",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-container": "#217128",
+                        "primary-container": "#002366",
+                        "on-background": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-container": "#5a0006",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-fixed-variant": "#2a4386",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#1b6d24",
+                        "on-tertiary-container": "#ff524c",
+                        "secondary-container": "#a0f399",
+                        "on-surface-variant": "#444650",
+                        "primary": "#00113a",
+                        "surface": "#f8f9fa",
+                        "inverse-primary": "#b3c5ff",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-tint": "#435b9f",
+                        "on-secondary-fixed": "#002204",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "secondary-fixed-dim": "#88d982",
+                        "outline-variant": "#c5c6d2",
+                        "tertiary-fixed-dim": "#ffb3ac",
+                        "on-secondary-fixed-variant": "#005312",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "outline": "#757682",
+                        "on-primary-fixed": "#00174a",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "surface-bright": "#f8f9fa",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#410003",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#758dd5",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        headline: ["Manrope", "sans-serif"],
+                        display: ["Manrope", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        label: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glass-gradient {
+            background: linear-gradient(135deg, rgba(0, 17, 58, 1) 0%, rgba(0, 35, 102, 1) 100%);
+        }
+
+        .stagger-line::before {
+            content: '';
+            position: absolute;
+            left: -1.25rem;
+            top: 0;
+            bottom: 1.5rem;
+            width: 1.5px;
+            background: #c5c6d266;
+        }
+
+        .stagger-line-item::after {
+            content: '';
+            position: absolute;
+            left: -1.25rem;
+            top: 1rem;
+            width: 1rem;
+            height: 1.5px;
+            background: #c5c6d266;
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+    <!-- TopAppBar -->
+    <header
+        class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-surface/70 backdrop-blur-xl shadow-sm shadow-on-surface/5">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+                <img class="w-full h-full object-cover"
+                    data-alt="A sophisticated headshot of a professional in a navy blue suit, captured with high-end editorial studio lighting. The background is a clean, minimal slate gray, emphasizing the sharp, professional aesthetic of the Ledge Ledger brand. Soft shadows and a high-resolution finish convey trust and premium wealth management services."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpkUr4q1N83u0yMaSbACwlHObjw4U24L9LWUEGrJzKlAuX_TjmsXjnsQAlWBRKs7CKQjLEOkFom-yPGXfwuya6GCOnEgE_xC5Z62SJc7wmPqtF2UUZ2SeicAeLxsA_fOn0jdIO9kImdKOEdczqXVS5WcbvjVY99l48VK8EH5HwHf66qHtbo4bFgNZr-KFchL-iXAt4u2o4qN2nFlFj93Kbr3vGMJO33f1Y8PXz-_v6B8hA0zr2yHHm1WleReIScu-ePfRLonpV78Ag">
+            </div>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-primary">Ledge Ledger</h1>
+        </div>
+        <button
+            class="text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-colors active:scale-95 duration-200">
+            <span class="material-symbols-outlined">notifications</span>
+        </button>
+    </header>
+    <main class="pt-24 pb-32 px-6 max-w-md mx-auto">
+        <!-- Editorial Headline -->
+        <section class="mb-8">
+            <span class="font-label text-xs uppercase tracking-widest text-outline mb-1 block">Architecture</span>
+            <h2 class="font-display text-4xl font-extrabold text-primary tracking-tight leading-tight">Envelopes</h2>
+        </section>
+        <!-- Portfolio Distribution Card -->
+        <section class="mb-12">
+            <div class="glass-gradient p-6 rounded-xl shadow-2xl shadow-primary/20 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="font-label text-xs uppercase tracking-widest opacity-70 mb-4">Portfolio Distribution</h3>
+                    <div class="flex items-end justify-between mb-6">
+                        <div class="font-display text-3xl font-bold">$42,850.00</div>
+                        <div class="flex gap-1">
+                            <div class="w-1.5 h-6 bg-white/20 rounded-full"></div>
+                            <div class="w-1.5 h-10 bg-white rounded-full"></div>
+                            <div class="w-1.5 h-4 bg-white/40 rounded-full"></div>
+                        </div>
+                    </div>
+                    <!-- Distribution Visual -->
+                    <div class="flex h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+                        <div class="bg-secondary-fixed w-[45%]" title="Essential"></div>
+                        <div class="bg-primary-fixed-dim w-[35%]" title="Lifestyle"></div>
+                        <div class="bg-on-tertiary-container w-[20%]" title="Financial Growth"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <div class="text-[10px] uppercase font-label opacity-60">Essential</div>
+                            <div class="text-xs font-semibold">45%</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase font-label opacity-60">Lifestyle</div>
+                            <div class="text-xs font-semibold">35%</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase font-label opacity-60">Growth</div>
+                            <div class="text-xs font-semibold">20%</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Shimmer Effect -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none translate-x-[-100%] animate-[shimmer_3s_infinite]"
+                    style="animation: shimmer 5s infinite;"></div>
+            </div>
+        </section>
+        <!-- Nested Categories -->
+        <div class="space-y-12">
+            <!-- Category Group: Essential -->
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">account_balance</span>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-on-surface">Essential</h3>
+                            <span
+                                class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter">Essential</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-display font-bold text-on-surface">$19,282</div>
+                        <div class="text-[10px] text-outline font-label uppercase">Allocated</div>
+                    </div>
+                </div>
+                <div class="ml-10 relative space-y-4 pt-2 stagger-line">
+                    <!-- Child Envelope -->
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">home</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Mortgage &amp; Rent</h4>
+                                <div class="flex gap-2">
+                                    <span
+                                        class="text-[9px] text-outline uppercase font-label tracking-widest">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$12,400</div>
+                    </div>
+                    <!-- Child Envelope -->
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">bolt</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Utilities</h4>
+                                <div class="flex gap-2">
+                                    <span
+                                        class="text-[9px] text-outline uppercase font-label tracking-widest">Recurring</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$842</div>
+                    </div>
+                </div>
+            </section>
+            <!-- Category Group: Lifestyle -->
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">beach_access</span>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-on-surface">Lifestyle</h3>
+                            <span
+                                class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter">Passive</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-display font-bold text-on-surface">$14,998</div>
+                        <div class="text-[10px] text-outline font-label uppercase">Allocated</div>
+                    </div>
+                </div>
+                <div class="ml-10 relative space-y-4 pt-2 stagger-line">
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">restaurant</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Dining</h4>
+                                <span class="text-[9px] text-outline uppercase font-label tracking-widest">Active</span>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$3,200</div>
+                    </div>
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">flight</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Travel</h4>
+                                <span class="text-[9px] text-outline uppercase font-label tracking-widest">Savings
+                                    Goal</span>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$10,500</div>
+                    </div>
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">sports_esports</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Hobbies</h4>
+                                <span
+                                    class="text-[9px] text-outline uppercase font-label tracking-widest">Passive</span>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$1,298</div>
+                    </div>
+                </div>
+            </section>
+            <!-- Category Group: Financial Growth -->
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-on-surface">Financial Growth</h3>
+                            <span
+                                class="bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter">Strategic</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-display font-bold text-on-surface">$8,570</div>
+                        <div class="text-[10px] text-outline font-label uppercase">Allocated</div>
+                    </div>
+                </div>
+                <div class="ml-10 relative space-y-4 pt-2 stagger-line">
+                    <div
+                        class="stagger-line-item relative bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-sm">monitoring</span>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-semibold text-sm">Market Index</h4>
+                                <span
+                                    class="text-[9px] text-outline uppercase font-label tracking-widest">Passive</span>
+                            </div>
+                        </div>
+                        <div class="font-display font-bold text-primary text-sm">$5,000</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <!-- FAB for New Category -->
+    <button
+        class="fixed bottom-24 right-6 w-14 h-14 glass-gradient rounded-full shadow-xl flex items-center justify-center text-white active:scale-90 transition-transform duration-200 z-50">
+        <span class="material-symbols-outlined">add</span>
+    </button>
+    <!-- BottomNavBar -->
+    <nav
+        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-surface/70 backdrop-blur-xl shadow-2xl shadow-on-surface/8">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-6 py-2"
+            href="#">
+            <span class="material-symbols-outlined mb-1">home</span>
+            <span class="font-label text-xs uppercase tracking-widest">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-6 py-2 transition-all"
+            href="#">
+            <span class="material-symbols-outlined mb-1"
+                style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+            <span class="font-label text-xs uppercase tracking-widest">Ledger</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-6 py-2"
+            href="#">
+            <span class="material-symbols-outlined mb-1">analytics</span>
+            <span class="font-label text-xs uppercase tracking-widest">Insights</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-6 py-2"
+            href="#">
+            <span class="material-symbols-outlined mb-1">local_fire_department</span>
+            <span class="font-label text-xs uppercase tracking-widest">Streaks</span>
+        </a>
+    </nav>
+    <script>
+        // Micro-interactions
+        document.querySelectorAll('.stagger-line-item').forEach(item => {
+            item.addEventListener('touchstart', () => {
+                item.style.backgroundColor = 'var(--surface-container-low)';
+            });
+            item.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    item.style.backgroundColor = '';
+                }, 100);
+            });
+        });
+
+        // Simple horizontal parallax for the distribution card on scroll
+        window.addEventListener('scroll', () => {
+            const card = document.querySelector('.glass-gradient');
+            const scrolled = window.pageYOffset;
+            if (card) {
+                card.style.transform = `translateY(${scrolled * 0.05}px)`;
+            }
+        });
+    </script>
+</body>
+
+</html>
