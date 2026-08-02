@@ -243,8 +243,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                                     vertical: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: state.type ==
-                                            TransactionType.expense
+                                    color: state.type == TransactionType.expense
                                         ? const Color(0xFF00113A)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(8),
@@ -274,8 +273,7 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                                     vertical: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: state.type ==
-                                            TransactionType.income
+                                    color: state.type == TransactionType.income
                                         ? const Color(0xFF00113A)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(8),
@@ -285,10 +283,10 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                                       'Income',
                                       style: GoogleFonts.manrope(
                                         fontWeight: FontWeight.bold,
-                                        color: state.type ==
-                                                TransactionType.income
-                                            ? Colors.white
-                                            : const Color(0xFF757682),
+                                        color:
+                                            state.type == TransactionType.income
+                                                ? Colors.white
+                                                : const Color(0xFF757682),
                                       ),
                                     ),
                                   ),

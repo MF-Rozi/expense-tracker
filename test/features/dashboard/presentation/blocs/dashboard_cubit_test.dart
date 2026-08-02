@@ -11,8 +11,7 @@ import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockTransactionRepository extends Mock
-    implements TransactionRepository {}
+class MockTransactionRepository extends Mock implements TransactionRepository {}
 
 void main() {
   setUpAll(() {
@@ -156,12 +155,12 @@ void main() {
               5,
             )
             .having(
-              (s) => s.recentTransactions
-                  .map((t) => t.description.getOrCrash())
-                  .toList(),
-              'recentTransactions items',
-              ['Tx 0', 'Tx 1', 'Tx 2', 'Tx 3', 'Tx 4'],
-            ),
+          (s) => s.recentTransactions
+              .map((t) => t.description.getOrCrash())
+              .toList(),
+          'recentTransactions items',
+          ['Tx 0', 'Tx 1', 'Tx 2', 'Tx 3', 'Tx 4'],
+        ),
       ],
     );
 

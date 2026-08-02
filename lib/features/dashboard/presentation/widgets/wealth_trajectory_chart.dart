@@ -57,9 +57,8 @@ class WealthTrajectoryChart extends StatelessWidget {
       width: 40,
       height: height,
       decoration: BoxDecoration(
-        color: isHighlighted
-            ? const Color(0xFF00113A)
-            : const Color(0xFFE5E7EB),
+        color:
+            isHighlighted ? const Color(0xFF00113A) : const Color(0xFFE5E7EB),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
         boxShadow: isHighlighted
             ? [
