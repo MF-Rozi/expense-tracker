@@ -3,6 +3,7 @@ import 'package:expense_tracker/features/category/presentation/blocs/category_cu
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
+import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_state.dart';
 import 'package:expense_tracker/features/transaction/presentation/widgets/calculator_pad.dart';
@@ -223,6 +224,79 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
+                      // Transaction Type Toggle (Segmented Toggle)
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => context
+                                    .read<TransactionCubit>()
+                                    .updateType(TransactionType.expense),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: state.type == TransactionType.expense
+                                        ? const Color(0xFF00113A)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Expense',
+                                      style: GoogleFonts.manrope(
+                                        fontWeight: FontWeight.bold,
+                                        color: state.type ==
+                                                TransactionType.expense
+                                            ? Colors.white
+                                            : const Color(0xFF757682),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => context
+                                    .read<TransactionCubit>()
+                                    .updateType(TransactionType.income),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: state.type == TransactionType.income
+                                        ? const Color(0xFF00113A)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Income',
+                                      style: GoogleFonts.manrope(
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            state.type == TransactionType.income
+                                                ? Colors.white
+                                                : const Color(0xFF757682),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       // Master Display Card
                       _MasterDisplayCard(
                         amount: state.parsedAmount,
