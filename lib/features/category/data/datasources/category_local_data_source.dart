@@ -1,4 +1,5 @@
 import 'package:expense_tracker/features/category/data/models/category_model.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 
@@ -11,9 +12,78 @@ abstract class CategoryLocalDataSource {
 
 @LazySingleton(as: CategoryLocalDataSource)
 class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
-  IsarCategoryLocalDataSource(this._isar);
+  IsarCategoryLocalDataSource(this._isar) {
+    _seedPillarsIfNeeded();
+  }
 
   final Isar _isar;
+
+  Future<void> _seedPillarsIfNeeded() async {
+    final count = await _isar.categoryModels.count();
+    if (count == 0) {
+      await _isar.writeTxn(() async {
+        final defaultPillars = [
+          // Expense Pillars
+          CategoryModel()
+            ..uuid = 'essential'
+            ..name = 'Essential'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.expense
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+          CategoryModel()
+            ..uuid = 'lifestyle'
+            ..name = 'Lifestyle'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.expense
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+          CategoryModel()
+            ..uuid = 'growth'
+            ..name = 'Financial Growth'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.expense
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+          // Income Pillars
+          CategoryModel()
+            ..uuid = 'primary_revenue'
+            ..name = 'Primary Revenue'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.income
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+          CategoryModel()
+            ..uuid = 'secondary_income'
+            ..name = 'Secondary Income'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.income
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+          CategoryModel()
+            ..uuid = 'portfolio_growth'
+            ..name = 'Portfolio Growth'
+            ..isSynced = false
+            ..updatedAt = DateTime.now()
+            ..parentId = null
+            ..type = CategoryType.income
+            ..expectedMonthlyBudget = 0.0
+            ..behavioralModifier = BehavioralModifier.active,
+        ];
+        await _isar.categoryModels.putAll(defaultPillars);
+      });
+    }
+  }
 
   @override
   Stream<List<CategoryModel>> watchCategories() {
@@ -35,11 +105,8 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           await _isar.categoryModels.filter().uuidEqualTo(uuid).findFirst();
       if (category == null) return;
 
-      // Find all descendants recursively (or just by parentUuid since it's
+      // Find all descendants recursively (or just by parentId since it's
       // hierarchical)
-      // Note: If we have multiple levels, we need a recursive delete or a loop.
-      // For now, let's assume we might have multiple levels.
-
       final uuidsToDelete = <String>{uuid};
       final toProcess = <String>[uuid];
 
@@ -47,7 +114,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
         final currentUuid = toProcess.removeAt(0);
         final children = await _isar.categoryModels
             .filter()
-            .parentUuidEqualTo(currentUuid)
+            .parentIdEqualTo(currentUuid)
             .findAll();
         for (final child in children) {
           if (!uuidsToDelete.contains(child.uuid)) {

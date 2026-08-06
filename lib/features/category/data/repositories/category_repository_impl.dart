@@ -25,9 +25,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
   @override
   Future<Either<Failure, Unit>> saveCategory(Category category) async {
     try {
-      if (category.parentUuid != null) {
+      if (category.parentId != null) {
         final parent = await _localDataSource.getCategoryByUuid(
-          category.parentUuid!.getOrCrash(),
+          category.parentId!.getOrCrash(),
         );
         if (parent == null) {
           return const Left(

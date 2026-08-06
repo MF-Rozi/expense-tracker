@@ -14,7 +14,10 @@ class CategoryModel {
       ..name = entity.name.getOrCrash()
       ..isSynced = entity.isSynced
       ..updatedAt = entity.updatedAt
-      ..parentUuid = entity.parentUuid?.getOrCrash();
+      ..parentId = entity.parentId?.getOrCrash()
+      ..type = entity.type
+      ..expectedMonthlyBudget = entity.expectedMonthlyBudget
+      ..behavioralModifier = entity.behavioralModifier;
   }
 
   Id id = Isar.autoIncrement;
@@ -23,7 +26,7 @@ class CategoryModel {
   late String uuid;
 
   @Index()
-  String? parentUuid;
+  String? parentId;
 
   late String name;
 
@@ -31,13 +34,24 @@ class CategoryModel {
 
   late DateTime updatedAt;
 
+  @enumerated
+  late CategoryType type;
+
+  late double expectedMonthlyBudget;
+
+  @enumerated
+  late BehavioralModifier behavioralModifier;
+
   Category toEntity() {
     return Category(
       uuid: UniqueId(uuid),
       name: StringSingleLine(name),
       isSynced: isSynced,
       updatedAt: updatedAt,
-      parentUuid: parentUuid != null ? UniqueId(parentUuid!) : null,
+      parentId: parentId != null ? UniqueId(parentId!) : null,
+      type: type,
+      expectedMonthlyBudget: expectedMonthlyBudget,
+      behavioralModifier: behavioralModifier,
     );
   }
 }
