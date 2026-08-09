@@ -122,4 +122,3 @@ class CategoryCubit extends Cubit<CategoryState> {
     return super.close();
   }
 }
-

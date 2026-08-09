@@ -92,7 +92,7 @@ class CategoryManagePage extends StatelessWidget {
                         onCategoryTap: (category) {
                           context
                               .read<CategoryCubit>()
-                              .selectCategory(category.uuid.getOrCrash());
+                              .selectParent(category.uuid.getOrCrash());
                         },
                         onAddTap: () {
                           Navigator.of(context).push(
