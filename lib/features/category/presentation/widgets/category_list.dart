@@ -48,7 +48,7 @@ class CategoryList extends StatelessWidget {
               final childCount = allCategories
                   .where(
                     (c) =>
-                        c.parentUuid?.getOrCrash() ==
+                        c.parentId?.getOrCrash() ==
                         category.uuid.getOrCrash(),
                   )
                   .length;
