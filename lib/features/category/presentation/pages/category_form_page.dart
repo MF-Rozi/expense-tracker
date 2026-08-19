@@ -308,5 +308,3 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     );
   }
 }
-
-

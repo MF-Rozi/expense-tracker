@@ -1,8 +1,8 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
-import 'package:expense_tracker/features/category/presentation/widgets/portfolio_distribution_card.dart';
-import 'package:expense_tracker/features/category/presentation/widgets/hierarchy_insight_card.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/envelope_creation_form.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/envelope_tree_list_view.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/hierarchy_insight_card.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/portfolio_distribution_card.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,19 +28,25 @@ Category _makeCategory({
   );
 }
 
-final _essential = _makeCategory(uuid: 'p1', name: 'Essential');
-final _lifestyle = _makeCategory(uuid: 'p2', name: 'Lifestyle');
-final _growth = _makeCategory(uuid: 'p3', name: 'Growth');
+const _p1Id = '550e8400-e29b-41d4-a716-446655440001';
+const _p2Id = '550e8400-e29b-41d4-a716-446655440002';
+const _p3Id = '550e8400-e29b-41d4-a716-446655440003';
+const _c1Id = '550e8400-e29b-41d4-a716-446655440004';
+const _c2Id = '550e8400-e29b-41d4-a716-446655440005';
+
+final _essential = _makeCategory(uuid: _p1Id, name: 'Essential');
+final _lifestyle = _makeCategory(uuid: _p2Id, name: 'Lifestyle');
+final _growth = _makeCategory(uuid: _p3Id, name: 'Growth');
 final _mortgage = _makeCategory(
-  uuid: 'c1',
+  uuid: _c1Id,
   name: 'Mortgage & Rent',
-  parentId: 'p1',
+  parentId: _p1Id,
   budget: 1200,
 );
 final _dining = _makeCategory(
-  uuid: 'c2',
+  uuid: _c2Id,
   name: 'Dining',
-  parentId: 'p2',
+  parentId: _p2Id,
   budget: 300,
 );
 
@@ -55,14 +61,14 @@ void main() {
           home: Scaffold(
             body: PortfolioDistributionCard(
               pillars: [_essential, _lifestyle, _growth],
-              pillarBudgets: {'p1': 1200, 'p2': 300, 'p3': 0},
+              pillarBudgets: const {_p1Id: 1200, _p2Id: 300, _p3Id: 0},
               totalBudget: 1500,
             ),
           ),
         ),
       );
 
-      expect(find.text('\$1500.00'), findsOneWidget);
+      expect(find.text(r'$1500.00'), findsOneWidget);
     });
 
     testWidgets('shows "Portfolio Distribution" label', (tester) async {
@@ -71,7 +77,7 @@ void main() {
           home: Scaffold(
             body: PortfolioDistributionCard(
               pillars: [_essential],
-              pillarBudgets: {'p1': 500},
+              pillarBudgets: const {_p1Id: 500},
               totalBudget: 500,
             ),
           ),
@@ -83,11 +89,11 @@ void main() {
 
     testWidgets('renders without pillars (empty state)', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: PortfolioDistributionCard(
-              pillars: const [],
-              pillarBudgets: const {},
+              pillars: [],
+              pillarBudgets: {},
               totalBudget: 0,
             ),
           ),
@@ -116,9 +122,15 @@ void main() {
         ),
       );
 
-      expect(find.text("Hierarchy Insight"), findsOneWidget);
-      expect(find.textContaining('Artisanal Coffee'), findsOneWidget);
-      expect(find.textContaining('Lifestyle > Dining'), findsOneWidget);
+      expect(find.text('Hierarchy Insight'), findsOneWidget);
+      expect(
+        find.textContaining('Artisanal Coffee', findRichText: true),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Lifestyle > Dining', findRichText: true),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows percentage when budget is set', (tester) async {
@@ -136,7 +148,7 @@ void main() {
         ),
       );
 
-      expect(find.textContaining('10%'), findsOneWidget);
+      expect(find.textContaining('10%', findRichText: true), findsOneWidget);
     });
 
     testWidgets('handles null pillar/subParent gracefully', (tester) async {
@@ -155,7 +167,7 @@ void main() {
       );
 
       // Uses em-dashes for missing pillars
-      expect(find.textContaining('—'), findsWidgets);
+      expect(find.textContaining('—', findRichText: true), findsWidgets);
     });
   });
 
@@ -232,7 +244,7 @@ void main() {
             body: SingleChildScrollView(
               child: EnvelopeCreationForm(
                 selectedType: CategoryType.expense,
-                availablePillars: [],
+                availablePillars: const [],
                 selectedPillar: null,
                 selectedModifier: BehavioralModifier.passive,
                 nameController: nameCtrl,

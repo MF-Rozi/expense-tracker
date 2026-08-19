@@ -147,11 +147,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       itemBuilder: (context, index) {
                         final category = categories[index];
                         final String subtitle;
-                        if (category.parentUuid != null) {
+                        if (category.parentId != null) {
                           final parent = categories.firstWhere(
                             (c) =>
                                 c.uuid.getOrCrash() ==
-                                category.parentUuid!.getOrCrash(),
+                                category.parentId!.getOrCrash(),
                             orElse: () => category,
                           );
                           subtitle = parent.name.getOrCrash();

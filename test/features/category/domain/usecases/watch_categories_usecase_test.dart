@@ -37,6 +37,9 @@ void main() {
         name: StringSingleLine('Food'),
         isSynced: true,
         updatedAt: DateTime.utc(2026, 6, 3),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 0,
+        behavioralModifier: BehavioralModifier.active,
       );
       final stream = Stream<Either<Failure, List<Category>>>.value(
         right<Failure, List<Category>>([category]),

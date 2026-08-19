@@ -10,37 +10,49 @@ void main() {
         name: StringSingleLine('Food'),
         isSynced: false,
         updatedAt: DateTime.utc(2026, 6, 3),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 500,
+        behavioralModifier: BehavioralModifier.active,
       );
 
       expect(category.isRoot, isTrue);
-      expect(category.parentUuid, isNull);
+      expect(category.parentId, isNull);
       expect(category.props, [
         category.uuid,
         category.name,
         null,
         false,
         DateTime.utc(2026, 6, 3),
+        CategoryType.expense,
+        500.0,
+        BehavioralModifier.active,
       ]);
     });
 
     test('represents a child category', () {
-      final parentUuid = UniqueId('a7d7b2f7-4d18-43f0-bf8f-4f3f6d9f4b3b');
+      final parentId = UniqueId('a7d7b2f7-4d18-43f0-bf8f-4f3f6d9f4b3b');
       final category = Category(
         uuid: UniqueId('b3f76e40-4f1f-4c40-9d16-1c3a4f8a0f11'),
         name: StringSingleLine('Groceries'),
-        parentUuid: parentUuid,
+        parentId: parentId,
         isSynced: true,
         updatedAt: DateTime.utc(2026, 6, 3, 12),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 200,
+        behavioralModifier: BehavioralModifier.active,
       );
 
       expect(category.isRoot, isFalse);
-      expect(category.parentUuid, parentUuid);
+      expect(category.parentId, parentId);
       expect(category.props, [
         category.uuid,
         category.name,
-        parentUuid,
+        parentId,
         true,
         DateTime.utc(2026, 6, 3, 12),
+        CategoryType.expense,
+        200.0,
+        BehavioralModifier.active,
       ]);
     });
   });

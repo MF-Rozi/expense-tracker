@@ -97,6 +97,9 @@ void main() {
     name: StringSingleLine('Food'),
     isSynced: false,
     updatedAt: DateTime.now(),
+    type: CategoryType.expense,
+    expectedMonthlyBudget: 0,
+    behavioralModifier: BehavioralModifier.active,
   );
 
   blocTest<TransactionCubit, TransactionState>(

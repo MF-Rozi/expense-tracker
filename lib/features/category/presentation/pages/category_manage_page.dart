@@ -151,4 +151,3 @@ class CategoryManagePage extends StatelessWidget {
     );
   }
 }
-

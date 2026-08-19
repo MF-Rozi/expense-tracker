@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('CategoryModel', () {
     final tUuid = UniqueId('550e8400-e29b-41d4-a716-446655440000');
-    final tParentUuid = UniqueId('550e8400-e29b-41d4-a716-446655440001');
+    final tParentId = UniqueId('550e8400-e29b-41d4-a716-446655440001');
     final tDate = DateTime(2026, 6, 3);
 
     final tCategory = Category(
@@ -14,7 +14,10 @@ void main() {
       name: StringSingleLine('Food'),
       isSynced: false,
       updatedAt: tDate,
-      parentUuid: tParentUuid,
+      parentId: tParentId,
+      type: CategoryType.expense,
+      expectedMonthlyBudget: 1500,
+      behavioralModifier: BehavioralModifier.active,
     );
 
     test('should map from entity correctly', () {
@@ -24,7 +27,10 @@ void main() {
       expect(model.name, 'Food');
       expect(model.isSynced, false);
       expect(model.updatedAt, tDate);
-      expect(model.parentUuid, tParentUuid.getOrCrash());
+      expect(model.parentId, tParentId.getOrCrash());
+      expect(model.type, CategoryType.expense);
+      expect(model.expectedMonthlyBudget, 1500);
+      expect(model.behavioralModifier, BehavioralModifier.active);
     });
 
     test('should map to entity correctly', () {
@@ -33,26 +39,36 @@ void main() {
         ..name = 'Food'
         ..isSynced = false
         ..updatedAt = tDate
-        ..parentUuid = tParentUuid.getOrCrash();
+        ..parentId = tParentId.getOrCrash()
+        ..type = CategoryType.expense
+        ..expectedMonthlyBudget = 1500
+        ..behavioralModifier = BehavioralModifier.active;
 
       final entity = model.toEntity();
 
       expect(entity, tCategory);
     });
 
-    test('should handle null parentUuid correctly', () {
+    test('should handle null parentId correctly', () {
       final rootCategory = Category(
         uuid: tUuid,
         name: StringSingleLine('Root'),
         isSynced: true,
         updatedAt: tDate,
+        type: CategoryType.income,
+        expectedMonthlyBudget: 500,
+        behavioralModifier: BehavioralModifier.recurring,
       );
 
       final model = CategoryModel.fromEntity(rootCategory);
-      expect(model.parentUuid, isNull);
+      expect(model.parentId, isNull);
+      expect(model.type, CategoryType.income);
+      expect(model.expectedMonthlyBudget, 500);
+      expect(model.behavioralModifier, BehavioralModifier.recurring);
 
       final entity = model.toEntity();
-      expect(entity.parentUuid, isNull);
+      expect(entity.parentId, isNull);
+      expect(entity, rootCategory);
     });
   });
 }
