@@ -51,10 +51,24 @@ class CategoryCubit extends Cubit<CategoryState> {
     });
   }
 
-  void selectCategory(String uuid) {
-    final newStack = List<String>.from(state.navigationStack)..add(uuid);
-    emit(state.copyWith(navigationStack: newStack));
+  void setCategoryType(CategoryType type) {
+    emit(state.copyWith(selectedType: type));
   }
+
+  void selectParent(String? parentId) {
+    if (parentId == null) {
+      emit(state.copyWith(navigationStack: []));
+    } else {
+      final newStack = List<String>.from(state.navigationStack)..add(parentId);
+      emit(state.copyWith(navigationStack: newStack));
+    }
+  }
+
+  // Refactored/commented out old selectCategory method since we use selectParent now.
+  // void selectCategory(String uuid) {
+  //   final newStack = List<String>.from(state.navigationStack)..add(uuid);
+  //   emit(state.copyWith(navigationStack: newStack));
+  // }
 
   void goBack() {
     if (state.navigationStack.isNotEmpty) {

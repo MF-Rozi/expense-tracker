@@ -26,7 +26,7 @@ void main() {
 
   group('saveCategory', () {
     final tUuid = UniqueId('550e8400-e29b-41d4-a716-446655440000');
-    final tParentUuid = UniqueId('550e8400-e29b-41d4-a716-446655440001');
+    final tParentId = UniqueId('550e8400-e29b-41d4-a716-446655440001');
     final tDate = DateTime(2026, 6, 3);
 
     final tCategory = Category(
@@ -34,7 +34,10 @@ void main() {
       name: StringSingleLine('Food'),
       isSynced: false,
       updatedAt: tDate,
-      parentUuid: tParentUuid,
+      parentId: tParentId,
+      type: CategoryType.expense,
+      expectedMonthlyBudget: 1000,
+      behavioralModifier: BehavioralModifier.active,
     );
 
     test('should return Right(unit) when saving a root category', () async {
@@ -43,6 +46,9 @@ void main() {
         name: StringSingleLine('Root'),
         isSynced: false,
         updatedAt: tDate,
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 0,
+        behavioralModifier: BehavioralModifier.active,
       );
 
       when(() => mockDataSource.saveCategory(any()))
@@ -65,7 +71,7 @@ void main() {
       final result = await repository.saveCategory(tCategory);
 
       expect(result, const Right<Failure, Unit>(unit));
-      verify(() => mockDataSource.getCategoryByUuid(tParentUuid.getOrCrash()))
+      verify(() => mockDataSource.getCategoryByUuid(tParentId.getOrCrash()))
           .called(1);
       verify(() => mockDataSource.saveCategory(any())).called(1);
     });
@@ -84,7 +90,7 @@ void main() {
           Failure.localFailure(message: 'Parent category not found'),
         ),
       );
-      verify(() => mockDataSource.getCategoryByUuid(tParentUuid.getOrCrash()))
+      verify(() => mockDataSource.getCategoryByUuid(tParentId.getOrCrash()))
           .called(1);
       verifyNever(() => mockDataSource.saveCategory(any()));
     });
@@ -113,7 +119,10 @@ void main() {
           ..uuid = '550e8400-e29b-41d4-a716-446655440002'
           ..name = 'C1'
           ..isSynced = false
-          ..updatedAt = DateTime.now(),
+          ..updatedAt = DateTime.now()
+          ..type = CategoryType.expense
+          ..expectedMonthlyBudget = 0
+          ..behavioralModifier = BehavioralModifier.active,
       ];
       when(() => mockDataSource.watchCategories())
           .thenAnswer((_) => Stream.value(models));

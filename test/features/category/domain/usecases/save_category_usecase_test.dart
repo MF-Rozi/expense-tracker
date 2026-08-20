@@ -25,6 +25,9 @@ void main() {
         name: StringSingleLine('Food'),
         isSynced: false,
         updatedAt: DateTime.utc(2026, 6, 3),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 0,
+        behavioralModifier: BehavioralModifier.active,
       );
       when(() => repository.saveCategory(category)).thenAnswer(
         (_) async => right<Failure, Unit>(unit),

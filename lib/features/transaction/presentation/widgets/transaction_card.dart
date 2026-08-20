@@ -25,6 +25,9 @@ class TransactionCard extends StatelessWidget {
         name: StringSingleLine('Uncategorized'),
         isSynced: false,
         updatedAt: DateTime.now(),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 0,
+        behavioralModifier: BehavioralModifier.active,
       ),
     );
     final categoryName = category.name.getOrCrash();
