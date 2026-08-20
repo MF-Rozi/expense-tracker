@@ -215,8 +215,7 @@ class PortfolioDistributionCard extends StatelessWidget {
   Widget _buildLegendItem(Category pillar, int index) {
     final pillarId = pillar.uuid.getOrCrash();
     final budget = pillarBudgets[pillarId] ?? 0.0;
-    final pct =
-        totalBudget > 0 ? ((budget / totalBudget) * 100).round() : 0;
+    final pct = totalBudget > 0 ? ((budget / totalBudget) * 100).round() : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

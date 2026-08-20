@@ -24,70 +24,70 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
       if (count == 0) {
         await _isar.writeTxn(() async {
           final defaultPillars = [
-          // Expense Pillars
-          CategoryModel()
-            ..uuid = 'essential'
-            ..name = 'Essential'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.expense
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-          CategoryModel()
-            ..uuid = 'lifestyle'
-            ..name = 'Lifestyle'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.expense
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-          CategoryModel()
-            ..uuid = 'growth'
-            ..name = 'Financial Growth'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.expense
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-          // Income Pillars
-          CategoryModel()
-            ..uuid = 'primary_revenue'
-            ..name = 'Primary Revenue'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.income
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-          CategoryModel()
-            ..uuid = 'secondary_income'
-            ..name = 'Secondary Income'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.income
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-          CategoryModel()
-            ..uuid = 'portfolio_growth'
-            ..name = 'Portfolio Growth'
-            ..isSynced = false
-            ..updatedAt = DateTime.now()
-            ..parentId = null
-            ..type = CategoryType.income
-            ..expectedMonthlyBudget = 0.0
-            ..behavioralModifier = BehavioralModifier.active,
-        ];
-        await _isar.categoryModels.putAll(defaultPillars);
-      });
+            // Expense Pillars
+            CategoryModel()
+              ..uuid = 'essential'
+              ..name = 'Essential'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.expense
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+            CategoryModel()
+              ..uuid = 'lifestyle'
+              ..name = 'Lifestyle'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.expense
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+            CategoryModel()
+              ..uuid = 'growth'
+              ..name = 'Financial Growth'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.expense
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+            // Income Pillars
+            CategoryModel()
+              ..uuid = 'primary_revenue'
+              ..name = 'Primary Revenue'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.income
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+            CategoryModel()
+              ..uuid = 'secondary_income'
+              ..name = 'Secondary Income'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.income
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+            CategoryModel()
+              ..uuid = 'portfolio_growth'
+              ..name = 'Portfolio Growth'
+              ..isSynced = false
+              ..updatedAt = DateTime.now()
+              ..parentId = null
+              ..type = CategoryType.income
+              ..expectedMonthlyBudget = 0.0
+              ..behavioralModifier = BehavioralModifier.active,
+          ];
+          await _isar.categoryModels.putAll(defaultPillars);
+        });
+      }
+    } catch (_) {
+      // Ignore in tests or if Isar collection is not available
     }
-  } catch (_) {
-    // Ignore in tests or if Isar collection is not available
   }
-}
 
   @override
   Stream<List<CategoryModel>> watchCategories() {

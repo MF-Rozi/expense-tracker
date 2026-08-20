@@ -123,7 +123,6 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
 
     final parsedBudget = double.tryParse(_budgetController.text) ?? 0.0;
 
-
     final category = Category(
       uuid: widget.categoryToEdit?.uuid ?? UniqueId.generate(),
       name: StringSingleLine(nameText),

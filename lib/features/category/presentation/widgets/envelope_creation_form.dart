@@ -195,8 +195,7 @@ class EnvelopeCreationForm extends StatelessWidget {
       itemCount: availablePillars.length,
       itemBuilder: (context, index) {
         final pillar = availablePillars[index];
-        final isSelected =
-            selectedPillar?.uuid == pillar.uuid;
+        final isSelected = selectedPillar?.uuid == pillar.uuid;
         return _PillarCard(
           pillar: pillar,
           isSelected: isSelected,
