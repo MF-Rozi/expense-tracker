@@ -21,7 +21,7 @@ class TransactionCard extends StatelessWidget {
     final category = categories.firstWhere(
       (c) => c.uuid.getOrCrash() == transaction.categoryUuid.getOrCrash(),
       orElse: () => Category(
-        uuid: UniqueId(''),
+        uuid: UniqueId.generate(),
         name: StringSingleLine('Uncategorized'),
         isSynced: false,
         updatedAt: DateTime.now(),

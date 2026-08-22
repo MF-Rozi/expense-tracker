@@ -2,6 +2,7 @@ import 'package:expense_tracker/features/category/data/models/category_model.dar
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class CategoryLocalDataSource {
   Stream<List<CategoryModel>> watchCategories();
@@ -26,7 +27,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           final defaultPillars = [
             // Expense Pillars
             CategoryModel()
-              ..uuid = 'essential'
+              ..uuid = const Uuid().v4()
               ..name = 'Essential'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -35,7 +36,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               ..expectedMonthlyBudget = 0.0
               ..behavioralModifier = BehavioralModifier.active,
             CategoryModel()
-              ..uuid = 'lifestyle'
+              ..uuid = const Uuid().v4()
               ..name = 'Lifestyle'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -44,7 +45,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               ..expectedMonthlyBudget = 0.0
               ..behavioralModifier = BehavioralModifier.active,
             CategoryModel()
-              ..uuid = 'growth'
+              ..uuid = const Uuid().v4()
               ..name = 'Financial Growth'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -54,7 +55,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               ..behavioralModifier = BehavioralModifier.active,
             // Income Pillars
             CategoryModel()
-              ..uuid = 'primary_revenue'
+              ..uuid = const Uuid().v4()
               ..name = 'Primary Revenue'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -63,7 +64,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               ..expectedMonthlyBudget = 0.0
               ..behavioralModifier = BehavioralModifier.active,
             CategoryModel()
-              ..uuid = 'secondary_income'
+              ..uuid = const Uuid().v4()
               ..name = 'Secondary Income'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -72,7 +73,7 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               ..expectedMonthlyBudget = 0.0
               ..behavioralModifier = BehavioralModifier.active,
             CategoryModel()
-              ..uuid = 'portfolio_growth'
+              ..uuid = const Uuid().v4()
               ..name = 'Portfolio Growth'
               ..isSynced = false
               ..updatedAt = DateTime.now()
@@ -83,6 +84,42 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           ];
           await _isar.categoryModels.putAll(defaultPillars);
         });
+      } else {
+        // Migration check for legacy non-UUID seeded pillars
+        final legacyPillars = await _isar.categoryModels
+            .filter()
+            .uuidEqualTo('essential')
+            .or()
+            .uuidEqualTo('lifestyle')
+            .or()
+            .uuidEqualTo('growth')
+            .or()
+            .uuidEqualTo('primary_revenue')
+            .or()
+            .uuidEqualTo('secondary_income')
+            .or()
+            .uuidEqualTo('portfolio_growth')
+            .findAll();
+
+        if (legacyPillars.isNotEmpty) {
+          await _isar.writeTxn(() async {
+            for (final cat in legacyPillars) {
+              final oldUuid = cat.uuid;
+              final newUuid = const Uuid().v4();
+              cat.uuid = newUuid;
+              await _isar.categoryModels.put(cat);
+
+              final children = await _isar.categoryModels
+                  .filter()
+                  .parentIdEqualTo(oldUuid)
+                  .findAll();
+              for (final child in children) {
+                child.parentId = newUuid;
+                await _isar.categoryModels.put(child);
+              }
+            }
+          });
+        }
       }
     } catch (_) {
       // Ignore in tests or if Isar collection is not available

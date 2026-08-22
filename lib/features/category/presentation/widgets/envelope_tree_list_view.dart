@@ -197,13 +197,22 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
     Color chipBg;
     Color chipText;
     if (name.contains('essential') || name.contains('need')) {
-      chipBg = const Color(0xFFA0F399); // secondary-container
+      chipBg = const Color(0xFFA0F399); // secondary-container (green)
       chipText = const Color(0xFF217128); // on-secondary-container
     } else if (name.contains('lifestyle') || name.contains('life')) {
-      chipBg = const Color(0xFF002366); // primary-container
+      chipBg = const Color(0xFF002366); // primary-container (navy blue)
       chipText = const Color(0xFF758DD5); // on-primary-container
+    } else if (name.contains('revenue') || name.contains('primary')) {
+      chipBg = const Color(0xFFD6E3FF); // light blue
+      chipText = const Color(0xFF003884); // dark blue
+    } else if (name.contains('secondary') || name.contains('side')) {
+      chipBg = const Color(0xFFCCE8E0); // soft teal
+      chipText = const Color(0xFF004F44); // dark teal
+    } else if (name.contains('portfolio')) {
+      chipBg = const Color(0xFFE8DEF8); // soft purple
+      chipText = const Color(0xFF4A4458); // dark purple
     } else {
-      chipBg = const Color(0xFF5A0006); // tertiary-container
+      chipBg = const Color(0xFF5A0006); // tertiary-container (dark red for Financial Growth)
       chipText = const Color(0xFFFF524C); // on-tertiary-container
     }
 

@@ -477,29 +477,32 @@ class _PillarCard extends StatelessWidget {
               : null,
         ),
         child: Stack(
+          alignment: Alignment.center,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _iconForPillar(name),
-                  size: 22,
-                  color: isSelected ? Colors.white : _onSurfaceVariant,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  name.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _iconForPillar(name),
+                    size: 22,
                     color: isSelected ? Colors.white : _onSurfaceVariant,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    name.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: isSelected ? Colors.white : _onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
             if (isSelected)
               Positioned(
