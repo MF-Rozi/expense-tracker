@@ -19,70 +19,225 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
 
   final Isar _isar;
 
+  CategoryModel _createCategory({
+    required String name,
+    required CategoryType type,
+    String? parentId,
+    BehavioralModifier modifier = BehavioralModifier.active,
+    double budget = 0.0,
+  }) {
+    return CategoryModel()
+      ..uuid = const Uuid().v4()
+      ..name = name
+      ..isSynced = false
+      ..updatedAt = DateTime.now()
+      ..parentId = parentId
+      ..type = type
+      ..expectedMonthlyBudget = budget
+      ..behavioralModifier = modifier;
+  }
+
   Future<void> _seedPillarsIfNeeded() async {
     try {
-      final count = await _isar.categoryModels.count();
-      if (count == 0) {
+      final totalCount = await _isar.categoryModels.count();
+      final nonRootCount =
+          await _isar.categoryModels.filter().parentIdIsNotNull().count();
+
+      // Definition of the default hierarchy
+      final defaultHierarchy = <({
+        String pillarName,
+        CategoryType type,
+        Map<String, List<({String name, BehavioralModifier modifier})>> subParents,
+      })>[
+        // ─── EXPENSE PILLARS ───
+        (
+          pillarName: 'Essential',
+          type: CategoryType.expense,
+          subParents: {
+            'Groceries & Household': [
+              (name: 'Groceries', modifier: BehavioralModifier.active),
+              (name: 'Household Supplies', modifier: BehavioralModifier.active),
+              (name: 'Electricity & Water', modifier: BehavioralModifier.recurring),
+              (name: 'Internet & Mobile', modifier: BehavioralModifier.recurring),
+            ],
+            'Transportation': [
+              (name: 'Fuel & Gas', modifier: BehavioralModifier.active),
+              (name: 'Public Transit & Tolls', modifier: BehavioralModifier.active),
+              (name: 'Vehicle Maintenance', modifier: BehavioralModifier.active),
+            ],
+            'Healthcare': [
+              (name: 'Medical & Pharmacy', modifier: BehavioralModifier.active),
+              (name: 'Health Insurance', modifier: BehavioralModifier.recurring),
+            ],
+            'Education': [
+              (name: 'Tuition & School Fees', modifier: BehavioralModifier.recurring),
+              (name: 'Books & Courses', modifier: BehavioralModifier.active),
+            ],
+          },
+        ),
+        (
+          pillarName: 'Lifestyle',
+          type: CategoryType.expense,
+          subParents: {
+            'Shopping': [
+              (name: 'Clothing & Apparel', modifier: BehavioralModifier.active),
+              (name: 'Online Shopping', modifier: BehavioralModifier.active),
+              (name: 'Gadgets & Electronics', modifier: BehavioralModifier.active),
+            ],
+            'Dining & Leisure': [
+              (name: 'Restaurants & Dining Out', modifier: BehavioralModifier.active),
+              (name: 'Coffee & Snacks', modifier: BehavioralModifier.active),
+            ],
+            'Entertainment': [
+              (name: 'Streaming & Subscriptions', modifier: BehavioralModifier.recurring),
+              (name: 'Hobbies & Gaming', modifier: BehavioralModifier.active),
+              (name: 'Travel & Vacations', modifier: BehavioralModifier.active),
+            ],
+            'Donations & Charity': [
+              (name: 'Charity & Tithe', modifier: BehavioralModifier.recurring),
+              (name: 'Donations & Contributions', modifier: BehavioralModifier.active),
+            ],
+            'Work & Career': [
+              (name: 'Work & Office Supplies', modifier: BehavioralModifier.active),
+            ],
+          },
+        ),
+        (
+          pillarName: 'Financial Growth',
+          type: CategoryType.expense,
+          subParents: {
+            'Investments': [
+              (name: 'Stocks', modifier: BehavioralModifier.active),
+              (name: 'Mutual Funds', modifier: BehavioralModifier.active),
+              (name: 'Gold & Precious Metals', modifier: BehavioralModifier.active),
+              (name: 'Crypto & Other Assets', modifier: BehavioralModifier.active),
+            ],
+            'Savings': [
+              (name: 'Emergency Fund', modifier: BehavioralModifier.passive),
+              (name: 'High-Yield Savings', modifier: BehavioralModifier.passive),
+            ],
+          },
+        ),
+        // ─── INCOME PILLARS ───
+        (
+          pillarName: 'Primary Revenue',
+          type: CategoryType.income,
+          subParents: {
+            'Salary': [
+              (name: 'Base Salary', modifier: BehavioralModifier.recurring),
+              (name: 'Allowances & Benefits', modifier: BehavioralModifier.recurring),
+            ],
+            'Business': [
+              (name: 'Business Revenue & Sales', modifier: BehavioralModifier.active),
+            ],
+          },
+        ),
+        (
+          pillarName: 'Secondary Income',
+          type: CategoryType.income,
+          subParents: {
+            'Bonus & Incentives': [
+              (name: 'Performance Bonus', modifier: BehavioralModifier.passive),
+              (name: 'Holiday Bonus', modifier: BehavioralModifier.passive),
+            ],
+            'Side Hustle & Sales': [
+              (name: 'Freelance & Consulting', modifier: BehavioralModifier.active),
+              (name: 'Item Resale', modifier: BehavioralModifier.active),
+            ],
+            'Gifts & Grants': [
+              (name: 'Gifts & Financial Support', modifier: BehavioralModifier.passive),
+            ],
+          },
+        ),
+        (
+          pillarName: 'Portfolio Growth',
+          type: CategoryType.income,
+          subParents: {
+            'Investment Returns': [
+              (name: 'Stock Dividends & Gains', modifier: BehavioralModifier.passive),
+              (name: 'Deposit Interest & Yields', modifier: BehavioralModifier.passive),
+              (name: 'Rental & Property Income', modifier: BehavioralModifier.passive),
+            ],
+          },
+        ),
+      ];
+
+      if (totalCount == 0) {
         await _isar.writeTxn(() async {
-          final defaultPillars = [
-            // Expense Pillars
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Essential'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.expense
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Lifestyle'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.expense
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Financial Growth'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.expense
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-            // Income Pillars
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Primary Revenue'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.income
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Secondary Income'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.income
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-            CategoryModel()
-              ..uuid = const Uuid().v4()
-              ..name = 'Portfolio Growth'
-              ..isSynced = false
-              ..updatedAt = DateTime.now()
-              ..parentId = null
-              ..type = CategoryType.income
-              ..expectedMonthlyBudget = 0.0
-              ..behavioralModifier = BehavioralModifier.active,
-          ];
-          await _isar.categoryModels.putAll(defaultPillars);
+          final allModels = <CategoryModel>[];
+
+          for (final group in defaultHierarchy) {
+            final pillar = _createCategory(
+              name: group.pillarName,
+              type: group.type,
+              parentId: null,
+            );
+            allModels.add(pillar);
+
+            for (final entry in group.subParents.entries) {
+              final subParent = _createCategory(
+                name: entry.key,
+                type: group.type,
+                parentId: pillar.uuid,
+              );
+              allModels.add(subParent);
+
+              for (final child in entry.value) {
+                final childModel = _createCategory(
+                  name: child.name,
+                  type: group.type,
+                  parentId: subParent.uuid,
+                  modifier: child.modifier,
+                );
+                allModels.add(childModel);
+              }
+            }
+          }
+
+          await _isar.categoryModels.putAll(allModels);
+        });
+      } else if (nonRootCount == 0) {
+        // If only pillars were seeded previously, seed default sub-categories under existing pillars
+        final existingPillars =
+            await _isar.categoryModels.filter().parentIdIsNull().findAll();
+
+        await _isar.writeTxn(() async {
+          final newModels = <CategoryModel>[];
+
+          for (final group in defaultHierarchy) {
+            final pillar = existingPillars.firstWhere(
+              (p) => p.name.toLowerCase() == group.pillarName.toLowerCase(),
+              orElse: () => _createCategory(
+                name: group.pillarName,
+                type: group.type,
+              ),
+            );
+
+            if (pillar.id == Isar.autoIncrement) {
+              newModels.add(pillar);
+            }
+
+            for (final entry in group.subParents.entries) {
+              final subParent = _createCategory(
+                name: entry.key,
+                type: group.type,
+                parentId: pillar.uuid,
+              );
+              newModels.add(subParent);
+
+              for (final child in entry.value) {
+                final childModel = _createCategory(
+                  name: child.name,
+                  type: group.type,
+                  parentId: subParent.uuid,
+                  modifier: child.modifier,
+                );
+                newModels.add(childModel);
+              }
+            }
+          }
+
+          await _isar.categoryModels.putAll(newModels);
         });
       } else {
         // Migration check for legacy non-UUID seeded pillars
