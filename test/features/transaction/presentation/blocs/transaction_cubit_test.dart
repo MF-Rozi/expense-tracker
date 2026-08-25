@@ -175,4 +175,20 @@ void main() {
       verifyZeroInteractions(mockCreateTransactionUseCase);
     },
   );
+
+  blocTest<TransactionCubit, TransactionState>(
+    'should clear selectedCategory when updateType changes to mismatched type',
+    build: () => cubit,
+    act: (cubit) {
+      cubit.selectCategory(tCategory); // expense category
+      cubit.updateType(TransactionType.income);
+    },
+    expect: () => [
+      isA<TransactionState>()
+          .having((s) => s.selectedCategory, 'category', tCategory),
+      isA<TransactionState>()
+          .having((s) => s.type, 'type', TransactionType.income)
+          .having((s) => s.selectedCategory, 'category', isNull),
+    ],
+  );
 }

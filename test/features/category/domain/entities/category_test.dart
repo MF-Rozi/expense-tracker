@@ -55,5 +55,53 @@ void main() {
         BehavioralModifier.active,
       ]);
     });
+
+    test('getRootPillar, getHierarchyChain, and getBreadcrumbPath work correctly',
+        () {
+      final p1Id = UniqueId.generate();
+      final sp1Id = UniqueId.generate();
+      final l1Id = UniqueId.generate();
+
+      final pillar = Category(
+        uuid: p1Id,
+        name: StringSingleLine('Lifestyle'),
+        isSynced: false,
+        updatedAt: DateTime.utc(2026),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 1000,
+        behavioralModifier: BehavioralModifier.active,
+      );
+      final subParent = Category(
+        uuid: sp1Id,
+        name: StringSingleLine('Dining Out'),
+        parentId: p1Id,
+        isSynced: false,
+        updatedAt: DateTime.utc(2026),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 500,
+        behavioralModifier: BehavioralModifier.active,
+      );
+      final leaf = Category(
+        uuid: l1Id,
+        name: StringSingleLine('Artisanal Coffee'),
+        parentId: sp1Id,
+        isSynced: false,
+        updatedAt: DateTime.utc(2026),
+        type: CategoryType.expense,
+        expectedMonthlyBudget: 100,
+        behavioralModifier: BehavioralModifier.active,
+      );
+      final all = [pillar, subParent, leaf];
+
+      expect(pillar.getRootPillar(all), pillar);
+      expect(subParent.getRootPillar(all), pillar);
+      expect(leaf.getRootPillar(all), pillar);
+
+      expect(leaf.getHierarchyChain(all), [pillar, subParent, leaf]);
+      expect(
+        leaf.getBreadcrumbPath(all),
+        'Lifestyle › Dining Out › Artisanal Coffee',
+      );
+    });
   });
 }

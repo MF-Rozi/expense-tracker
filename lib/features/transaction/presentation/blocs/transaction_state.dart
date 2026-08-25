@@ -34,6 +34,7 @@ class TransactionState extends Equatable {
     String? rawExpression,
     double? parsedAmount,
     Category? selectedCategory,
+    bool clearSelectedCategory = false,
     TransactionType? type,
     String? description,
     DateTime? date,
@@ -45,7 +46,9 @@ class TransactionState extends Equatable {
     return TransactionState(
       rawExpression: rawExpression ?? this.rawExpression,
       parsedAmount: parsedAmount ?? this.parsedAmount,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedCategory: clearSelectedCategory
+          ? null
+          : (selectedCategory ?? this.selectedCategory),
       type: type ?? this.type,
       description: description ?? this.description,
       date: date ?? this.date,

@@ -61,6 +61,49 @@ class Category extends Equatable {
     return false; // Level 4 or deeper is invalid
   }
 
+  /// Returns the root ancestor (Pillar) of this category, or itself if it is a root.
+  Category getRootPillar(List<Category> allCategories) {
+    if (parentId == null) return this;
+    final visited = <UniqueId>{uuid};
+    Category current = this;
+    while (current.parentId != null) {
+      if (visited.contains(current.parentId)) break;
+      visited.add(current.parentId!);
+      final parent = allCategories.cast<Category?>().firstWhere(
+            (c) => c?.uuid == current.parentId,
+            orElse: () => null,
+          );
+      if (parent == null) break;
+      current = parent;
+    }
+    return current;
+  }
+
+  /// Returns the ordered list of categories from root Pillar down to this category.
+  List<Category> getHierarchyChain(List<Category> allCategories) {
+    final chain = <Category>[this];
+    final visited = <UniqueId>{uuid};
+    Category current = this;
+    while (current.parentId != null) {
+      if (visited.contains(current.parentId)) break;
+      visited.add(current.parentId!);
+      final parent = allCategories.cast<Category?>().firstWhere(
+            (c) => c?.uuid == current.parentId,
+            orElse: () => null,
+          );
+      if (parent == null) break;
+      chain.insert(0, parent);
+      current = parent;
+    }
+    return chain;
+  }
+
+  /// Returns a formatted breadcrumb string (e.g. "Essential › Housing › Rent").
+  String getBreadcrumbPath(List<Category> allCategories) {
+    final chain = getHierarchyChain(allCategories);
+    return chain.map((c) => c.name.getOrCrash()).join(' › ');
+  }
+
   @override
   List<Object?> get props => [
         uuid,
