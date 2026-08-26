@@ -47,7 +47,8 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
       final defaultHierarchy = <({
         String pillarName,
         CategoryType type,
-        Map<String, List<({String name, BehavioralModifier modifier})>> subParents,
+        Map<String, List<({String name, BehavioralModifier modifier})>>
+            subParents,
       })>[
         // ─── EXPENSE PILLARS ───
         (
@@ -57,20 +58,38 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
             'Groceries & Household': [
               (name: 'Groceries', modifier: BehavioralModifier.active),
               (name: 'Household Supplies', modifier: BehavioralModifier.active),
-              (name: 'Electricity & Water', modifier: BehavioralModifier.recurring),
-              (name: 'Internet & Mobile', modifier: BehavioralModifier.recurring),
+              (
+                name: 'Electricity & Water',
+                modifier: BehavioralModifier.recurring,
+              ),
+              (
+                name: 'Internet & Mobile',
+                modifier: BehavioralModifier.recurring,
+              ),
             ],
             'Transportation': [
               (name: 'Fuel & Gas', modifier: BehavioralModifier.active),
-              (name: 'Public Transit & Tolls', modifier: BehavioralModifier.active),
-              (name: 'Vehicle Maintenance', modifier: BehavioralModifier.active),
+              (
+                name: 'Public Transit & Tolls',
+                modifier: BehavioralModifier.active,
+              ),
+              (
+                name: 'Vehicle Maintenance',
+                modifier: BehavioralModifier.active,
+              ),
             ],
             'Healthcare': [
               (name: 'Medical & Pharmacy', modifier: BehavioralModifier.active),
-              (name: 'Health Insurance', modifier: BehavioralModifier.recurring),
+              (
+                name: 'Health Insurance',
+                modifier: BehavioralModifier.recurring,
+              ),
             ],
             'Education': [
-              (name: 'Tuition & School Fees', modifier: BehavioralModifier.recurring),
+              (
+                name: 'Tuition & School Fees',
+                modifier: BehavioralModifier.recurring,
+              ),
               (name: 'Books & Courses', modifier: BehavioralModifier.active),
             ],
           },
@@ -82,23 +101,41 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
             'Shopping': [
               (name: 'Clothing & Apparel', modifier: BehavioralModifier.active),
               (name: 'Online Shopping', modifier: BehavioralModifier.active),
-              (name: 'Gadgets & Electronics', modifier: BehavioralModifier.active),
+              (
+                name: 'Gadgets & Electronics',
+                modifier: BehavioralModifier.active,
+              ),
             ],
             'Dining & Leisure': [
-              (name: 'Restaurants & Dining Out', modifier: BehavioralModifier.active),
+              (
+                name: 'Restaurants & Dining Out',
+                modifier: BehavioralModifier.active,
+              ),
               (name: 'Coffee & Snacks', modifier: BehavioralModifier.active),
             ],
             'Entertainment': [
-              (name: 'Streaming & Subscriptions', modifier: BehavioralModifier.recurring),
+              (
+                name: 'Streaming & Subscriptions',
+                modifier: BehavioralModifier.recurring,
+              ),
               (name: 'Hobbies & Gaming', modifier: BehavioralModifier.active),
               (name: 'Travel & Vacations', modifier: BehavioralModifier.active),
             ],
             'Donations & Charity': [
-              (name: 'Charity & Tithe', modifier: BehavioralModifier.recurring),
-              (name: 'Donations & Contributions', modifier: BehavioralModifier.active),
+              (
+                name: 'Charity & Tithe',
+                modifier: BehavioralModifier.recurring,
+              ),
+              (
+                name: 'Donations & Contributions',
+                modifier: BehavioralModifier.active,
+              ),
             ],
             'Work & Career': [
-              (name: 'Work & Office Supplies', modifier: BehavioralModifier.active),
+              (
+                name: 'Work & Office Supplies',
+                modifier: BehavioralModifier.active,
+              ),
             ],
           },
         ),
@@ -109,12 +146,21 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
             'Investments': [
               (name: 'Stocks', modifier: BehavioralModifier.active),
               (name: 'Mutual Funds', modifier: BehavioralModifier.active),
-              (name: 'Gold & Precious Metals', modifier: BehavioralModifier.active),
-              (name: 'Crypto & Other Assets', modifier: BehavioralModifier.active),
+              (
+                name: 'Gold & Precious Metals',
+                modifier: BehavioralModifier.active,
+              ),
+              (
+                name: 'Crypto & Other Assets',
+                modifier: BehavioralModifier.active,
+              ),
             ],
             'Savings': [
               (name: 'Emergency Fund', modifier: BehavioralModifier.passive),
-              (name: 'High-Yield Savings', modifier: BehavioralModifier.passive),
+              (
+                name: 'High-Yield Savings',
+                modifier: BehavioralModifier.passive,
+              ),
             ],
           },
         ),
@@ -125,10 +171,16 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           subParents: {
             'Salary': [
               (name: 'Base Salary', modifier: BehavioralModifier.recurring),
-              (name: 'Allowances & Benefits', modifier: BehavioralModifier.recurring),
+              (
+                name: 'Allowances & Benefits',
+                modifier: BehavioralModifier.recurring,
+              ),
             ],
             'Business': [
-              (name: 'Business Revenue & Sales', modifier: BehavioralModifier.active),
+              (
+                name: 'Business Revenue & Sales',
+                modifier: BehavioralModifier.active,
+              ),
             ],
           },
         ),
@@ -141,11 +193,17 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
               (name: 'Holiday Bonus', modifier: BehavioralModifier.passive),
             ],
             'Side Hustle & Sales': [
-              (name: 'Freelance & Consulting', modifier: BehavioralModifier.active),
+              (
+                name: 'Freelance & Consulting',
+                modifier: BehavioralModifier.active,
+              ),
               (name: 'Item Resale', modifier: BehavioralModifier.active),
             ],
             'Gifts & Grants': [
-              (name: 'Gifts & Financial Support', modifier: BehavioralModifier.passive),
+              (
+                name: 'Gifts & Financial Support',
+                modifier: BehavioralModifier.passive,
+              ),
             ],
           },
         ),
@@ -154,9 +212,18 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           type: CategoryType.income,
           subParents: {
             'Investment Returns': [
-              (name: 'Stock Dividends & Gains', modifier: BehavioralModifier.passive),
-              (name: 'Deposit Interest & Yields', modifier: BehavioralModifier.passive),
-              (name: 'Rental & Property Income', modifier: BehavioralModifier.passive),
+              (
+                name: 'Stock Dividends & Gains',
+                modifier: BehavioralModifier.passive,
+              ),
+              (
+                name: 'Deposit Interest & Yields',
+                modifier: BehavioralModifier.passive,
+              ),
+              (
+                name: 'Rental & Property Income',
+                modifier: BehavioralModifier.passive,
+              ),
             ],
           },
         ),
@@ -170,7 +237,6 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
             final pillar = _createCategory(
               name: group.pillarName,
               type: group.type,
-              parentId: null,
             );
             allModels.add(pillar);
 
@@ -197,7 +263,8 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
           await _isar.categoryModels.putAll(allModels);
         });
       } else if (nonRootCount == 0) {
-        // If only pillars were seeded previously, seed default sub-categories under existing pillars
+        // If only pillars were seeded previously, seed default sub-categories
+        // under existing pillars
         final existingPillars =
             await _isar.categoryModels.filter().parentIdIsNull().findAll();
 

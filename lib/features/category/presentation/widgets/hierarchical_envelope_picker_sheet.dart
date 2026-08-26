@@ -11,7 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 /// Features:
 /// - Filters categories by [targetType] (Expense vs. Income)
 /// - Interactive expandable/collapsible tree by Pillar > Sub-Parent > Envelope
-/// - Instant search across envelopes, sub-parents, and pillars with breadcrumb results
+/// - Instant search across envelopes, sub-parents, and pillars with
+///   breadcrumb results
 /// - Highlights the [selectedCategory] with a clear visual active state
 /// - Quick "+ Add Envelope" action to create envelopes directly from the modal
 class HierarchicalEnvelopePickerSheet extends StatefulWidget {
@@ -117,7 +118,6 @@ class _HierarchicalEnvelopePickerSheetState
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Column(
@@ -239,9 +239,7 @@ class _HierarchicalEnvelopePickerSheetState
                             size: 18,
                             color: Color(0xFF757682),
                           ),
-                          onPressed: () {
-                            _searchController.clear();
-                          },
+                          onPressed: _searchController.clear,
                         )
                       : null,
                   border: InputBorder.none,
@@ -260,7 +258,7 @@ class _HierarchicalEnvelopePickerSheetState
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                // Filter categories for the active target type (Expense or Income)
+                // Filter categories for the active target type (Expense/Income)
                 final typedCategories = state.allCategories
                     .where((c) => c.type == widget.targetType)
                     .toList();
@@ -270,7 +268,10 @@ class _HierarchicalEnvelopePickerSheetState
                 }
 
                 if (_searchQuery.isNotEmpty) {
-                  return _buildSearchResults(typedCategories, state.allCategories);
+                  return _buildSearchResults(
+                    typedCategories,
+                    state.allCategories,
+                  );
                 }
 
                 return _buildPillarsTree(typedCategories, state.allCategories);
@@ -300,7 +301,8 @@ class _HierarchicalEnvelopePickerSheetState
       separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (context, index) {
         final pillar = pillars[index];
-        final isCollapsed = _collapsedPillars.contains(pillar.uuid.getOrCrash());
+        final isCollapsed =
+            _collapsedPillars.contains(pillar.uuid.getOrCrash());
         final children = typedCategories
             .where((c) => c.parentId == pillar.uuid)
             .toList();
@@ -540,7 +542,8 @@ class _HierarchicalEnvelopePickerSheetState
                     name,
                     style: GoogleFonts.manrope(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w600,
                       color: const Color(0xFF191C1D),
                     ),
                   ),
@@ -782,7 +785,8 @@ class _HierarchicalEnvelopePickerSheetState
             ),
             const SizedBox(height: 8),
             Text(
-              'Create envelopes to organize your ${isExpense ? "expenses" : "income"} into hierarchical pillars.',
+              'Create envelopes to organize your '
+              '${isExpense ? "expenses" : "income"} into hierarchical pillars.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,
@@ -836,7 +840,7 @@ class _HierarchicalEnvelopePickerSheetState
       return category.expectedMonthlyBudget;
     }
     return directChildren.fold(
-      0.0,
+      0,
       (sum, c) => sum + _sumBudgetUnder(c, allCategories),
     );
   }

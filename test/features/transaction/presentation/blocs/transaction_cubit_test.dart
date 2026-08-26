@@ -179,10 +179,9 @@ void main() {
   blocTest<TransactionCubit, TransactionState>(
     'should clear selectedCategory when updateType changes to mismatched type',
     build: () => cubit,
-    act: (cubit) {
-      cubit.selectCategory(tCategory); // expense category
-      cubit.updateType(TransactionType.income);
-    },
+    act: (cubit) => cubit
+      ..selectCategory(tCategory) // expense category
+      ..updateType(TransactionType.income),
     expect: () => [
       isA<TransactionState>()
           .having((s) => s.selectedCategory, 'category', tCategory),

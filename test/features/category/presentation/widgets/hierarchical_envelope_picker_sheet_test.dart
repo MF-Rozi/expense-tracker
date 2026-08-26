@@ -46,20 +46,17 @@ void main() {
   final essentialPillar = _makeCategory(
     uuid: p1,
     name: 'Essential',
-    type: CategoryType.expense,
     budget: 1500,
   );
   final housingSub = _makeCategory(
     uuid: sp1,
     name: 'Housing',
-    type: CategoryType.expense,
     parentId: p1,
     budget: 1200,
   );
   final rentEnvelope = _makeCategory(
     uuid: e1,
     name: 'Rent & Mortgage',
-    type: CategoryType.expense,
     parentId: sp1,
     budget: 1200,
   );
@@ -67,13 +64,11 @@ void main() {
   final lifestylePillar = _makeCategory(
     uuid: p2,
     name: 'Lifestyle',
-    type: CategoryType.expense,
     budget: 500,
   );
   final diningSub = _makeCategory(
     uuid: sp2,
     name: 'Dining',
-    type: CategoryType.expense,
     parentId: p2,
     budget: 300,
   );
@@ -115,8 +110,8 @@ void main() {
 
   Widget buildTestWidget({
     required CategoryType targetType,
-    Category? selectedCategory,
     required ValueChanged<Category> onSelected,
+    Category? selectedCategory,
   }) {
     return MaterialApp(
       home: Scaffold(

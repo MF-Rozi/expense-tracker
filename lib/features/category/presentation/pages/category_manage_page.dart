@@ -41,7 +41,7 @@ class CategoryManagePage extends StatelessWidget {
       return category.expectedMonthlyBudget;
     }
     return directChildren.fold(
-      0.0,
+      0,
       (sum, c) => sum + _sumBudgetUnder(c, allCategories),
     );
   }
@@ -52,6 +52,7 @@ class CategoryManagePage extends StatelessWidget {
     Category category, {
     bool popNavAfter = false,
   }) async {
+    final categoryCubit = blocContext.read<CategoryCubit>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -61,7 +62,8 @@ class CategoryManagePage extends StatelessWidget {
           style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'Are you sure you want to delete "${category.name.getOrCrash()}" and all its nested sub-envelopes?',
+          'Are you sure you want to delete '
+          '"${category.name.getOrCrash()}" and all its nested sub-envelopes?',
           style: GoogleFonts.inter(fontSize: 14),
         ),
         actions: [
@@ -86,12 +88,12 @@ class CategoryManagePage extends StatelessWidget {
       ),
     );
 
-    if (confirmed == true) {
-      blocContext.read<CategoryCubit>().deleteCategory(
-            category.uuid.getOrCrash(),
-          );
+    if (confirmed ?? false) {
+      await categoryCubit.deleteCategory(
+        category.uuid.getOrCrash(),
+      );
       if (popNavAfter) {
-        blocContext.read<CategoryCubit>().goBack();
+        categoryCubit.goBack();
       }
     }
   }
@@ -572,7 +574,8 @@ class CategoryManagePage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Nested envelopes inside "${activeCategory.name.getOrCrash()}" will appear here.',
+              'Nested envelopes inside "${activeCategory.name.getOrCrash()}" '
+              'will appear here.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,

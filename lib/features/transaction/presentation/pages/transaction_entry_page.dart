@@ -342,7 +342,6 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                                 _showCategoryPicker(context, state);
                               },
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
                                     width: 36,
@@ -387,7 +386,8 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                                                 style: GoogleFonts.manrope(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w800,
-                                                  color: const Color(0xFF191C1D),
+                                                  color:
+                                                      const Color(0xFF191C1D),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),

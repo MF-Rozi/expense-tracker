@@ -61,11 +61,12 @@ class Category extends Equatable {
     return false; // Level 4 or deeper is invalid
   }
 
-  /// Returns the root ancestor (Pillar) of this category, or itself if it is a root.
+  /// Returns the root ancestor (Pillar) of this category,
+  /// or itself if it is a root.
   Category getRootPillar(List<Category> allCategories) {
     if (parentId == null) return this;
     final visited = <UniqueId>{uuid};
-    Category current = this;
+    var current = this;
     while (current.parentId != null) {
       if (visited.contains(current.parentId)) break;
       visited.add(current.parentId!);
@@ -79,11 +80,12 @@ class Category extends Equatable {
     return current;
   }
 
-  /// Returns the ordered list of categories from root Pillar down to this category.
+  /// Returns the ordered list of categories from root Pillar down
+  /// to this category.
   List<Category> getHierarchyChain(List<Category> allCategories) {
     final chain = <Category>[this];
     final visited = <UniqueId>{uuid};
-    Category current = this;
+    var current = this;
     while (current.parentId != null) {
       if (visited.contains(current.parentId)) break;
       visited.add(current.parentId!);

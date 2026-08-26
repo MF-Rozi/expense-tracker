@@ -212,7 +212,8 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
       chipBg = const Color(0xFFE8DEF8); // soft purple
       chipText = const Color(0xFF4A4458); // dark purple
     } else {
-      chipBg = const Color(0xFF5A0006); // tertiary-container (dark red for Financial Growth)
+      // tertiary-container (dark red for Financial Growth)
+      chipBg = const Color(0xFF5A0006);
       chipText = const Color(0xFFFF524C); // on-tertiary-container
     }
 
