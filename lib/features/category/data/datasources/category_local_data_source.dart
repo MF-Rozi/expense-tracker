@@ -47,8 +47,8 @@ class IsarCategoryLocalDataSource implements CategoryLocalDataSource {
       final defaultHierarchy = <({
         String pillarName,
         CategoryType type,
-        Map<String, List<({String name, BehavioralModifier modifier})>>
-            subParents,
+        Map<String,
+            List<({String name, BehavioralModifier modifier})>> subParents,
       })>[
         // ─── EXPENSE PILLARS ───
         (

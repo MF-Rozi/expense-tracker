@@ -303,9 +303,8 @@ class _HierarchicalEnvelopePickerSheetState
         final pillar = pillars[index];
         final isCollapsed =
             _collapsedPillars.contains(pillar.uuid.getOrCrash());
-        final children = typedCategories
-            .where((c) => c.parentId == pillar.uuid)
-            .toList();
+        final children =
+            typedCategories.where((c) => c.parentId == pillar.uuid).toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,9 +347,8 @@ class _HierarchicalEnvelopePickerSheetState
               : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF00113A)
-                : const Color(0xFFE1E3E4),
+            color:
+                isSelected ? const Color(0xFF00113A) : const Color(0xFFE1E3E4),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
@@ -462,9 +460,8 @@ class _HierarchicalEnvelopePickerSheetState
       padding: const EdgeInsets.only(left: 16),
       child: Column(
         children: children.map((child) {
-          final subChildren = typedCategories
-              .where((c) => c.parentId == child.uuid)
-              .toList();
+          final subChildren =
+              typedCategories.where((c) => c.parentId == child.uuid).toList();
 
           return Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -508,9 +505,8 @@ class _HierarchicalEnvelopePickerSheetState
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF00113A)
-                : const Color(0xFFE1E3E4),
+            color:
+                isSelected ? const Color(0xFF00113A) : const Color(0xFFE1E3E4),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -833,9 +829,8 @@ class _HierarchicalEnvelopePickerSheetState
   // ────────────────────────────── Helpers ───────────────────────────────────
 
   double _sumBudgetUnder(Category category, List<Category> allCategories) {
-    final directChildren = allCategories
-        .where((c) => c.parentId == category.uuid)
-        .toList();
+    final directChildren =
+        allCategories.where((c) => c.parentId == category.uuid).toList();
     if (directChildren.isEmpty) {
       return category.expectedMonthlyBudget;
     }
