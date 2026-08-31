@@ -57,8 +57,8 @@ void main() {
     });
 
     test(
-        'getRootPillar, getHierarchyChain, and getBreadcrumbPath work correctly',
-        () {
+        'getRootPillar, getHierarchyChain, and getBreadcrumbPath '
+        'work correctly', () {
       final p1Id = UniqueId.generate();
       final sp1Id = UniqueId.generate();
       final l1Id = UniqueId.generate();
