@@ -1,7 +1,7 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
-import 'package:expense_tracker/features/category/presentation/widgets/category_list_item.dart';
+import 'package:expense_tracker/features/category/presentation/widgets/hierarchical_envelope_picker_sheet.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -77,106 +77,52 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
     super.dispose();
   }
 
-  void _showCategoryPicker(BuildContext context) {
+  void _showCategoryPicker(BuildContext context, TransactionState state) {
     final transactionCubit = context.read<TransactionCubit>();
-    showModalBottomSheet<void>(
+    final targetType = state.type == TransactionType.income
+        ? CategoryType.income
+        : CategoryType.expense;
+
+    HierarchicalEnvelopePickerSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => BlocProvider.value(
-        value: getIt<CategoryCubit>(),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.75,
-          decoration: const BoxDecoration(
-            color: Color(0xFFF8F9FA),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00113A).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Text(
-                'Select Ledger Category',
-                style: GoogleFonts.manrope(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF00113A),
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Assign this transaction to an envelope.',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: const Color(0xFF444650),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Expanded(
-                child: BlocBuilder<CategoryCubit, CategoryState>(
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final categories = state.allCategories;
-                    if (categories.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'No categories found.',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF444650),
-                          ),
-                        ),
-                      );
-                    }
+      targetType: targetType,
+      categoryCubit: getIt<CategoryCubit>(),
+      selectedCategory: state.selectedCategory,
+    ).then((selected) {
+      if (selected != null) {
+        transactionCubit.selectCategory(selected);
+      }
+    });
+  }
 
-                    return ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-                      itemCount: categories.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        final String subtitle;
-                        if (category.parentId != null) {
-                          final parent = categories.firstWhere(
-                            (c) =>
-                                c.uuid.getOrCrash() ==
-                                category.parentId!.getOrCrash(),
-                            orElse: () => category,
-                          );
-                          subtitle = parent.name.getOrCrash();
-                        } else {
-                          subtitle = 'Root Category';
-                        }
-
-                        return CategoryListItem(
-                          category: category,
-                          subtitle: subtitle,
-                          onTap: () {
-                            transactionCubit.selectCategory(category);
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  IconData _iconForCategory(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('mortgage') ||
+        lower.contains('rent') ||
+        lower.contains('home') ||
+        lower.contains('house')) {
+      return Icons.home_outlined;
+    } else if (lower.contains('util') || lower.contains('electric')) {
+      return Icons.bolt_outlined;
+    } else if (lower.contains('din') ||
+        lower.contains('food') ||
+        lower.contains('restaurant') ||
+        lower.contains('coffee')) {
+      return Icons.restaurant_outlined;
+    } else if (lower.contains('travel') || lower.contains('flight')) {
+      return Icons.flight_outlined;
+    } else if (lower.contains('hobbi') || lower.contains('game')) {
+      return Icons.sports_esports_outlined;
+    } else if (lower.contains('market') ||
+        lower.contains('invest') ||
+        lower.contains('crypto')) {
+      return Icons.bar_chart_outlined;
+    } else if (lower.contains('salary') || lower.contains('paycheck')) {
+      return Icons.account_balance_wallet_outlined;
+    } else if (lower.contains('freelance') || lower.contains('client')) {
+      return Icons.work_outline;
+    }
+    return Icons.category_outlined;
   }
 
   @override
@@ -337,35 +283,153 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Category
+                      // Category / Envelope
                       _BentoInputCell(
-                        label: 'Category',
-                        child: InkWell(
-                          onTap: () {
-                            setState(() => _isCalculatorVisible = false);
-                            _showCategoryPicker(context);
-                          },
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  state.selectedCategory?.name.getOrCrash() ??
-                                      'Select Category',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: state.selectedCategory != null
-                                        ? const Color(0xFF191C1D)
-                                        : const Color(0xFF444650),
-                                  ),
+                        label: 'Envelope',
+                        child: BlocBuilder<CategoryCubit, CategoryState>(
+                          bloc: getIt<CategoryCubit>(),
+                          builder: (context, catState) {
+                            final selectedCat = state.selectedCategory;
+                            if (selectedCat == null) {
+                              return InkWell(
+                                onTap: () {
+                                  setState(() => _isCalculatorVisible = false);
+                                  _showCategoryPicker(context, state);
+                                },
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF00113A)
+                                            .withValues(alpha: 0.05),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.folder_open_outlined,
+                                        color: Color(0xFF757682),
+                                        size: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        'Select Ledger Envelope',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xFF757682),
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.chevron_right,
+                                      color: Color(0xFF757682),
+                                    ),
+                                  ],
                                 ),
+                              );
+                            }
+
+                            final breadcrumb = selectedCat
+                                .getBreadcrumbPath(catState.allCategories);
+                            final hasBreadcrumb = breadcrumb.contains('›');
+
+                            return InkWell(
+                              onTap: () {
+                                setState(() => _isCalculatorVisible = false);
+                                _showCategoryPicker(context, state);
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00113A)
+                                          .withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      _iconForCategory(
+                                        selectedCat.name.getOrCrash(),
+                                      ),
+                                      color: const Color(0xFF00113A),
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (hasBreadcrumb) ...[
+                                          Text(
+                                            breadcrumb,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xFF757682),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 2),
+                                        ],
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                selectedCat.name.getOrCrash(),
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800,
+                                                  color:
+                                                      const Color(0xFF191C1D),
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 1.5,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFEEF0F2),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                selectedCat
+                                                    .behavioralModifier.name
+                                                    .toUpperCase(),
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 8.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.6,
+                                                  color:
+                                                      const Color(0xFF757682),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right,
+                                    color: Color(0xFF444650),
+                                  ),
+                                ],
                               ),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: Color(0xFF444650),
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 16),

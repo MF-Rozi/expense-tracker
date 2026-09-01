@@ -81,7 +81,19 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   void updateType(TransactionType type) {
-    emit(state.copyWith(type: type));
+    final currentCat = state.selectedCategory;
+    final isMismatch = currentCat != null &&
+        ((type == TransactionType.expense &&
+                currentCat.type != CategoryType.expense) ||
+            (type == TransactionType.income &&
+                currentCat.type != CategoryType.income));
+
+    emit(
+      state.copyWith(
+        type: type,
+        clearSelectedCategory: isMismatch,
+      ),
+    );
   }
 
   void updateDate(DateTime date) {
