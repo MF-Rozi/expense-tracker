@@ -4,12 +4,25 @@ import 'package:expense_tracker/features/category/presentation/blocs/category_st
 import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/envelope_tree_list_view.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/portfolio_distribution_card.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CategoryManagePage extends StatelessWidget {
+class CategoryManagePage extends StatefulWidget {
   const CategoryManagePage({super.key});
+
+  @override
+  State<CategoryManagePage> createState() => _CategoryManagePageState();
+}
+
+class _CategoryManagePageState extends State<CategoryManagePage> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<EasterEggCubit>().onCategoriesOpened();
+  }
 
   IconData _iconForChild(String name) {
     final lower = name.toLowerCase();
