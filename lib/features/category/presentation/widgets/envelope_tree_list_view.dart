@@ -4,19 +4,21 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Expandable tree list view for the Category Architecture screen.
 ///
-/// Renders Level 1 pillars as section headers and their Level 2 sub-parents
-/// (or Level 3 envelopes) as indented child rows with the `stagger-line` /
-/// `stagger-line-item` visual decoration from the HTML mockup
-/// (category-new-design.html, lines 874–892, 961–1120).
+/// Renders Level 1 pillars as section headers, Level 2 sub-parents as
+/// expandable rows, and Level 3 envelopes inline below their sub-parent —
+/// all with the `stagger-line` / `stagger-line-item` visual decoration from
+/// the HTML mockup (category-new-design.html, lines 874–892, 961–1120).
 ///
-/// Only two levels of nesting are rendered here (Pillar → Sub-Parent /
-/// direct Envelopes). A third level requires the user to tap a sub-parent
-/// row and navigate deeper — this widget delegates that via [onChildTap].
+/// The hierarchy is capped at three levels (Pillar → Sub-Parent → Envelope).
+/// Tapping a sub-parent row with children opens its focused page via
+/// [onChildTap]; the trailing chevron expands or collapses it inline instead.
+/// Sub-parents with children expose editing through [onChildEdit].
 class EnvelopeTreeListView extends StatefulWidget {
   const EnvelopeTreeListView({
     required this.allCategories,
     this.onPillarTap,
     this.onChildTap,
+    this.onChildEdit,
     this.onAddChild,
     super.key,
   });
@@ -28,7 +30,12 @@ class EnvelopeTreeListView extends StatefulWidget {
   final void Function(Category pillar)? onPillarTap;
 
   /// Called when the user taps a child row (sub-parent or leaf envelope).
+  /// Sub-parents with children expand or collapse via the trailing chevron
+  /// instead of calling this.
   final void Function(Category child)? onChildTap;
+
+  /// Called when the user taps the edit button on a sub-parent row.
+  final void Function(Category child)? onChildEdit;
 
   /// Called when the user taps the add button on a pillar section.
   final void Function(Category pillar)? onAddChild;
@@ -41,6 +48,9 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
   /// Tracks which pillar UUIDs are collapsed. Pillars start expanded.
   final Set<String> _collapsed = {};
 
+  /// Tracks which sub-parent UUIDs are collapsed. Sub-parents start expanded.
+  final Set<String> _collapsedSubs = {};
+
   List<Category> get _pillars =>
       widget.allCategories.where((c) => c.isRoot).toList();
 
@@ -51,12 +61,12 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
         .toList();
   }
 
-  void _togglePillar(String uuid) {
+  void _toggleCollapsed(Set<String> collapsed, String uuid) {
     setState(() {
-      if (_collapsed.contains(uuid)) {
-        _collapsed.remove(uuid);
+      if (collapsed.contains(uuid)) {
+        collapsed.remove(uuid);
       } else {
-        _collapsed.add(uuid);
+        collapsed.add(uuid);
       }
     });
   }
@@ -111,7 +121,7 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
 
     return InkWell(
       onTap: () {
-        _togglePillar(pillarId);
+        _toggleCollapsed(_collapsed, pillarId);
         widget.onPillarTap?.call(pillar);
       },
       borderRadius: BorderRadius.circular(12),
@@ -264,32 +274,173 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
   Widget _buildChildRow(Category child) {
     final name = child.name.getOrCrash();
     final budget = _sumBudgetUnder(child);
+    final childId = child.uuid.getOrCrash();
+    final grandchildren = _childrenOf(child);
+    final hasChildren = grandchildren.isNotEmpty;
+    final isCollapsed = _collapsedSubs.contains(childId);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: () => widget.onChildTap?.call(child),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF), // surface-container-lowest
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F4F5), // surface-container-low
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    _iconForChild(name),
+                    size: 16,
+                    color: const Color(0xFF757682),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF191C1D),
+                        ),
+                      ),
+                      Text(
+                        child.behavioralModifier.name.toUpperCase(),
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.5,
+                          color: const Color(0xFF757682),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  '\$${budget.toStringAsFixed(0)}',
+                  style: GoogleFonts.manrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF00113A),
+                  ),
+                ),
+                if (hasChildren) ...[
+                  const SizedBox(width: 4),
+                  if (widget.onChildEdit != null)
+                    InkResponse(
+                      onTap: () => widget.onChildEdit?.call(child),
+                      radius: 16,
+                      child: const SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: Color(0xFF757682),
+                        ),
+                      ),
+                    ),
+                  InkResponse(
+                    onTap: () => _toggleCollapsed(_collapsedSubs, childId),
+                    radius: 16,
+                    child: SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: AnimatedRotation(
+                        turns: isCollapsed ? 0 : 0.5,
+                        duration: const Duration(milliseconds: 250),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 18,
+                          color: Color(0xFF757682),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        if (hasChildren && !isCollapsed) ...[
+          const SizedBox(height: 8),
+          _buildGrandchildrenContainer(grandchildren),
+        ],
+      ],
+    );
+  }
+
+  /// Renders Level 3 envelopes inline below their sub-parent with the same
+  /// stagger-line visual, one indent deeper.
+  Widget _buildGrandchildrenContainer(List<Category> grandchildren) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: CustomPaint(
+        painter: _StaggerLinePainter(),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 8),
+          child: Column(
+            children: [
+              for (int i = 0; i < grandchildren.length; i++) ...[
+                if (i > 0) const SizedBox(height: 8),
+                _StaggerLineItemWrapper(
+                  child: _buildLeafRow(grandchildren[i]),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// A Level 3 envelope row. Shows its own budget (not an aggregate) and
+  /// delegates taps to [EnvelopeTreeListView.onChildTap].
+  Widget _buildLeafRow(Category leaf) {
+    final name = leaf.name.getOrCrash();
+    final budget = leaf.expectedMonthlyBudget;
 
     return InkWell(
-      onTap: () => widget.onChildTap?.call(child),
+      onTap: () => widget.onChildTap?.call(leaf),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF), // surface-container-lowest
+          color: const Color(0xFFF8F9FA), // surface (tinted vs parent card)
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE1E3E4)),
         ),
         child: Row(
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F4F5), // surface-container-low
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 _iconForChild(name),
-                size: 16,
+                size: 14,
                 color: const Color(0xFF757682),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,15 +448,15 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
                   Text(
                     name,
                     style: GoogleFonts.manrope(
-                      fontSize: 13,
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF191C1D),
                     ),
                   ),
                   Text(
-                    child.behavioralModifier.name.toUpperCase(),
+                    leaf.behavioralModifier.name.toUpperCase(),
                     style: GoogleFonts.inter(
-                      fontSize: 9,
+                      fontSize: 8.5,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 1.5,
                       color: const Color(0xFF757682),
@@ -317,7 +468,7 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
             Text(
               '\$${budget.toStringAsFixed(0)}',
               style: GoogleFonts.manrope(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF00113A),
               ),
@@ -330,14 +481,20 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
 
   // ─────────────────────────────── Helpers ──────────────────────────────────
 
-  /// Recursively sums expected monthly budgets for [category] and all its
-  /// descendants (so Pillars/Sub-Parents show aggregated totals).
-  double _sumBudgetUnder(Category category) {
+  /// Sums expected monthly budgets across [category]'s subtree so Pillars
+  /// and Sub-Parents show aggregated totals. The walk is capped at
+  /// [maxDepth] levels (Pillar → Sub-Parent → Envelope), which also guards
+  /// against infinite recursion if malformed data ever contains a cycle.
+  double _sumBudgetUnder(Category category, {int maxDepth = 3}) {
+    if (maxDepth <= 0) return 0;
     final directChildren = _childrenOf(category);
     if (directChildren.isEmpty) {
       return category.expectedMonthlyBudget;
     }
-    return directChildren.fold(0, (sum, c) => sum + _sumBudgetUnder(c));
+    return directChildren.fold(
+      0,
+      (sum, c) => sum + _sumBudgetUnder(c, maxDepth: maxDepth - 1),
+    );
   }
 
   IconData _iconForPillar(String name) {

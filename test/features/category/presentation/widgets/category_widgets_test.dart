@@ -33,6 +33,9 @@ const _p2Id = '550e8400-e29b-41d4-a716-446655440002';
 const _p3Id = '550e8400-e29b-41d4-a716-446655440003';
 const _c1Id = '550e8400-e29b-41d4-a716-446655440004';
 const _c2Id = '550e8400-e29b-41d4-a716-446655440005';
+const _subId = '550e8400-e29b-41d4-a716-446655440006';
+const _e1Id = '550e8400-e29b-41d4-a716-446655440007';
+const _e2Id = '550e8400-e29b-41d4-a716-446655440008';
 
 final _essential = _makeCategory(uuid: _p1Id, name: 'Essential');
 final _lifestyle = _makeCategory(uuid: _p2Id, name: 'Lifestyle');
@@ -48,6 +51,19 @@ final _dining = _makeCategory(
   name: 'Dining',
   parentId: _p2Id,
   budget: 300,
+);
+final _food = _makeCategory(uuid: _subId, name: 'Food', parentId: _p1Id);
+final _coffee = _makeCategory(
+  uuid: _e1Id,
+  name: 'Coffee',
+  parentId: _subId,
+  budget: 120,
+);
+final _groceries = _makeCategory(
+  uuid: _e2Id,
+  name: 'Groceries',
+  parentId: _subId,
+  budget: 180,
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -336,6 +352,172 @@ void main() {
       );
 
       expect(find.textContaining('No envelopes yet'), findsOneWidget);
+    });
+
+    group('three-level hierarchy', () {
+      final deepCategories = [
+        ...allCategories,
+        _food,
+        _coffee,
+        _groceries,
+      ];
+
+      testWidgets('renders level-3 envelopes inline under sub-parents',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(allCategories: deepCategories),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Food'), findsOneWidget);
+        expect(find.text('Coffee'), findsOneWidget);
+        expect(find.text('Groceries'), findsOneWidget);
+        // $300 appears as: Dining leaf budget, Lifestyle pillar aggregate,
+        // and Food sub-parent aggregate (120 + 180).
+        expect(find.text(r'$300'), findsNWidgets(3));
+      });
+
+      testWidgets('chevron tap toggles level-3 children without onChildTap',
+          (tester) async {
+        var childTaps = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(
+                  allCategories: deepCategories,
+                  onChildTap: (_) => childTaps++,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final foodRowChevron = find.descendant(
+          of: find.ancestor(
+            of: find.text('Food'),
+            matching: find.byType(InkWell),
+          ),
+          matching: find.byIcon(Icons.keyboard_arrow_down),
+        );
+
+        await tester.tap(foodRowChevron);
+        await tester.pumpAndSettle();
+        expect(find.text('Coffee'), findsNothing);
+        expect(find.text('Groceries'), findsNothing);
+        expect(childTaps, 0);
+
+        await tester.tap(foodRowChevron);
+        await tester.pumpAndSettle();
+        expect(find.text('Coffee'), findsOneWidget);
+        expect(find.text('Groceries'), findsOneWidget);
+        expect(childTaps, 0);
+      });
+
+      testWidgets('sub-parent row tap fires onChildTap for focused page',
+          (tester) async {
+        Category? tapped;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(
+                  allCategories: deepCategories,
+                  onChildTap: (c) => tapped = c,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Food'));
+        await tester.pumpAndSettle();
+        expect(tapped?.uuid.getOrCrash(), _subId);
+      });
+
+      testWidgets('onChildTap fires for leaf envelope rows', (tester) async {
+        Category? tapped;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(
+                  allCategories: deepCategories,
+                  onChildTap: (c) => tapped = c,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Coffee'));
+        await tester.pumpAndSettle();
+        expect(tapped?.uuid.getOrCrash(), _e1Id);
+      });
+
+      testWidgets('onChildEdit fires from sub-parent edit button',
+          (tester) async {
+        Category? edited;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(
+                  allCategories: deepCategories,
+                  onChildEdit: (c) => edited = c,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.byIcon(Icons.edit_outlined));
+        await tester.pumpAndSettle();
+        expect(edited?.uuid.getOrCrash(), _subId);
+      });
+
+      testWidgets('orphaned cycle data does not crash rendering',
+          (tester) async {
+        // In a single-parent model a parent cycle can only exist as an
+        // orphan island (unreachable from any root). Rendering must still
+        // not crash, and budget aggregation's depth cap guards against
+        // unbounded recursion if such data is ever summed directly.
+        final cyclicFood = _makeCategory(
+          uuid: _subId,
+          name: 'Food',
+          parentId: _subId, // cycle: Food is its own ancestor
+        );
+        final cyclicCoffee = _makeCategory(
+          uuid: _e1Id,
+          name: 'Coffee',
+          parentId: _subId,
+          budget: 120,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(
+                  allCategories: [
+                    _essential,
+                    cyclicFood,
+                    cyclicCoffee,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Essential'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
     });
   });
 }

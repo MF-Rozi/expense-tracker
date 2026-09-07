@@ -200,6 +200,21 @@ class CategoryManagePage extends StatelessWidget {
                                   .selectParent(child.uuid.getOrCrash());
                             }
                           },
+                          onChildEdit: (child) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    BlocProvider<CategoryCubit>.value(
+                                  value: blocContext.read<CategoryCubit>(),
+                                  child: CategoryFormPage(
+                                    categoryToEdit: child,
+                                    activeParentUuid:
+                                        child.parentId?.getOrCrash(),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                           onAddChild: (pillar) {
                             Navigator.of(context).push(
                               MaterialPageRoute<void>(
