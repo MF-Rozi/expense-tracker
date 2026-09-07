@@ -15,6 +15,7 @@ class EasterEggProgress extends Equatable {
   });
 
   static const int versionTapsRequired = 7;
+  static const int totalSteps = 3;
 
   final int versionTaps;
   final bool hintSeen;

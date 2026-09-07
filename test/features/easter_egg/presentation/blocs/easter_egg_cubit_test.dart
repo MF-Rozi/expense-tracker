@@ -26,7 +26,6 @@ void main() {
 
   EasterEggCubit buildCubit() =>
       EasterEggCubit(EasterEggStorageImpl(preferences), flashCubit);
-
   void revealHint(EasterEggCubit cubit) {
     for (var i = 0; i < EasterEggProgress.versionTapsRequired; i++) {
       cubit.onVersionTapped();
@@ -56,6 +55,11 @@ void main() {
       expect(cubit.state.progress.hintSeen, isTrue);
       expect(cubit.state.justRevealedHint, isTrue);
       expect(cubit.state.progress.unlocked, isFalse);
+
+      // The edge-triggered flag clears on the next state change so the
+      // ritual dialog neither stacks nor re-shows.
+      cubit.onVersionTapped();
+      expect(cubit.state.justRevealedHint, isFalse);
     });
 
     test('does not count steps before the hint is seen', () {
@@ -106,6 +110,43 @@ void main() {
         ..onStatsVisited()
         ..onCategoriesOpened();
       expect(cubit.state.progress.unlocked, isTrue);
+
+      final restored = buildCubit();
+      expect(restored.state.progress.unlocked, isTrue);
+      expect(restored.state.progress.completedSteps, 3);
+      // The dialog must not re-show after a restart.
+      expect(restored.state.justRevealedHint, isFalse);
+    });
+
+    test('mid-ritual state restores and completes', () {
+      final first = buildCubit();
+      revealHint(first);
+      first
+        ..onTransactionLogged()
+        ..onStatsVisited();
+      expect(first.state.progress.unlocked, isFalse);
+
+      final restored = buildCubit();
+      expect(restored.state.justRevealedHint, isFalse);
+      expect(restored.state.progress.hintSeen, isTrue);
+      expect(restored.state.progress.completedSteps, 2);
+      expect(restored.state.progress.unlocked, isFalse);
+
+      restored.onCategoriesOpened();
+      expect(restored.state.progress.unlocked, isTrue);
+      expect(flashCubit.messages, hasLength(1));
+    });
+
+    test('self-heals a partial unlock write on restore', () async {
+      // Simulates the app dying mid-write of the unlocking transition:
+      // all three steps persisted, but the unlocked flag was lost.
+      const stuck = EasterEggProgress(
+        hintSeen: true,
+        loggedTransaction: true,
+        visitedStats: true,
+        openedCategories: true,
+      );
+      await EasterEggStorageImpl(preferences).write(stuck);
 
       final restored = buildCubit();
       expect(restored.state.progress.unlocked, isTrue);
@@ -169,6 +210,7 @@ void main() {
       final restored = buildCubit();
       expect(restored.state.progress.unlocked, isFalse);
       expect(restored.state.progress.versionTaps, 0);
+      expect(restored.state.justRevealedHint, isFalse);
     });
   });
 }

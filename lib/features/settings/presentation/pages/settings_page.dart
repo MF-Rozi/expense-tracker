@@ -39,8 +39,7 @@ class SettingsPage extends StatelessWidget {
                   leading: const Icon(Icons.info_outline),
                   title: const Text('Version'),
                   subtitle: Text(_versionSubtitle(progress)),
-                  onTap: () =>
-                      context.read<EasterEggCubit>().onVersionTapped(),
+                  onTap: () => context.read<EasterEggCubit>().onVersionTapped(),
                 ),
                 if (progress.unlocked)
                   ListTile(

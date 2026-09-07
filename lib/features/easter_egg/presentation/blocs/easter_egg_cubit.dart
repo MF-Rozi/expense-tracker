@@ -28,7 +28,18 @@ class EasterEggCubit extends Cubit<EasterEggState> {
   final FlashCubit _flashCubit;
 
   void _restore() {
-    emit(EasterEggState(progress: _storage.read()));
+    var progress = _storage.read();
+    // Self-heal a partial write from the unlocking transition: if the
+    // process died between persisting the third step and the unlocked
+    // flag, the ritual is complete by definition — promote it instead of
+    // stranding the user in an unrecoverable 3/3 state.
+    if (!progress.unlocked &&
+        progress.hintSeen &&
+        progress.completedSteps == EasterEggProgress.totalSteps) {
+      progress = progress.copyWith(unlocked: true);
+      unawaited(_storage.write(progress));
+    }
+    emit(EasterEggState(progress: progress));
   }
 
   void onVersionTapped() {
@@ -38,8 +49,7 @@ class EasterEggCubit extends Cubit<EasterEggState> {
     var progress = current.copyWith(versionTaps: current.versionTaps + 1);
     var justRevealedHint = false;
     if (!progress.hintSeen &&
-        progress.versionTaps >=
-            EasterEggProgress.versionTapsRequired) {
+        progress.versionTaps >= EasterEggProgress.versionTapsRequired) {
       progress = progress.copyWith(hintSeen: true);
       justRevealedHint = true;
     }
@@ -84,7 +94,7 @@ class EasterEggCubit extends Cubit<EasterEggState> {
     if (stepped == current) return;
 
     var progress = stepped;
-    if (progress.completedSteps == 3) {
+    if (progress.completedSteps == EasterEggProgress.totalSteps) {
       progress = progress.copyWith(unlocked: true);
       unawaited(
         _flashCubit.displayFlash(

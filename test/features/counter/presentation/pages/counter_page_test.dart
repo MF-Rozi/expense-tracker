@@ -7,19 +7,42 @@
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:expense_tracker/features/counter/counter.dart';
+import 'package:expense_tracker/features/easter_egg/data/datasources/easter_egg_storage.dart';
+import 'package:expense_tracker/features/easter_egg/domain/entities/easter_egg_progress.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
+import 'package:expense_tracker/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../helpers/helpers.dart';
 
 class MockCounterCubit extends MockCubit<int> implements CounterCubit {}
 
+class _RecordingFlashCubit extends FlashCubit {
+  final List<String> messages = [];
+
+  @override
+  Future<void> displayFlash(String message) async {
+    messages.add(message);
+  }
+}
+
+Future<EasterEggCubit> buildEggCubit() async {
+  SharedPreferences.setMockInitialValues({});
+  final preferences = await SharedPreferences.getInstance();
+  return EasterEggCubit(
+    EasterEggStorageImpl(preferences),
+    _RecordingFlashCubit(),
+  );
+}
+
 void main() {
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
-      await tester.pumpApp(const CounterPage());
+      await tester.pumpApp(CounterPage(easterEggCubit: await buildEggCubit()));
       expect(find.byType(CounterView), findsOneWidget);
     });
   });
@@ -69,6 +92,37 @@ void main() {
       );
       await tester.tap(find.byIcon(Icons.remove));
       verify(() => counterCubit.decrement()).called(1);
+    });
+  });
+
+  group('CounterPage hide action', () {
+    testWidgets('re-locks the easter egg when the eye-off icon is tapped',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      await EasterEggStorageImpl(preferences).write(
+        const EasterEggProgress(
+          hintSeen: true,
+          loggedTransaction: true,
+          visitedStats: true,
+          openedCategories: true,
+          unlocked: true,
+        ),
+      );
+      final eggCubit = EasterEggCubit(
+        EasterEggStorageImpl(preferences),
+        _RecordingFlashCubit(),
+      );
+      expect(eggCubit.state.progress.unlocked, isTrue);
+
+      await tester.pumpApp(CounterPage(easterEggCubit: eggCubit));
+      expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.visibility_off_outlined));
+      await tester.pumpAndSettle();
+
+      expect(eggCubit.state.progress.unlocked, isFalse);
+      expect(eggCubit.state.progress.versionTaps, 0);
     });
   });
 }

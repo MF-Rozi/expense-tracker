@@ -9,13 +9,19 @@ import 'package:google_fonts/google_fonts.dart';
 /// Deliberately keeps the template's bare-bones logic; the joke is that
 /// this page survived the cleanup that deleted everything else.
 class CounterPage extends StatelessWidget {
-  const CounterPage({super.key});
+  const CounterPage({super.key, this.easterEggCubit});
+
+  /// Overridable for tests; defaults to the app-wide singleton.
+  final EasterEggCubit? easterEggCubit;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CounterCubit(),
-      child: const CounterView(),
+    return BlocProvider<EasterEggCubit>.value(
+      value: easterEggCubit ?? getIt<EasterEggCubit>(),
+      child: BlocProvider(
+        create: (_) => CounterCubit(),
+        child: const CounterView(),
+      ),
     );
   }
 }
@@ -41,7 +47,7 @@ class CounterView extends StatelessWidget {
             tooltip: 'Hide the secret room',
             icon: const Icon(Icons.visibility_off_outlined),
             onPressed: () {
-              getIt<EasterEggCubit>().deactivate();
+              context.read<EasterEggCubit>().deactivate();
               Navigator.of(context).pop();
             },
           ),

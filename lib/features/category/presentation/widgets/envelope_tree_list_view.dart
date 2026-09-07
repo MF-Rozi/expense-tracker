@@ -1,4 +1,5 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/extensions/category_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,9 +11,10 @@ import 'package:google_fonts/google_fonts.dart';
 /// the HTML mockup (category-new-design.html, lines 874–892, 961–1120).
 ///
 /// The hierarchy is capped at three levels (Pillar → Sub-Parent → Envelope).
-/// Tapping a sub-parent row with children opens its focused page via
-/// [onChildTap]; the trailing chevron expands or collapses it inline instead.
-/// Sub-parents with children expose editing through [onChildEdit].
+/// Tapping any child row opens its focused page via [onChildTap]; a
+/// sub-parent row additionally shows a trailing chevron that expands or
+/// collapses its level-3 children inline, plus an edit button routed to
+/// [onChildEdit].
 class EnvelopeTreeListView extends StatefulWidget {
   const EnvelopeTreeListView({
     required this.allCategories,
@@ -30,8 +32,8 @@ class EnvelopeTreeListView extends StatefulWidget {
   final void Function(Category pillar)? onPillarTap;
 
   /// Called when the user taps a child row (sub-parent or leaf envelope).
-  /// Sub-parents with children expand or collapse via the trailing chevron
-  /// instead of calling this.
+  /// The trailing chevron on sub-parent rows toggles their inline
+  /// expansion instead of calling this.
   final void Function(Category child)? onChildTap;
 
   /// Called when the user taps the edit button on a sub-parent row.
@@ -46,7 +48,7 @@ class EnvelopeTreeListView extends StatefulWidget {
 
 class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
   /// Tracks which pillar UUIDs are collapsed. Pillars start expanded.
-  final Set<String> _collapsed = {};
+  final Set<String> _collapsedPillars = {};
 
   /// Tracks which sub-parent UUIDs are collapsed. Sub-parents start expanded.
   final Set<String> _collapsedSubs = {};
@@ -89,13 +91,13 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
 
   Widget _buildPillarSection(Category pillar) {
     final pillarId = pillar.uuid.getOrCrash();
-    final isCollapsed = _collapsed.contains(pillarId);
+    final isCollapsed = _collapsedPillars.contains(pillarId);
     final children = _childrenOf(pillar);
 
     // Compute aggregated budget for display
     double totalBudget = 0;
     for (final child in children) {
-      totalBudget += _sumBudgetUnder(child);
+      totalBudget += child.sumBudgetUnder(widget.allCategories);
     }
 
     return Column(
@@ -121,7 +123,7 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
 
     return InkWell(
       onTap: () {
-        _toggleCollapsed(_collapsed, pillarId);
+        _toggleCollapsed(_collapsedPillars, pillarId);
         widget.onPillarTap?.call(pillar);
       },
       borderRadius: BorderRadius.circular(12),
@@ -273,7 +275,7 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
 
   Widget _buildChildRow(Category child) {
     final name = child.name.getOrCrash();
-    final budget = _sumBudgetUnder(child);
+    final budget = child.sumBudgetUnder(widget.allCategories);
     final childId = child.uuid.getOrCrash();
     final grandchildren = _childrenOf(child);
     final hasChildren = grandchildren.isNotEmpty;
@@ -480,22 +482,6 @@ class _EnvelopeTreeListViewState extends State<EnvelopeTreeListView> {
   }
 
   // ─────────────────────────────── Helpers ──────────────────────────────────
-
-  /// Sums expected monthly budgets across [category]'s subtree so Pillars
-  /// and Sub-Parents show aggregated totals. The walk is capped at
-  /// [maxDepth] levels (Pillar → Sub-Parent → Envelope), which also guards
-  /// against infinite recursion if malformed data ever contains a cycle.
-  double _sumBudgetUnder(Category category, {int maxDepth = 3}) {
-    if (maxDepth <= 0) return 0;
-    final directChildren = _childrenOf(category);
-    if (directChildren.isEmpty) {
-      return category.expectedMonthlyBudget;
-    }
-    return directChildren.fold(
-      0,
-      (sum, c) => sum + _sumBudgetUnder(c, maxDepth: maxDepth - 1),
-    );
-  }
 
   IconData _iconForPillar(String name) {
     final lower = name.toLowerCase();

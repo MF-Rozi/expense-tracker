@@ -151,7 +151,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
       body: BlocConsumer<TransactionCubit, TransactionState>(
         listener: (context, state) {
           if (state.status == TransactionFormStatus.success) {
-            getIt<EasterEggCubit>().onTransactionLogged();
+            // The ritual step is "log a transaction" — editing an
+            // existing one does not count.
+            if (widget.existingTransaction == null) {
+              getIt<EasterEggCubit>().onTransactionLogged();
+            }
             Navigator.of(context).pop();
           } else if (state.status == TransactionFormStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(

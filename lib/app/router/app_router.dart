@@ -5,6 +5,7 @@ import 'package:expense_tracker/features/counter/presentation/pages/counter_page
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/pages/home_page.dart';
 import 'package:expense_tracker/features/dashboard/presentation/pages/stats_coming_soon_page.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -73,6 +74,13 @@ GoRouter router([String? initialLocation]) => GoRouter(
         GoRoute(
           path: '/counter',
           name: 'counter',
+          // Locked users never reach the secret room — even via direct
+          // navigation or a future deep link.
+          redirect: (context, state) {
+            final unlocked =
+                getIt<EasterEggCubit>().state.progress.unlocked;
+            return unlocked ? null : '/settings';
+          },
           builder: (context, state) => const CounterPage(),
         ),
       ],

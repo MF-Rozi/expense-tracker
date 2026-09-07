@@ -52,7 +52,12 @@ final _dining = _makeCategory(
   parentId: _p2Id,
   budget: 300,
 );
-final _food = _makeCategory(uuid: _subId, name: 'Food', parentId: _p1Id);
+final _food = _makeCategory(
+  uuid: _subId,
+  name: 'Food',
+  parentId: _p1Id,
+  budget: 50,
+);
 final _coffee = _makeCategory(
   uuid: _e1Id,
   name: 'Coffee',
@@ -377,9 +382,39 @@ void main() {
         expect(find.text('Food'), findsOneWidget);
         expect(find.text('Coffee'), findsOneWidget);
         expect(find.text('Groceries'), findsOneWidget);
-        // $300 appears as: Dining leaf budget, Lifestyle pillar aggregate,
-        // and Food sub-parent aggregate (120 + 180).
+        // Sub-parent aggregates children only (120 + 180); its own 50
+        // budget is ignored because it has children.
         expect(find.text(r'$300'), findsNWidgets(3));
+        // Level-3 leaves show their own budget, not an aggregate.
+        expect(find.text(r'$120'), findsOneWidget);
+        expect(find.text(r'$180'), findsOneWidget);
+        // Pillar header aggregates across the full subtree.
+        expect(find.text(r'$1500'), findsOneWidget);
+      });
+
+      testWidgets('pillar collapse hides subs and level-3 envelopes',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: EnvelopeTreeListView(allCategories: deepCategories),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Essential'));
+        await tester.pumpAndSettle();
+        expect(find.text('Food'), findsNothing);
+        expect(find.text('Coffee'), findsNothing);
+        expect(find.text('Groceries'), findsNothing);
+        // Other pillars keep their own collapse state.
+        expect(find.text('Dining'), findsOneWidget);
+
+        await tester.tap(find.text('Essential'));
+        await tester.pumpAndSettle();
+        expect(find.text('Coffee'), findsOneWidget);
       });
 
       testWidgets('chevron tap toggles level-3 children without onChildTap',
@@ -411,6 +446,8 @@ void main() {
         expect(find.text('Coffee'), findsNothing);
         expect(find.text('Groceries'), findsNothing);
         expect(childTaps, 0);
+        // Without onChildEdit the pencil is not rendered at all.
+        expect(find.byIcon(Icons.edit_outlined), findsNothing);
 
         await tester.tap(foodRowChevron);
         await tester.pumpAndSettle();

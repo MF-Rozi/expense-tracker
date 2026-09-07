@@ -1,4 +1,5 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/extensions/category_tree.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
@@ -24,6 +25,28 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
     getIt<EasterEggCubit>().onCategoriesOpened();
   }
 
+  /// The tree renders and aggregates three levels, so creation is capped
+  /// there too: the FAB is hidden on focused pages that are already at
+  /// level 3 (a level-4 envelope would be invisible in the tree).
+  bool _canCreateChild(Category? activeCategory, List<Category> all) {
+    if (activeCategory == null) return true;
+    return _depthOf(activeCategory, all) < 3;
+  }
+
+  int _depthOf(Category category, List<Category> all) {
+    var depth = 1;
+    Category? current = category;
+    while (current?.parentId != null && depth < 10) {
+      final parentId = current!.parentId!.getOrCrash();
+      current = all.cast<Category?>().firstWhere(
+            (c) => c?.uuid.getOrCrash() == parentId,
+            orElse: () => null,
+          );
+      depth++;
+    }
+    return depth;
+  }
+
   IconData _iconForChild(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('mortgage') ||
@@ -44,19 +67,6 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
       return Icons.bar_chart_outlined;
     }
     return Icons.category_outlined;
-  }
-
-  double _sumBudgetUnder(Category category, List<Category> allCategories) {
-    final directChildren = allCategories
-        .where((c) => c.parentId?.getOrCrash() == category.uuid.getOrCrash())
-        .toList();
-    if (directChildren.isEmpty) {
-      return category.expectedMonthlyBudget;
-    }
-    return directChildren.fold(
-      0,
-      (sum, c) => sum + _sumBudgetUnder(c, allCategories),
-    );
   }
 
   Future<void> _confirmDelete(
@@ -295,27 +305,30 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                 ),
               ],
             ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BlocProvider<CategoryCubit>.value(
-                      value: blocContext.read<CategoryCubit>(),
-                      child: CategoryFormPage(
-                        activeParentUuid: state.activeParentUuid,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              backgroundColor: const Color(0xFF00113A),
-              foregroundColor: Colors.white,
-              label: Text(
-                'Add Envelope',
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-              ),
-              icon: const Icon(Icons.add),
-            ),
+            floatingActionButton:
+                _canCreateChild(activeCategory, state.allCategories)
+                    ? FloatingActionButton.extended(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        backgroundColor: const Color(0xFF00113A),
+                        foregroundColor: Colors.white,
+                        label: Text(
+                          'Add Envelope',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                        ),
+                        icon: const Icon(Icons.add),
+                      )
+                    : null,
           ),
         );
       },
@@ -335,7 +348,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
             )
         : null;
 
-    final totalBudget = _sumBudgetUnder(activeCategory, state.allCategories);
+    final totalBudget = activeCategory.sumBudgetUnder(state.allCategories);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -487,7 +500,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
     CategoryState state,
   ) {
     final name = child.name.getOrCrash();
-    final budget = _sumBudgetUnder(child, state.allCategories);
+    final budget = child.sumBudgetUnder(state.allCategories);
 
     return Container(
       padding: const EdgeInsets.all(14),
