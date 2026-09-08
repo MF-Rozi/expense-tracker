@@ -27,24 +27,19 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
 
   /// The tree renders and aggregates three levels, so creation is capped
   /// there too: the FAB is hidden on focused pages that are already at
-  /// level 3 (a level-4 envelope would be invisible in the tree).
+  /// level 3 (a level-4 envelope would be invisible in the tree). An
+  /// orphan parent (uuid missing from the list) also hides the FAB —
+  /// children under it would be unreachable in every surface.
   bool _canCreateChild(Category? activeCategory, List<Category> all) {
     if (activeCategory == null) return true;
-    return _depthOf(activeCategory, all) < 3;
-  }
-
-  int _depthOf(Category category, List<Category> all) {
-    var depth = 1;
-    Category? current = category;
-    while (current?.parentId != null && depth < 10) {
-      final parentId = current!.parentId!.getOrCrash();
-      current = all.cast<Category?>().firstWhere(
-            (c) => c?.uuid.getOrCrash() == parentId,
-            orElse: () => null,
-          );
-      depth++;
+    if (activeCategory.parentId != null) {
+      final parentId = activeCategory.parentId!.getOrCrash();
+      final parentExists = all.any(
+        (c) => c.uuid.getOrCrash() == parentId,
+      );
+      if (!parentExists) return false;
     }
-    return depth;
+    return activeCategory.getHierarchyChain(all).length < 3;
   }
 
   IconData _iconForChild(String name) {
@@ -285,7 +280,10 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                         ),
                         const SizedBox(height: 16),
                         if (state.currentViewCategories.isEmpty)
-                          _buildEmptySubEnvelopesState(activeCategory)
+                          _buildEmptySubEnvelopesState(
+                            activeCategory,
+                            state.allCategories,
+                          )
                         else
                           ...state.currentViewCategories.map(
                             (child) => Padding(
@@ -593,7 +591,11 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
     );
   }
 
-  Widget _buildEmptySubEnvelopesState(Category activeCategory) {
+  Widget _buildEmptySubEnvelopesState(
+    Category activeCategory,
+    List<Category> all,
+  ) {
+    final isMaxDepth = activeCategory.getHierarchyChain(all).length >= 3;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
@@ -606,7 +608,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
             ),
             const SizedBox(height: 12),
             Text(
-              'No sub-envelopes yet',
+              isMaxDepth ? 'Leaf envelope' : 'No sub-envelopes yet',
               style: GoogleFonts.manrope(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -615,8 +617,12 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Nested envelopes inside "${activeCategory.name.getOrCrash()}" '
-              'will appear here.',
+              isMaxDepth
+                  ? '"${activeCategory.name.getOrCrash()}" is at the '
+                      'deepest level and cannot contain nested envelopes.'
+                  : 'Nested envelopes inside '
+                      '"${activeCategory.name.getOrCrash()}" '
+                      'will appear here.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,

@@ -60,7 +60,7 @@ class SettingsPage extends StatelessWidget {
     if (progress.unlocked) return 'Secret unlocked — Counter is below';
     if (!progress.hintSeen) return '1.0.0';
     return 'Something is stirring... '
-        '(${progress.completedSteps}/3 steps)';
+        '(${progress.completedSteps}/${EasterEggProgress.totalSteps} steps)';
   }
 
   void _showRitualDialog(BuildContext context) {

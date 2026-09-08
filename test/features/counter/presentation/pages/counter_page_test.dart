@@ -10,34 +10,14 @@ import 'package:expense_tracker/features/counter/counter.dart';
 import 'package:expense_tracker/features/easter_egg/data/datasources/easter_egg_storage.dart';
 import 'package:expense_tracker/features/easter_egg/domain/entities/easter_egg_progress.dart';
 import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
-import 'package:expense_tracker/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../helpers/helpers.dart';
 
 class MockCounterCubit extends MockCubit<int> implements CounterCubit {}
-
-class _RecordingFlashCubit extends FlashCubit {
-  final List<String> messages = [];
-
-  @override
-  Future<void> displayFlash(String message) async {
-    messages.add(message);
-  }
-}
-
-Future<EasterEggCubit> buildEggCubit() async {
-  SharedPreferences.setMockInitialValues({});
-  final preferences = await SharedPreferences.getInstance();
-  return EasterEggCubit(
-    EasterEggStorageImpl(preferences),
-    _RecordingFlashCubit(),
-  );
-}
 
 void main() {
   group('CounterPage', () {
@@ -98,8 +78,7 @@ void main() {
   group('CounterPage hide action', () {
     testWidgets('re-locks the easter egg when the eye-off icon is tapped',
         (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final preferences = await SharedPreferences.getInstance();
+      final preferences = await mockPreferences();
       await EasterEggStorageImpl(preferences).write(
         const EasterEggProgress(
           hintSeen: true,
@@ -111,7 +90,7 @@ void main() {
       );
       final eggCubit = EasterEggCubit(
         EasterEggStorageImpl(preferences),
-        _RecordingFlashCubit(),
+        RecordingFlashCubit(),
       );
       expect(eggCubit.state.progress.unlocked, isTrue);
 

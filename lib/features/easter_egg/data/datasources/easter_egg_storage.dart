@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:expense_tracker/features/easter_egg/domain/entities/easter_egg_progress.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,40 +9,44 @@ abstract class EasterEggStorage {
   Future<void> write(EasterEggProgress progress);
 }
 
+/// Persists the ritual as one atomic JSON snapshot. Separate keys would
+/// allow torn writes (e.g. steps persisted without the unlocked flag),
+/// which no in-process code can distinguish from an intentional state.
 @LazySingleton(as: EasterEggStorage)
 class EasterEggStorageImpl implements EasterEggStorage {
   const EasterEggStorageImpl(this._preferences);
 
   final SharedPreferences _preferences;
 
-  static const _tapsKey = 'easterEgg.versionTaps';
-  static const _hintKey = 'easterEgg.hintSeen';
-  static const _transactionKey = 'easterEgg.loggedTransaction';
-  static const _statsKey = 'easterEgg.visitedStats';
-  static const _categoriesKey = 'easterEgg.openedCategories';
-  static const _unlockedKey = 'easterEgg.unlocked';
+  static const _progressKey = 'easterEgg.progress';
 
   @override
   EasterEggProgress read() {
+    final raw = _preferences.getString(_progressKey);
+    if (raw == null) return const EasterEggProgress();
+    final map = jsonDecode(raw) as Map<String, dynamic>;
     return EasterEggProgress(
-      versionTaps: _preferences.getInt(_tapsKey) ?? 0,
-      hintSeen: _preferences.getBool(_hintKey) ?? false,
-      loggedTransaction: _preferences.getBool(_transactionKey) ?? false,
-      visitedStats: _preferences.getBool(_statsKey) ?? false,
-      openedCategories: _preferences.getBool(_categoriesKey) ?? false,
-      unlocked: _preferences.getBool(_unlockedKey) ?? false,
+      versionTaps: map['versionTaps'] as int? ?? 0,
+      hintSeen: map['hintSeen'] as bool? ?? false,
+      loggedTransaction: map['loggedTransaction'] as bool? ?? false,
+      visitedStats: map['visitedStats'] as bool? ?? false,
+      openedCategories: map['openedCategories'] as bool? ?? false,
+      unlocked: map['unlocked'] as bool? ?? false,
     );
   }
 
   @override
-  Future<void> write(EasterEggProgress progress) async {
-    await Future.wait([
-      _preferences.setInt(_tapsKey, progress.versionTaps),
-      _preferences.setBool(_hintKey, progress.hintSeen),
-      _preferences.setBool(_transactionKey, progress.loggedTransaction),
-      _preferences.setBool(_statsKey, progress.visitedStats),
-      _preferences.setBool(_categoriesKey, progress.openedCategories),
-      _preferences.setBool(_unlockedKey, progress.unlocked),
-    ]);
+  Future<void> write(EasterEggProgress progress) {
+    return _preferences.setString(
+      _progressKey,
+      jsonEncode({
+        'versionTaps': progress.versionTaps,
+        'hintSeen': progress.hintSeen,
+        'loggedTransaction': progress.loggedTransaction,
+        'visitedStats': progress.visitedStats,
+        'openedCategories': progress.openedCategories,
+        'unlocked': progress.unlocked,
+      }),
+    );
   }
 }

@@ -1,29 +1,18 @@
 import 'package:expense_tracker/features/easter_egg/data/datasources/easter_egg_storage.dart';
 import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
-import 'package:expense_tracker/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../helpers/helpers.dart';
 
-class _RecordingFlashCubit extends FlashCubit {
-  final List<String> messages = [];
-
-  @override
-  Future<void> displayFlash(String message) async {
-    messages.add(message);
-  }
-}
-
 void main() {
   late SharedPreferences preferences;
-  late _RecordingFlashCubit flashCubit;
+  late RecordingFlashCubit flashCubit;
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
-    preferences = await SharedPreferences.getInstance();
-    flashCubit = _RecordingFlashCubit();
+    preferences = await mockPreferences();
+    flashCubit = RecordingFlashCubit();
   });
 
   Future<EasterEggCubit> buildCubit() async =>

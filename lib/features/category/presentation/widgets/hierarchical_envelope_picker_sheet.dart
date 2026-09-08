@@ -1,4 +1,5 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/extensions/category_tree.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
@@ -328,7 +329,7 @@ class _HierarchicalEnvelopePickerSheetState
   ) {
     final name = pillar.name.getOrCrash();
     final isSelected = widget.selectedCategory?.uuid == pillar.uuid;
-    final totalBudget = _sumBudgetUnder(pillar, allCategories);
+    final totalBudget = pillar.sumBudgetUnder(allCategories);
 
     return InkWell(
       onTap: () {
@@ -827,18 +828,6 @@ class _HierarchicalEnvelopePickerSheetState
   }
 
   // ────────────────────────────── Helpers ───────────────────────────────────
-
-  double _sumBudgetUnder(Category category, List<Category> allCategories) {
-    final directChildren =
-        allCategories.where((c) => c.parentId == category.uuid).toList();
-    if (directChildren.isEmpty) {
-      return category.expectedMonthlyBudget;
-    }
-    return directChildren.fold(
-      0,
-      (sum, c) => sum + _sumBudgetUnder(c, allCategories),
-    );
-  }
 
   Widget _buildPillarChip(Category pillar) {
     final name = pillar.name.getOrCrash().toLowerCase();
