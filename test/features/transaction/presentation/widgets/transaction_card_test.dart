@@ -68,8 +68,7 @@ void main() {
     expect(find.textContaining('Groceries'), findsNothing);
   });
 
-  testWidgets('resolves the category once the stream emits it',
-      (tester) async {
+  testWidgets('resolves the category once the stream emits it', (tester) async {
     await tester.pumpApp(
       BlocProvider<CategoryCubit>.value(
         value: categoryCubit,
