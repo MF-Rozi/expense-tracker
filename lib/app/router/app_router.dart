@@ -23,7 +23,11 @@ class AppRouter extends Equatable {
   List<Object?> get props => [home];
 }
 
-GoRouter router([String? initialLocation]) => GoRouter(
+GoRouter router([
+  String? initialLocation,
+  bool Function()? isCounterUnlocked,
+]) =>
+    GoRouter(
       debugLogDiagnostics: kDebugMode || kProfileMode,
       initialLocation: initialLocation ?? '/',
       routes: [
@@ -77,8 +81,11 @@ GoRouter router([String? initialLocation]) => GoRouter(
           // Locked users never reach the secret room — even via direct
           // navigation or a future deep link.
           redirect: (context, state) {
-            final unlocked = getIt<EasterEggCubit>().state.progress.unlocked;
-            return unlocked ? null : '/settings';
+            final isUnlocked = (isCounterUnlocked ??
+                    () => getIt<EasterEggCubit>().state.progress.unlocked)()
+                ? null
+                : '/settings';
+            return isUnlocked;
           },
           builder: (context, state) => const CounterPage(),
         ),

@@ -1,6 +1,4 @@
 import 'package:expense_tracker/app/router/app_router.dart';
-import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
-import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,15 +14,21 @@ void main() {
 
   setUp(() => GoogleFonts.config.allowRuntimeFetching = false);
 
-  Future<void> pumpRouter(WidgetTester tester, String location) {
+  Future<void> pumpRouter(
+    WidgetTester tester,
+    String location, {
+    required bool isCounterUnlocked,
+  }) {
     return tester.pumpWidget(
-      MaterialApp.router(routerConfig: router(location)),
+      MaterialApp.router(
+        routerConfig: router('/counter', () => isCounterUnlocked),
+      ),
     );
   }
 
   testWidgets('redirects locked users from /counter to settings',
       (tester) async {
-    await pumpRouter(tester, '/counter');
+    await pumpRouter(tester, '/counter', isCounterUnlocked: false);
     await tester.pumpAndSettle();
 
     // App bar title + bottom-nav label both render "Settings"; the page
@@ -34,17 +38,7 @@ void main() {
   });
 
   testWidgets('unlocked users reach the counter', (tester) async {
-    final egg = getIt<EasterEggCubit>();
-    for (var i = 0; i < 7; i++) {
-      egg.onVersionTapped();
-    }
-    egg
-      ..onTransactionLogged()
-      ..onStatsVisited()
-      ..onCategoriesOpened();
-    expect(egg.state.progress.unlocked, isTrue);
-
-    await pumpRouter(tester, '/counter');
+    await pumpRouter(tester, '/counter', isCounterUnlocked: true);
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
