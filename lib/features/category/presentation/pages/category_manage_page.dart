@@ -1,15 +1,46 @@
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/extensions/category_tree.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_form_page.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/envelope_tree_list_view.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/portfolio_distribution_card.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CategoryManagePage extends StatelessWidget {
+class CategoryManagePage extends StatefulWidget {
   const CategoryManagePage({super.key});
+
+  @override
+  State<CategoryManagePage> createState() => _CategoryManagePageState();
+}
+
+class _CategoryManagePageState extends State<CategoryManagePage> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<EasterEggCubit>().onCategoriesOpened();
+  }
+
+  /// The tree renders and aggregates three levels, so creation is capped
+  /// there too: the FAB is hidden on focused pages that are already at
+  /// level 3 (a level-4 envelope would be invisible in the tree). An
+  /// orphan parent (uuid missing from the list) also hides the FAB —
+  /// children under it would be unreachable in every surface.
+  bool _canCreateChild(Category? activeCategory, List<Category> all) {
+    if (activeCategory == null) return true;
+    if (activeCategory.parentId != null) {
+      final parentId = activeCategory.parentId!.getOrCrash();
+      final parentExists = all.any(
+        (c) => c.uuid.getOrCrash() == parentId,
+      );
+      if (!parentExists) return false;
+    }
+    return activeCategory.getHierarchyChain(all).length < 3;
+  }
 
   IconData _iconForChild(String name) {
     final lower = name.toLowerCase();
@@ -31,19 +62,6 @@ class CategoryManagePage extends StatelessWidget {
       return Icons.bar_chart_outlined;
     }
     return Icons.category_outlined;
-  }
-
-  double _sumBudgetUnder(Category category, List<Category> allCategories) {
-    final directChildren = allCategories
-        .where((c) => c.parentId?.getOrCrash() == category.uuid.getOrCrash())
-        .toList();
-    if (directChildren.isEmpty) {
-      return category.expectedMonthlyBudget;
-    }
-    return directChildren.fold(
-      0,
-      (sum, c) => sum + _sumBudgetUnder(c, allCategories),
-    );
   }
 
   Future<void> _confirmDelete(
@@ -200,6 +218,21 @@ class CategoryManagePage extends StatelessWidget {
                                   .selectParent(child.uuid.getOrCrash());
                             }
                           },
+                          onChildEdit: (child) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    BlocProvider<CategoryCubit>.value(
+                                  value: blocContext.read<CategoryCubit>(),
+                                  child: CategoryFormPage(
+                                    categoryToEdit: child,
+                                    activeParentUuid:
+                                        child.parentId?.getOrCrash(),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                           onAddChild: (pillar) {
                             Navigator.of(context).push(
                               MaterialPageRoute<void>(
@@ -247,7 +280,10 @@ class CategoryManagePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         if (state.currentViewCategories.isEmpty)
-                          _buildEmptySubEnvelopesState(activeCategory)
+                          _buildEmptySubEnvelopesState(
+                            activeCategory,
+                            state.allCategories,
+                          )
                         else
                           ...state.currentViewCategories.map(
                             (child) => Padding(
@@ -267,27 +303,30 @@ class CategoryManagePage extends StatelessWidget {
                 ),
               ],
             ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BlocProvider<CategoryCubit>.value(
-                      value: blocContext.read<CategoryCubit>(),
-                      child: CategoryFormPage(
-                        activeParentUuid: state.activeParentUuid,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              backgroundColor: const Color(0xFF00113A),
-              foregroundColor: Colors.white,
-              label: Text(
-                'Add Envelope',
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-              ),
-              icon: const Icon(Icons.add),
-            ),
+            floatingActionButton:
+                _canCreateChild(activeCategory, state.allCategories)
+                    ? FloatingActionButton.extended(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => BlocProvider<CategoryCubit>.value(
+                                value: blocContext.read<CategoryCubit>(),
+                                child: CategoryFormPage(
+                                  activeParentUuid: state.activeParentUuid,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        backgroundColor: const Color(0xFF00113A),
+                        foregroundColor: Colors.white,
+                        label: Text(
+                          'Add Envelope',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                        ),
+                        icon: const Icon(Icons.add),
+                      )
+                    : null,
           ),
         );
       },
@@ -307,7 +346,7 @@ class CategoryManagePage extends StatelessWidget {
             )
         : null;
 
-    final totalBudget = _sumBudgetUnder(activeCategory, state.allCategories);
+    final totalBudget = activeCategory.sumBudgetUnder(state.allCategories);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -459,7 +498,7 @@ class CategoryManagePage extends StatelessWidget {
     CategoryState state,
   ) {
     final name = child.name.getOrCrash();
-    final budget = _sumBudgetUnder(child, state.allCategories);
+    final budget = child.sumBudgetUnder(state.allCategories);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -552,7 +591,11 @@ class CategoryManagePage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptySubEnvelopesState(Category activeCategory) {
+  Widget _buildEmptySubEnvelopesState(
+    Category activeCategory,
+    List<Category> all,
+  ) {
+    final isMaxDepth = activeCategory.getHierarchyChain(all).length >= 3;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
@@ -565,7 +608,7 @@ class CategoryManagePage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'No sub-envelopes yet',
+              isMaxDepth ? 'Leaf envelope' : 'No sub-envelopes yet',
               style: GoogleFonts.manrope(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -574,8 +617,12 @@ class CategoryManagePage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Nested envelopes inside "${activeCategory.name.getOrCrash()}" '
-              'will appear here.',
+              isMaxDepth
+                  ? '"${activeCategory.name.getOrCrash()}" is at the '
+                      'deepest level and cannot contain nested envelopes.'
+                  : 'Nested envelopes inside '
+                      '"${activeCategory.name.getOrCrash()}" '
+                      'will appear here.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,

@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/app/view/main_layout.dart';
 import 'package:expense_tracker/features/category/presentation/pages/category_manage_page.dart';
+import 'package:expense_tracker/features/counter/presentation/pages/counter_page.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/pages/home_page.dart';
+import 'package:expense_tracker/features/dashboard/presentation/pages/stats_coming_soon_page.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -10,7 +13,6 @@ import 'package:expense_tracker/features/transaction/presentation/pages/transact
 import 'package:expense_tracker/features/transaction/presentation/pages/transaction_history_page.dart';
 import 'package:expense_tracker/injector.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,7 +23,11 @@ class AppRouter extends Equatable {
   List<Object?> get props => [home];
 }
 
-GoRouter router([String? initialLocation]) => GoRouter(
+GoRouter router([
+  String? initialLocation,
+  bool Function()? isCounterUnlocked,
+]) =>
+    GoRouter(
       debugLogDiagnostics: kDebugMode || kProfileMode,
       initialLocation: initialLocation ?? '/',
       routes: [
@@ -44,11 +50,7 @@ GoRouter router([String? initialLocation]) => GoRouter(
             GoRoute(
               path: '/stats',
               name: 'stats',
-              builder: (context, state) => const Scaffold(
-                body: Center(
-                  child: Text('Coming Soon'),
-                ),
-              ),
+              builder: (context, state) => const StatsComingSoonPage(),
             ),
             GoRoute(
               path: '/settings',
@@ -72,6 +74,20 @@ GoRouter router([String? initialLocation]) => GoRouter(
           path: '/categories',
           name: 'categories',
           builder: (context, state) => const CategoryManagePage(),
+        ),
+        GoRoute(
+          path: '/counter',
+          name: 'counter',
+          // Locked users never reach the secret room — even via direct
+          // navigation or a future deep link.
+          redirect: (context, state) {
+            final isUnlocked = (isCounterUnlocked ??
+                    () => getIt<EasterEggCubit>().state.progress.unlocked)()
+                ? null
+                : '/settings';
+            return isUnlocked;
+          },
+          builder: (context, state) => const CounterPage(),
         ),
       ],
     );

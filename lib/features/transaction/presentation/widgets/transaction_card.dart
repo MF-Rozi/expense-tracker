@@ -17,7 +17,10 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = context.read<CategoryCubit>().state.allCategories;
+    // watch (not read): on first launch the categories stream has not
+    // emitted yet — the card must rebuild and resolve names once it does,
+    // instead of being stuck on the "Uncategorized" fallback.
+    final categories = context.watch<CategoryCubit>().state.allCategories;
     final category = categories.firstWhere(
       (c) => c.uuid.getOrCrash() == transaction.categoryUuid.getOrCrash(),
       orElse: () => Category(

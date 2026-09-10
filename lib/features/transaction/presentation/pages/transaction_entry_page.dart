@@ -2,6 +2,7 @@ import 'package:expense_tracker/features/category/domain/entities/category.dart'
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/category/presentation/widgets/hierarchical_envelope_picker_sheet.dart';
+import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -150,6 +151,11 @@ class _TransactionEntryPageState extends State<TransactionEntryPage> {
       body: BlocConsumer<TransactionCubit, TransactionState>(
         listener: (context, state) {
           if (state.status == TransactionFormStatus.success) {
+            // The ritual step is "log a transaction" — editing an
+            // existing one does not count.
+            if (widget.existingTransaction == null) {
+              getIt<EasterEggCubit>().onTransactionLogged();
+            }
             Navigator.of(context).pop();
           } else if (state.status == TransactionFormStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(

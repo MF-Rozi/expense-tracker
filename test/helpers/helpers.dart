@@ -6,4 +6,5 @@
 // https://opensource.org/licenses/MIT.
 
 export 'configure_injector.dart';
+export 'easter_egg_test_helpers.dart';
 export 'pump_app.dart';
