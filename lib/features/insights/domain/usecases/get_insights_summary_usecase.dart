@@ -102,7 +102,10 @@ class GetInsightsSummaryUseCase
       );
       final envelope = accumulator.envelopes.putIfAbsent(
         envelopeKey,
-        () => _EnvelopeAccumulator(category: category),
+        () => _EnvelopeAccumulator(
+          category: category,
+          breadcrumb: category.getBreadcrumbPath(categories),
+        ),
       );
 
       if (transaction.type == TransactionType.expense) {
@@ -124,7 +127,10 @@ class GetInsightsSummaryUseCase
 
     final pillars = pillarAccumulators.values
         .map(
-          (accumulator) => accumulator.toInsight(totalOutflow: totalOutflow),
+          (accumulator) => accumulator.toInsight(
+            totalOutflow: totalOutflow,
+            categories: categories,
+          ),
         )
         .toList()
       ..sort(_compareByActivity);
@@ -180,17 +186,22 @@ class GetInsightsSummaryParams extends Equatable {
 }
 
 class _EnvelopeAccumulator {
-  _EnvelopeAccumulator({required this.category});
+  _EnvelopeAccumulator({required this.category, required this.breadcrumb});
 
   final Category category;
+  final String breadcrumb;
   double outflow = 0;
   double inflow = 0;
   int transactionCount = 0;
 
-  EnvelopeInsight toInsight({required double pillarActivity}) {
+  EnvelopeInsight toInsight({
+    required double pillarActivity,
+    required List<Category> categories,
+  }) {
     final activity = outflow + inflow;
     return EnvelopeInsight(
       category: category,
+      breadcrumb: category.getBreadcrumbPath(categories),
       outflow: outflow,
       inflow: inflow,
       transactionCount: transactionCount,
@@ -207,7 +218,10 @@ class _PillarAccumulator {
   double inflow = 0;
   final Map<String, _EnvelopeAccumulator> envelopes = {};
 
-  PillarInsight toInsight({required double totalOutflow}) {
+  PillarInsight toInsight({
+    required double totalOutflow,
+    required List<Category> categories,
+  }) {
     final pillarActivity = outflow + inflow;
     return PillarInsight(
       pillar: pillar,
@@ -216,7 +230,10 @@ class _PillarAccumulator {
       shareOfTotalOutflow: totalOutflow == 0 ? 0 : outflow / totalOutflow,
       envelopes: envelopes.values
           .map(
-            (envelope) => envelope.toInsight(pillarActivity: pillarActivity),
+            (envelope) => envelope.toInsight(
+              pillarActivity: pillarActivity,
+              categories: categories,
+            ),
           )
           .toList()
         ..sort((a, b) {

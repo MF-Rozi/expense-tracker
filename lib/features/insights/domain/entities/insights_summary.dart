@@ -113,6 +113,7 @@ class PillarInsight extends Equatable {
 class EnvelopeInsight extends Equatable {
   const EnvelopeInsight({
     required this.category,
+    required this.breadcrumb,
     required this.outflow,
     required this.inflow,
     required this.transactionCount,
@@ -120,6 +121,10 @@ class EnvelopeInsight extends Equatable {
   });
 
   final Category category;
+
+  /// Full hierarchy path of [category]
+  /// (e.g. "Essential › Groceries & Household › Groceries").
+  final String breadcrumb;
   final double outflow;
   final double inflow;
   final int transactionCount;
@@ -131,6 +136,7 @@ class EnvelopeInsight extends Equatable {
   @override
   List<Object?> get props => [
         category,
+        breadcrumb,
         outflow,
         inflow,
         transactionCount,
