@@ -8,6 +8,7 @@ import 'package:expense_tracker/features/insights/domain/entities/insight_timefr
 import 'package:expense_tracker/features/insights/domain/entities/insights_summary.dart';
 import 'package:expense_tracker/features/insights/domain/usecases/get_insights_summary_usecase.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 
 part 'insights_state.dart';
 
@@ -21,7 +22,7 @@ typedef InsightsNowProvider = DateTime Function();
 class InsightsCubit extends Cubit<InsightsState> {
   InsightsCubit(
     this._loadInsightsSummary, {
-    InsightsNowProvider? nowProvider,
+    @ignoreParam InsightsNowProvider? nowProvider,
   })  : _nowProvider = nowProvider ?? DateTime.now,
         super(const InsightsState());
 
@@ -33,16 +34,68 @@ class InsightsCubit extends Cubit<InsightsState> {
   /// Fetches the currently selected timeframe.
   Future<void> load() => _fetch(state.selectedTimeframe);
 
-  /// Switches the timeframe and fetches it.
+  /// Switches to a preset timeframe and fetches it. Clears any custom
+  /// range so refresh() keeps the preset behavior.
   Future<void> selectTimeframe(InsightsTimeframe timeframe) {
-    if (timeframe != state.selectedTimeframe) {
-      emit(state.copyWith(selectedTimeframe: timeframe));
+    if (timeframe == InsightsTimeframe.custom) {
+      throw ArgumentError(
+        'use selectCustomRange for the custom timeframe',
+      );
     }
+    emit(
+      state.copyWith(
+        selectedTimeframe: timeframe,
+        clearCustomRange: true,
+      ),
+    );
     return _fetch(timeframe);
+  }
+
+  /// Picks a custom range, switches the timeframe to custom, and
+  /// fetches. Boundaries are normalized to full days.
+  Future<void> selectCustomRange(DateTime start, DateTime end) {
+    final normalized = DateRange(
+      start: DateTime(start.year, start.month, start.day),
+      end: DateTime(end.year, end.month, end.day, 23, 59, 59, 999),
+    );
+    emit(
+      state.copyWith(
+        selectedTimeframe: InsightsTimeframe.custom,
+        customRange: normalized,
+      ),
+    );
+    return _fetch(InsightsTimeframe.custom);
   }
 
   /// Re-fetches the current timeframe (pull-to-refresh).
   Future<void> refresh() => _fetch(state.selectedTimeframe);
+
+  String _periodLabel(
+    InsightsTimeframe timeframe,
+    DateRange? customRange,
+    DateTime now,
+  ) {
+    switch (timeframe) {
+      case InsightsTimeframe.thisMonth:
+        return DateFormat('MMMM yyyy').format(now);
+      case InsightsTimeframe.lastQuarter:
+        final window = timeframe.resolve(now);
+        return '${DateFormat('MMM').format(window.current.start)} – '
+            '${DateFormat('MMM yyyy').format(window.current.end)}';
+      case InsightsTimeframe.ytd:
+        return 'Jan 1 – ${DateFormat('MMM d, yyyy').format(now)}';
+      case InsightsTimeframe.allTime:
+        return 'All Time';
+      case InsightsTimeframe.custom:
+        final range = customRange;
+        if (range == null) return 'Custom';
+        final sameYear = range.start.year == range.end.year;
+        final startFormat =
+            sameYear ? DateFormat('d MMM') : DateFormat('d MMM yyyy');
+        return '${startFormat.format(range.start)} – '
+            '${DateFormat('d MMM yyyy').format(range.end)}';
+    }
+  }
 
   Future<void> _fetch(InsightsTimeframe timeframe) async {
     final token = ++_requestToken;
@@ -53,8 +106,14 @@ class InsightsCubit extends Cubit<InsightsState> {
       ),
     );
 
+    final now = _nowProvider();
     final result = await _loadInsightsSummary(
-      GetInsightsSummaryParams(timeframe: timeframe, now: _nowProvider()),
+      GetInsightsSummaryParams(
+        timeframe: timeframe,
+        now: now,
+        customRange: state.customRange,
+        periodLabel: _periodLabel(timeframe, state.customRange, now),
+      ),
     );
 
     // A newer request superseded this one — drop the stale response.

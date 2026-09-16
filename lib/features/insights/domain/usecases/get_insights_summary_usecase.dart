@@ -34,42 +34,72 @@ class GetInsightsSummaryUseCase
   Future<Either<Failure, InsightsSummary>> call(
     GetInsightsSummaryParams params,
   ) async {
-    final window = params.timeframe.resolve(params.now);
+    final window = _resolveWindow(params);
 
     final categoriesResult = await _categoryRepository.watchCategories().first;
     final currentResult = await _transactionRepository.getTransactions(
-      startDate: window.current.start,
-      endDate: window.current.end,
+      startDate: window?.current.start,
+      endDate: window?.current.end,
     );
-    final previousResult = await _transactionRepository.getTransactions(
-      startDate: window.previous.start,
-      endDate: window.previous.end,
-    );
+    var previous = const <Transaction>[];
+    if (window != null) {
+      final previousResult = await _transactionRepository.getTransactions(
+        startDate: window.previous.start,
+        endDate: window.previous.end,
+      );
+      previous = previousResult.fold((_) => <Transaction>[], (t) => t);
+    }
 
     final failure = categoriesResult.fold((f) => f, (_) => null) ??
-        currentResult.fold((f) => f, (_) => null) ??
-        previousResult.fold((f) => f, (_) => null);
+        currentResult.fold((f) => f, (_) => null);
     if (failure != null) {
       return Left(failure);
     }
 
     final categories = categoriesResult.fold((_) => <Category>[], (c) => c);
     final current = currentResult.fold((_) => <Transaction>[], (t) => t);
-    final previous = previousResult.fold((_) => <Transaction>[], (t) => t);
 
     return Right(
       _aggregate(
         currentTransactions: current,
         previousTransactions: previous,
         categories: categories,
+        hasPreviousWindow: window != null,
+        periodLabel: params.periodLabel,
       ),
     );
+  }
+
+  /// Null window means "all time" — a single unfiltered fetch with no
+  /// period-over-period comparison.
+  InsightsWindow? _resolveWindow(GetInsightsSummaryParams params) {
+    switch (params.timeframe) {
+      case InsightsTimeframe.allTime:
+        return null;
+      case InsightsTimeframe.custom:
+        final customRange = params.customRange;
+        if (customRange == null) {
+          throw ArgumentError(
+            'timeframe custom requires customRange in the params',
+          );
+        }
+        return InsightsWindow(
+          current: customRange,
+          previous: customRange.previousEqualLength(),
+        );
+      case InsightsTimeframe.thisMonth:
+      case InsightsTimeframe.lastQuarter:
+      case InsightsTimeframe.ytd:
+        return params.timeframe.resolve(params.now);
+    }
   }
 
   InsightsSummary _aggregate({
     required List<Transaction> currentTransactions,
     required List<Transaction> previousTransactions,
     required List<Category> categories,
+    required bool hasPreviousWindow,
+    required String periodLabel,
   }) {
     final categoryByUuid = <String, Category>{
       for (final category in categories) category.uuid.getOrCrash(): category,
@@ -135,17 +165,27 @@ class GetInsightsSummaryUseCase
         .toList()
       ..sort(_compareByActivity);
 
+    // Without a previous window (All Time) the deltas render as a dash
+    // instead of a meaningless comparison.
+    final outflowDelta = hasPreviousWindow
+        ? InsightsDelta.calculate(
+            current: totalOutflow,
+            previous: previousOutflow,
+          )
+        : InsightsDelta(current: totalOutflow, previous: 0, isNew: false);
+    final inflowDelta = hasPreviousWindow
+        ? InsightsDelta.calculate(
+            current: totalInflow,
+            previous: previousInflow,
+          )
+        : InsightsDelta(current: totalInflow, previous: 0, isNew: false);
+
     return InsightsSummary(
+      periodLabel: periodLabel,
       totalOutflow: totalOutflow,
       totalInflow: totalInflow,
-      outflowDelta: InsightsDelta.calculate(
-        current: totalOutflow,
-        previous: previousOutflow,
-      ),
-      inflowDelta: InsightsDelta.calculate(
-        current: totalInflow,
-        previous: previousInflow,
-      ),
+      outflowDelta: outflowDelta,
+      inflowDelta: inflowDelta,
       pillars: pillars,
     );
   }
@@ -176,13 +216,22 @@ class GetInsightsSummaryParams extends Equatable {
   const GetInsightsSummaryParams({
     required this.timeframe,
     required this.now,
+    this.customRange,
+    this.periodLabel = '',
   });
 
   final InsightsTimeframe timeframe;
   final DateTime now;
 
+  /// Required when [timeframe] is `custom`; ignored otherwise.
+  final DateRange? customRange;
+
+  /// Human-readable window label computed by the caller so the summary
+  /// carries everything the UI renders.
+  final String periodLabel;
+
   @override
-  List<Object?> get props => [timeframe, now];
+  List<Object?> get props => [timeframe, now, customRange, periodLabel];
 }
 
 class _EnvelopeAccumulator {

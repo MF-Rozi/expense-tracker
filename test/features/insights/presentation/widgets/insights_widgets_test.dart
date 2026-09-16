@@ -170,6 +170,7 @@ void main() {
             body: TimeframeFilterRow(
               selected: InsightsTimeframe.thisMonth,
               onTimeframeChanged: (_) {},
+              onCustomSelected: () {},
             ),
           ),
         ),
@@ -178,6 +179,27 @@ void main() {
       expect(find.text('This Month'), findsOneWidget);
       expect(find.text('Last Quarter'), findsOneWidget);
       expect(find.text('YTD'), findsOneWidget);
+    });
+
+    testWidgets('shows all five options and fires onCustomSelected',
+        (tester) async {
+      var customTapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TimeframeFilterRow(
+              selected: InsightsTimeframe.thisMonth,
+              onTimeframeChanged: (_) {},
+              onCustomSelected: () => customTapped = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('All Time'), findsOneWidget);
+      expect(find.text('Custom'), findsOneWidget);
+      await tester.tap(find.text('Custom'));
+      expect(customTapped, isTrue);
     });
 
     testWidgets('fires onTimeframeChanged when a segment is tapped',
@@ -189,6 +211,7 @@ void main() {
             body: TimeframeFilterRow(
               selected: InsightsTimeframe.thisMonth,
               onTimeframeChanged: (t) => tapped = t,
+              onCustomSelected: () {},
             ),
           ),
         ),

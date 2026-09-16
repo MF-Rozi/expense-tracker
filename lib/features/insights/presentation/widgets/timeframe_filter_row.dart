@@ -2,16 +2,20 @@ import 'package:expense_tracker/features/insights/domain/entities/insight_timefr
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Capsule segmented control for the three analysis timeframes.
+/// Capsule segmented control for the analysis timeframes. Five options
+/// don't fit a phone width, so the row scrolls horizontally; a Custom
+/// selection opens the date-range picker from the page.
 class TimeframeFilterRow extends StatelessWidget {
   const TimeframeFilterRow({
     required this.selected,
     required this.onTimeframeChanged,
+    required this.onCustomSelected,
     super.key,
   });
 
   final InsightsTimeframe selected;
   final ValueChanged<InsightsTimeframe> onTimeframeChanged;
+  final VoidCallback onCustomSelected;
 
   static const _trackColor = Color(0xFFF3F4F5);
   static const _inactiveColor = Color(0xFF444650);
@@ -25,6 +29,8 @@ class TimeframeFilterRow extends StatelessWidget {
     InsightsTimeframe.thisMonth: 'This Month',
     InsightsTimeframe.lastQuarter: 'Last Quarter',
     InsightsTimeframe.ytd: 'YTD',
+    InsightsTimeframe.allTime: 'All Time',
+    InsightsTimeframe.custom: 'Custom',
   };
 
   @override
@@ -35,16 +41,17 @@ class TimeframeFilterRow extends StatelessWidget {
         color: _trackColor,
         borderRadius: BorderRadius.circular(100),
       ),
-      child: Row(
-        children: [
-          for (final timeframe in InsightsTimeframe.values) ...[
-            if (timeframe != InsightsTimeframe.thisMonth)
-              const SizedBox(width: 4),
-            Expanded(
-              child: _buildSegment(timeframe),
-            ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final timeframe in InsightsTimeframe.values) ...[
+              if (timeframe != InsightsTimeframe.thisMonth)
+                const SizedBox(width: 4),
+              _buildSegment(timeframe),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -54,11 +61,13 @@ class TimeframeFilterRow extends StatelessWidget {
     final label = _labels[timeframe]!;
 
     return GestureDetector(
-      onTap: () => onTimeframeChanged(timeframe),
+      onTap: () => timeframe == InsightsTimeframe.custom
+          ? onCustomSelected()
+          : onTimeframeChanged(timeframe),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
           gradient: isActive ? _gradient : null,
           borderRadius: BorderRadius.circular(100),

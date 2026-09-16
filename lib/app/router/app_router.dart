@@ -4,8 +4,9 @@ import 'package:expense_tracker/features/category/presentation/pages/category_ma
 import 'package:expense_tracker/features/counter/presentation/pages/counter_page.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/pages/home_page.dart';
-import 'package:expense_tracker/features/dashboard/presentation/pages/stats_coming_soon_page.dart';
 import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
+import 'package:expense_tracker/features/insights/presentation/blocs/insights_cubit.dart';
+import 'package:expense_tracker/features/insights/presentation/pages/insights_page.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -50,7 +51,10 @@ GoRouter router([
             GoRoute(
               path: '/stats',
               name: 'stats',
-              builder: (context, state) => const StatsComingSoonPage(),
+              builder: (context, state) => BlocProvider(
+                create: (context) => getIt<InsightsCubit>()..load(),
+                child: const InsightsPage(),
+              ),
             ),
             GoRoute(
               path: '/settings',

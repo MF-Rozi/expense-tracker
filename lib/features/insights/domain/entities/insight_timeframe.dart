@@ -4,11 +4,18 @@ import 'package:equatable/equatable.dart';
 enum InsightsTimeframe {
   thisMonth,
   lastQuarter,
-  ytd;
+  ytd,
+  allTime,
+  custom;
 
   /// Resolves this timeframe against [now] into the current analysis
   /// range and the previous comparable range used for period-over-period
   /// deltas. All ranges are inclusive on both ends.
+  ///
+  /// [allTime] and [custom] have no derived window: all time is fetched
+  /// unfiltered, and a custom range is supplied by the caller — see
+  /// `GetInsightsSummaryParams.customRange` and the equal-length
+  /// previous-window rule in the usecase.
   InsightsWindow resolve(DateTime now) {
     switch (this) {
       case InsightsTimeframe.thisMonth:
@@ -58,6 +65,11 @@ enum InsightsTimeframe {
           current: DateRange(start: start, end: end),
           previous: DateRange(start: previousStart, end: previousEnd),
         );
+      case InsightsTimeframe.allTime:
+      case InsightsTimeframe.custom:
+        throw UnsupportedError(
+          '$name has no derived window — the usecase handles it directly',
+        );
     }
   }
 
@@ -73,7 +85,24 @@ class DateRange extends Equatable {
   final DateTime start;
   final DateTime end;
 
+  /// Number of days covered, counting both end days (never zero).
+  /// Callers should pass midnight-normalized boundaries so the count is
+  /// exact.
+  int get daySpan => end.difference(start).inDays + 1;
+
   bool contains(DateTime date) => !date.isBefore(start) && !date.isAfter(end);
+
+  /// The equal-length window immediately before this one — the
+  /// period-over-period comparison for custom ranges.
+  DateRange previousEqualLength() {
+    final previousEnd = start.subtract(const Duration(milliseconds: 1));
+    final previousStart = DateTime(
+      previousEnd.year,
+      previousEnd.month,
+      previousEnd.day,
+    ).subtract(Duration(days: daySpan - 1));
+    return DateRange(start: previousStart, end: previousEnd);
+  }
 
   @override
   List<Object?> get props => [start, end];

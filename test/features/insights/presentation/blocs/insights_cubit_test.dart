@@ -29,10 +29,22 @@ void main() {
   final thisMonthParams = GetInsightsSummaryParams(
     timeframe: InsightsTimeframe.thisMonth,
     now: fixedNow,
+    periodLabel: 'September 2026',
   );
   final lastQuarterParams = GetInsightsSummaryParams(
     timeframe: InsightsTimeframe.lastQuarter,
     now: fixedNow,
+    periodLabel: 'Apr – Jun 2026',
+  );
+  final customRange = DateRange(
+    start: DateTime(2026, 3, 3),
+    end: DateTime(2026, 3, 10, 23, 59, 59, 999),
+  );
+  final customParams = GetInsightsSummaryParams(
+    timeframe: InsightsTimeframe.custom,
+    now: fixedNow,
+    customRange: customRange,
+    periodLabel: '3 Mar – 10 Mar 2026',
   );
 
   setUpAll(() {
@@ -128,6 +140,37 @@ void main() {
     await cubit.refresh();
 
     verify(() => useCase.call(thisMonthParams)).called(1);
+  });
+
+  test('selectCustomRange normalizes boundaries and fetches', () async {
+    var customSummaryBuilt = false;
+    when(() => useCase.call(customParams)).thenAnswer((_) async {
+      customSummaryBuilt = true;
+      return const Right(quarterSummaryFixture);
+    });
+
+    await cubit.selectCustomRange(
+      DateTime(2026, 3, 3, 14), // time-of-day normalized away
+      DateTime(2026, 3, 10),
+    );
+
+    expect(cubit.state.selectedTimeframe, InsightsTimeframe.custom);
+    expect(cubit.state.customRange, customRange);
+    expect(customSummaryBuilt, isTrue);
+  });
+
+  test('selecting a preset clears a previously picked custom range', () async {
+    when(() => useCase.call(customParams))
+        .thenAnswer((_) async => const Right(quarterSummaryFixture));
+    await cubit.selectCustomRange(DateTime(2026, 3, 3), DateTime(2026, 3, 10));
+    expect(cubit.state.customRange, isNotNull);
+
+    when(() => useCase.call(thisMonthParams))
+        .thenAnswer((_) async => Right(summary));
+    await cubit.selectTimeframe(InsightsTimeframe.thisMonth);
+
+    expect(cubit.state.customRange, isNull);
+    expect(cubit.state.selectedTimeframe, InsightsTimeframe.thisMonth);
   });
 
   test('rapid timeframe switches keep only the newest response', () async {

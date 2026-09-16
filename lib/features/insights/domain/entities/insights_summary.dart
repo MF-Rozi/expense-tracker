@@ -10,6 +10,7 @@ class InsightsSummary extends Equatable {
     required this.outflowDelta,
     required this.inflowDelta,
     required this.pillars,
+    this.periodLabel = '',
   });
 
   /// Sum of expense-transaction amounts in the current window.
@@ -24,8 +25,13 @@ class InsightsSummary extends Equatable {
   final InsightsDelta outflowDelta;
   final InsightsDelta inflowDelta;
 
+  /// Human-readable window label ("This Month", "Apr 1 – Jun 30, 2026",
+  /// "All Time", "Sep 1 – Sep 10").
+  final String periodLabel;
+
   @override
   List<Object?> get props => [
+        periodLabel,
         totalOutflow,
         totalInflow,
         outflowDelta,
