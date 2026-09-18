@@ -69,7 +69,7 @@ class _CustomRangePickerPageState extends State<CustomRangePickerPage> {
   Widget _buildDayGrid() {
     final year = _displayedMonth.year;
     final month = _displayedMonth.month;
-    final firstDay = DateTime(year, month, 1);
+    final firstDay = DateTime(year, month);
     final leadingBlanks = firstDay.weekday % 7; // Sunday-first grid
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final today = DateTime.now();

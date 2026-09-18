@@ -58,7 +58,7 @@ void main() {
         pillar: essential,
         outflow: 600,
         inflow: 0,
-        shareOfTotalOutflow: 1.0,
+        shareOfTotalOutflow: 1,
         envelopes: [
           EnvelopeInsight(
             category: groceries,
@@ -66,7 +66,7 @@ void main() {
             outflow: 600,
             inflow: 0,
             transactionCount: 3,
-            shareOfPillar: 1.0,
+            shareOfPillar: 1,
           ),
         ],
       ),
@@ -109,15 +109,13 @@ void main() {
 
   testWidgets('tapping a timeframe refetches with new params', (tester) async {
     when(() => useCase.call(any())).thenAnswer(
-      (_) async => Right(
+      (_) async => const Right(
         InsightsSummary(
           totalOutflow: 0,
           totalInflow: 0,
-          outflowDelta:
-              const InsightsDelta(current: 0, previous: 0, isNew: false),
-          inflowDelta:
-              const InsightsDelta(current: 0, previous: 0, isNew: false),
-          pillars: const [],
+          outflowDelta: InsightsDelta(current: 0, previous: 0, isNew: false),
+          inflowDelta: InsightsDelta(current: 0, previous: 0, isNew: false),
+          pillars: [],
         ),
       ),
     );
@@ -143,7 +141,7 @@ void main() {
   testWidgets('shows a failure card when load fails without data',
       (tester) async {
     when(() => useCase.call(any())).thenAnswer(
-      (_) async => Left(Failure.localFailure(message: 'db exploded')),
+      (_) async => const Left(Failure.localFailure(message: 'db exploded')),
     );
     final cubit = InsightsCubit(useCase, nowProvider: () => fixedNow);
 
@@ -151,21 +149,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-        find.text('Could not load insights. Pull to retry.'), findsOneWidget);
+      find.text('Could not load insights. Pull to retry.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('shows the empty state when the period has no activity',
       (tester) async {
     when(() => useCase.call(any())).thenAnswer(
-      (_) async => Right(
+      (_) async => const Right(
         InsightsSummary(
           totalOutflow: 0,
           totalInflow: 0,
-          outflowDelta:
-              const InsightsDelta(current: 0, previous: 0, isNew: false),
-          inflowDelta:
-              const InsightsDelta(current: 0, previous: 0, isNew: false),
-          pillars: const [],
+          outflowDelta: InsightsDelta(current: 0, previous: 0, isNew: false),
+          inflowDelta: InsightsDelta(current: 0, previous: 0, isNew: false),
+          pillars: [],
         ),
       ),
     );
