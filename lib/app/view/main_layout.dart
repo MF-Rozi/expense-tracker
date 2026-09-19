@@ -69,8 +69,8 @@ class MainLayout extends StatelessWidget {
                 label: 'Transactions',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart),
-                label: 'Stats',
+                icon: Icon(Icons.donut_small),
+                label: 'Insights',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
