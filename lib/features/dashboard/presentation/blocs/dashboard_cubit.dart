@@ -1,15 +1,16 @@
 import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
-import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
-import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
 class DashboardCubit extends Cubit<DashboardState> {
-  DashboardCubit(this._repository) : super(const DashboardState());
+  DashboardCubit(this._getDashboardSummaryUseCase)
+      : super(const DashboardState());
 
-  final TransactionRepository _repository;
+  final GetDashboardSummaryUseCase _getDashboardSummaryUseCase;
 
   Future<void> loadDashboardData() async {
     emit(
@@ -19,14 +20,7 @@ class DashboardCubit extends Cubit<DashboardState> {
       ),
     );
 
-    final now = DateTime.now();
-    final startDate = DateTime(now.year, now.month);
-    final endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    final result = await _repository.getTransactions(
-      startDate: startDate,
-      endDate: endDate,
-    );
+    final result = await _getDashboardSummaryUseCase(NoParams());
 
     result.fold(
       (failure) {
@@ -37,25 +31,15 @@ class DashboardCubit extends Cubit<DashboardState> {
           ),
         );
       },
-      (transactions) {
-        final totalIncome = transactions
-            .where((t) => t.type == TransactionType.income)
-            .fold<double>(0, (sum, t) => sum + t.amount.getOrCrash());
-
-        final totalExpense = transactions
-            .where((t) => t.type == TransactionType.expense)
-            .fold<double>(0, (sum, t) => sum + t.amount.getOrCrash());
-
-        final totalBalance = totalIncome - totalExpense;
-        final recentTransactions = transactions.take(5).toList();
-
+      (summary) {
         emit(
           state.copyWith(
             isLoading: false,
-            totalBalance: totalBalance,
-            totalIncome: totalIncome,
-            totalExpense: totalExpense,
-            recentTransactions: recentTransactions,
+            totalBalance: summary.totalBalance,
+            totalIncome: summary.totalIncome,
+            totalExpense: summary.totalExpense,
+            recentTransactions: summary.recentTransactions,
+            wealthTrajectory: summary.wealthTrajectory,
             failureOption: none(),
           ),
         );
