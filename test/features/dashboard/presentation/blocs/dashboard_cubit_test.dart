@@ -108,8 +108,7 @@ void main() {
       'should emit loading and then success with summary data when load '
       'succeeds',
       build: () {
-        when(() => mockUseCase(any()))
-            .thenAnswer((_) async => Right(tSummary));
+        when(() => mockUseCase(any())).thenAnswer((_) async => Right(tSummary));
         return cubit;
       },
       act: (cubit) => cubit.loadDashboardData(),
