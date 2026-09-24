@@ -7,6 +7,8 @@
 
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
+import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
+import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
 import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,8 +21,11 @@ import '../../helpers/helpers.dart';
 
 class MockCategoryCubit extends Mock implements CategoryCubit {}
 
+class MockDashboardCubit extends Mock implements DashboardCubit {}
+
 void main() {
   late MockCategoryCubit mockCategoryCubit;
+  late MockDashboardCubit mockDashboardCubit;
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -31,8 +36,21 @@ void main() {
     when(() => mockCategoryCubit.stream)
         .thenAnswer((_) => const Stream.empty());
 
-    getIt.allowReassignment = true;
-    getIt.registerSingleton<CategoryCubit>(mockCategoryCubit);
+    mockDashboardCubit = MockDashboardCubit();
+    when(() => mockDashboardCubit.state).thenReturn(const DashboardState());
+    when(() => mockDashboardCubit.stream)
+        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockDashboardCubit.loadDashboardData(
+        showLoadingIndicator: any(named: 'showLoadingIndicator'),
+      ),
+    ).thenAnswer((_) async {});
+    when(() => mockDashboardCubit.close()).thenAnswer((_) async {});
+
+    getIt
+      ..allowReassignment = true
+      ..registerSingleton<CategoryCubit>(mockCategoryCubit)
+      ..registerFactory<DashboardCubit>(() => mockDashboardCubit);
   });
 
   setUp(() => GoogleFonts.config.allowRuntimeFetching = false);

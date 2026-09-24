@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
@@ -9,6 +11,7 @@ import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/watch_transactions_use_case.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -16,9 +19,13 @@ import 'package:mocktail/mocktail.dart';
 class MockGetDashboardSummaryUseCase extends Mock
     implements GetDashboardSummaryUseCase {}
 
+class MockWatchTransactionsUseCase extends Mock
+    implements WatchTransactionsUseCase {}
+
 void main() {
   late DashboardCubit cubit;
   late MockGetDashboardSummaryUseCase mockUseCase;
+  late MockWatchTransactionsUseCase mockWatchUseCase;
 
   setUpAll(() {
     registerFallbackValue(NoParams());
@@ -26,7 +33,9 @@ void main() {
 
   setUp(() {
     mockUseCase = MockGetDashboardSummaryUseCase();
-    cubit = DashboardCubit(mockUseCase);
+    mockWatchUseCase = MockWatchTransactionsUseCase();
+    when(() => mockWatchUseCase(any())).thenAnswer((_) => const Stream.empty());
+    cubit = DashboardCubit(mockUseCase, mockWatchUseCase);
   });
 
   tearDown(() {
@@ -161,6 +170,55 @@ void main() {
               'failureOption',
               const None<Failure>(),
             ),
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having(
+              (s) => s.failureOption,
+              'failureOption',
+              some(failure),
+            ),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should automatically reload dashboard data when watchTransactions '
+      'stream emits an update',
+      build: () {
+        final streamController =
+            StreamController<Either<Failure, List<Transaction>>>();
+        when(() => mockWatchUseCase(any()))
+            .thenAnswer((_) => streamController.stream);
+        when(() => mockUseCase(any())).thenAnswer((_) async => Right(tSummary));
+
+        final c = DashboardCubit(mockUseCase, mockWatchUseCase);
+        streamController.add(const Right([]));
+        return c;
+      },
+      expect: () => [
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having((s) => s.totalBalance, 'totalBalance', 180)
+            .having(
+              (s) => s.wealthTrajectory,
+              'wealthTrajectory',
+              tTrajectory,
+            ),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should emit failure when watchTransactions stream emits a failure',
+      build: () {
+        final streamController =
+            StreamController<Either<Failure, List<Transaction>>>();
+        when(() => mockWatchUseCase(any()))
+            .thenAnswer((_) => streamController.stream);
+
+        final c = DashboardCubit(mockUseCase, mockWatchUseCase);
+        streamController.add(const Left(failure));
+        return c;
+      },
+      expect: () => [
         isA<DashboardState>()
             .having((s) => s.isLoading, 'isLoading', isFalse)
             .having(
