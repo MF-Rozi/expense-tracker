@@ -141,8 +141,7 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                 SliverAppBar(
                   expandedHeight: 120,
                   pinned: true,
-                  backgroundColor:
-                      const Color(0xFFF8FAFC).withValues(alpha: 0.8),
+                  backgroundColor: const Color(0xFFF8F9FA),
                   elevation: 0,
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back),
@@ -156,9 +155,10 @@ class _CategoryManagePageState extends State<CategoryManagePage> {
                     },
                   ),
                   flexibleSpace: FlexibleSpaceBar(
-                    titlePadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
+                    titlePadding: const EdgeInsets.only(
+                      left: 56,
+                      right: 24,
+                      bottom: 16,
                     ),
                     title: Text(
                       activeCategory?.name.getOrCrash() ?? 'Envelopes',
