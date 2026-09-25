@@ -126,8 +126,93 @@ void main() {
           .having((s) => s.status, 'status', TransactionFormStatus.success),
     ],
     verify: (_) {
-      verify(() => mockCreateTransactionUseCase(any())).called(1);
+      final captured = verify(
+        () => mockCreateTransactionUseCase(captureAny()),
+      ).captured;
+      final tx = captured.first as Transaction;
+      expect(tx.description.getOrCrash(), 'Spending for Food');
+      expect(tx.note, isNull);
       verifyZeroInteractions(mockUpdateTransactionUseCase);
+    },
+  );
+
+  blocTest<TransactionCubit, TransactionState>(
+    'should generate "Income from <Category>" when type is income and '
+    'description is empty',
+    build: () {
+      when(() => mockCreateTransactionUseCase(any()))
+          .thenAnswer((_) async => const Right<Failure, Unit>(unit));
+      return cubit;
+    },
+    act: (cubit) => cubit
+      ..updateType(TransactionType.income)
+      ..selectCategory(
+        Category(
+          uuid: UniqueId.generate(),
+          name: StringSingleLine('Salary'),
+          isSynced: false,
+          updatedAt: DateTime.now(),
+          type: CategoryType.income,
+          expectedMonthlyBudget: 0,
+          behavioralModifier: BehavioralModifier.active,
+        ),
+      )
+      ..updateExpression('5000000')
+      ..submitTransaction(),
+    expect: () => [
+      isA<TransactionState>()
+          .having((s) => s.type, 'type', TransactionType.income),
+      isA<TransactionState>().having(
+        (s) => s.selectedCategory?.name.getOrCrash(),
+        'cat',
+        'Salary',
+      ),
+      isA<TransactionState>()
+          .having((s) => s.rawExpression, 'rawExpression', '5000000'),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.loading),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.success),
+    ],
+    verify: (_) {
+      final captured = verify(
+        () => mockCreateTransactionUseCase(captureAny()),
+      ).captured;
+      final tx = captured.first as Transaction;
+      expect(tx.description.getOrCrash(), 'Income from Salary');
+    },
+  );
+
+  blocTest<TransactionCubit, TransactionState>(
+    'should preserve user-entered description when not empty or whitespace',
+    build: () {
+      when(() => mockCreateTransactionUseCase(any()))
+          .thenAnswer((_) async => const Right<Failure, Unit>(unit));
+      return cubit;
+    },
+    act: (cubit) => cubit
+      ..selectCategory(tCategory)
+      ..updateDescription('Custom Groceries')
+      ..updateExpression('50000')
+      ..submitTransaction(),
+    expect: () => [
+      isA<TransactionState>()
+          .having((s) => s.selectedCategory, 'category', tCategory),
+      isA<TransactionState>()
+          .having((s) => s.description, 'description', 'Custom Groceries'),
+      isA<TransactionState>()
+          .having((s) => s.rawExpression, 'rawExpression', '50000'),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.loading),
+      isA<TransactionState>()
+          .having((s) => s.status, 'status', TransactionFormStatus.success),
+    ],
+    verify: (_) {
+      final captured = verify(
+        () => mockCreateTransactionUseCase(captureAny()),
+      ).captured;
+      final tx = captured.first as Transaction;
+      expect(tx.description.getOrCrash(), 'Custom Groceries');
     },
   );
 

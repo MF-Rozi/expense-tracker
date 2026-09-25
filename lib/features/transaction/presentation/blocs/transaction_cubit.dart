@@ -127,6 +127,27 @@ class TransactionCubit extends Cubit<TransactionState> {
     );
   }
 
+  String _resolveDescription() {
+    final trimmed = state.description.trim();
+    if (trimmed.isNotEmpty) {
+      return trimmed;
+    }
+
+    final categoryName = state.selectedCategory?.name.getOrElse('').trim();
+    if (categoryName == null || categoryName.isEmpty) {
+      return 'Transaction';
+    }
+
+    switch (state.type) {
+      case TransactionType.expense:
+        return 'Spending for $categoryName';
+      case TransactionType.income:
+        return 'Income from $categoryName';
+      case TransactionType.investment:
+        return 'Investment in $categoryName';
+    }
+  }
+
   Future<void> submitTransaction() async {
     if (state.selectedCategory == null) {
       emit(
@@ -140,14 +161,17 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     emit(state.copyWith(status: TransactionFormStatus.loading));
 
+    final effectiveDescription = _resolveDescription();
+    final effectiveNote = state.note.trim();
+
     final transaction = Transaction(
       uuid: state.existingTransactionId ?? UniqueId.generate(),
       amount: Amount(state.parsedAmount),
-      description: StringSingleLine(state.description),
+      description: StringSingleLine(effectiveDescription),
       date: state.date ?? DateTime.now(),
       categoryUuid: state.selectedCategory!.uuid,
       type: state.type,
-      note: state.note.isNotEmpty ? state.note : null,
+      note: effectiveNote.isNotEmpty ? effectiveNote : null,
     );
 
     final result = state.existingTransactionId != null

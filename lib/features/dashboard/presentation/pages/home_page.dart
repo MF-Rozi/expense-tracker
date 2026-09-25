@@ -114,7 +114,9 @@ class _HomePageState extends State<HomePage> {
                       totalExpense: state.totalExpense,
                     ),
                     const SizedBox(height: 24),
-                    const WealthTrajectoryChart(),
+                    WealthTrajectoryChart(
+                      trajectory: state.wealthTrajectory,
+                    ),
                     const SizedBox(height: 24),
                     const RecordEntryCard(),
                     const SizedBox(height: 32),

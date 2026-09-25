@@ -1,29 +1,41 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/dashboard/domain/entities/dashboard_summary.dart';
+import 'package:expense_tracker/features/dashboard/domain/entities/wealth_trajectory.dart';
+import 'package:expense_tracker/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
-import 'package:expense_tracker/features/transaction/domain/entities/transaction_flow_type.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
-import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
+import 'package:expense_tracker/features/transaction/domain/usecases/watch_transactions_use_case.dart';
 import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockTransactionRepository extends Mock implements TransactionRepository {}
+class MockGetDashboardSummaryUseCase extends Mock
+    implements GetDashboardSummaryUseCase {}
+
+class MockWatchTransactionsUseCase extends Mock
+    implements WatchTransactionsUseCase {}
 
 void main() {
+  late DashboardCubit cubit;
+  late MockGetDashboardSummaryUseCase mockUseCase;
+  late MockWatchTransactionsUseCase mockWatchUseCase;
+
   setUpAll(() {
-    registerFallbackValue(TransactionFlowType.all);
+    registerFallbackValue(NoParams());
   });
 
-  late DashboardCubit cubit;
-  late MockTransactionRepository mockRepository;
-
   setUp(() {
-    mockRepository = MockTransactionRepository();
-    cubit = DashboardCubit(mockRepository);
+    mockUseCase = MockGetDashboardSummaryUseCase();
+    mockWatchUseCase = MockWatchTransactionsUseCase();
+    when(() => mockWatchUseCase(any())).thenAnswer((_) => const Stream.empty());
+    cubit = DashboardCubit(mockUseCase, mockWatchUseCase);
   });
 
   tearDown(() {
@@ -47,6 +59,49 @@ void main() {
     );
   }
 
+  final tTrajectory = WealthTrajectory(
+    points: [
+      TrajectoryPoint(
+        month: DateTime(2026, 5),
+        netWorth: 100,
+        isCurrentMonth: false,
+      ),
+      TrajectoryPoint(
+        month: DateTime(2026, 6),
+        netWorth: 200,
+        isCurrentMonth: false,
+      ),
+      TrajectoryPoint(
+        month: DateTime(2026, 7),
+        netWorth: 300,
+        isCurrentMonth: false,
+      ),
+      TrajectoryPoint(
+        month: DateTime(2026, 8),
+        netWorth: 400,
+        isCurrentMonth: false,
+      ),
+      TrajectoryPoint(
+        month: DateTime(2026, 9),
+        netWorth: 500,
+        isCurrentMonth: true,
+      ),
+    ],
+    growthPercentage: 25,
+    headlineDescription: 'Your net worth increased by 25.0% this month.',
+  );
+
+  final tSummary = DashboardSummary(
+    totalBalance: 180,
+    totalIncome: 350,
+    totalExpense: 170,
+    recentTransactions: [
+      createTx(amount: 100, type: TransactionType.income, desc: 'Income 1'),
+      createTx(amount: 50, type: TransactionType.expense, desc: 'Expense 1'),
+    ],
+    wealthTrajectory: tTrajectory,
+  );
+
   group('DashboardCubit', () {
     test('initial state should have correct default values', () {
       expect(cubit.state.isLoading, isTrue);
@@ -54,44 +109,15 @@ void main() {
       expect(cubit.state.totalIncome, 0);
       expect(cubit.state.totalExpense, 0);
       expect(cubit.state.recentTransactions, isEmpty);
+      expect(cubit.state.wealthTrajectory, isNull);
       expect(cubit.state.failureOption, const None<Failure>());
     });
 
     blocTest<DashboardCubit, DashboardState>(
-      'should emit loading and then success with correctly calculated sums '
-      'when loading data succeeds',
+      'should emit loading and then success with summary data when load '
+      'succeeds',
       build: () {
-        final transactions = [
-          createTx(
-            amount: 100,
-            type: TransactionType.income,
-            desc: 'Income 1',
-          ),
-          createTx(
-            amount: 50,
-            type: TransactionType.expense,
-            desc: 'Expense 1',
-          ),
-          createTx(
-            amount: 250,
-            type: TransactionType.income,
-            desc: 'Income 2',
-          ),
-          createTx(
-            amount: 120,
-            type: TransactionType.expense,
-            desc: 'Expense 2',
-          ),
-        ];
-        when(
-          () => mockRepository.getTransactions(
-            startDate: any(named: 'startDate'),
-            endDate: any(named: 'endDate'),
-            searchQuery: any(named: 'searchQuery'),
-            categoryId: any(named: 'categoryId'),
-            flowType: any(named: 'flowType'),
-          ),
-        ).thenAnswer((_) async => Right(transactions));
+        when(() => mockUseCase(any())).thenAnswer((_) async => Right(tSummary));
         return cubit;
       },
       act: (cubit) => cubit.loadDashboardData(),
@@ -111,7 +137,12 @@ void main() {
             .having(
               (s) => s.recentTransactions.length,
               'recentTransactions length',
-              4,
+              2,
+            )
+            .having(
+              (s) => s.wealthTrajectory,
+              'wealthTrajectory',
+              tTrajectory,
             )
             .having(
               (s) => s.failureOption,
@@ -121,63 +152,13 @@ void main() {
       ],
     );
 
-    blocTest<DashboardCubit, DashboardState>(
-      'should strictly cap recentTransactions to 5 items '
-      'when there are more than 5 transactions',
-      build: () {
-        final transactions = List.generate(
-          10,
-          (index) => createTx(
-            amount: 10,
-            type: TransactionType.expense,
-            desc: 'Tx $index',
-          ),
-        );
-        when(
-          () => mockRepository.getTransactions(
-            startDate: any(named: 'startDate'),
-            endDate: any(named: 'endDate'),
-            searchQuery: any(named: 'searchQuery'),
-            categoryId: any(named: 'categoryId'),
-            flowType: any(named: 'flowType'),
-          ),
-        ).thenAnswer((_) async => Right(transactions));
-        return cubit;
-      },
-      act: (cubit) => cubit.loadDashboardData(),
-      expect: () => [
-        isA<DashboardState>().having((s) => s.isLoading, 'isLoading', isTrue),
-        isA<DashboardState>()
-            .having((s) => s.isLoading, 'isLoading', isFalse)
-            .having(
-              (s) => s.recentTransactions.length,
-              'recentTransactions length',
-              5,
-            )
-            .having(
-          (s) => s.recentTransactions
-              .map((t) => t.description.getOrCrash())
-              .toList(),
-          'recentTransactions items',
-          ['Tx 0', 'Tx 1', 'Tx 2', 'Tx 3', 'Tx 4'],
-        ),
-      ],
-    );
-
     const failure = Failure.localFailure(message: 'Database error');
 
     blocTest<DashboardCubit, DashboardState>(
       'should emit loading and then failure when loading data fails',
       build: () {
-        when(
-          () => mockRepository.getTransactions(
-            startDate: any(named: 'startDate'),
-            endDate: any(named: 'endDate'),
-            searchQuery: any(named: 'searchQuery'),
-            categoryId: any(named: 'categoryId'),
-            flowType: any(named: 'flowType'),
-          ),
-        ).thenAnswer((_) async => const Left(failure));
+        when(() => mockUseCase(any()))
+            .thenAnswer((_) async => const Left(failure));
         return cubit;
       },
       act: (cubit) => cubit.loadDashboardData(),
@@ -194,7 +175,56 @@ void main() {
             .having(
               (s) => s.failureOption,
               'failureOption',
-              const Some(failure),
+              some(failure),
+            ),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should automatically reload dashboard data when watchTransactions '
+      'stream emits an update',
+      build: () {
+        final streamController =
+            StreamController<Either<Failure, List<Transaction>>>();
+        when(() => mockWatchUseCase(any()))
+            .thenAnswer((_) => streamController.stream);
+        when(() => mockUseCase(any())).thenAnswer((_) async => Right(tSummary));
+
+        final c = DashboardCubit(mockUseCase, mockWatchUseCase);
+        streamController.add(const Right([]));
+        return c;
+      },
+      expect: () => [
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having((s) => s.totalBalance, 'totalBalance', 180)
+            .having(
+              (s) => s.wealthTrajectory,
+              'wealthTrajectory',
+              tTrajectory,
+            ),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should emit failure when watchTransactions stream emits a failure',
+      build: () {
+        final streamController =
+            StreamController<Either<Failure, List<Transaction>>>();
+        when(() => mockWatchUseCase(any()))
+            .thenAnswer((_) => streamController.stream);
+
+        final c = DashboardCubit(mockUseCase, mockWatchUseCase);
+        streamController.add(const Left(failure));
+        return c;
+      },
+      expect: () => [
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having(
+              (s) => s.failureOption,
+              'failureOption',
+              some(failure),
             ),
       ],
     );
