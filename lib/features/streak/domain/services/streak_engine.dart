@@ -4,6 +4,7 @@ import 'package:expense_tracker/features/streak/domain/entities/streak_config.da
 import 'package:expense_tracker/features/streak/domain/entities/streak_period.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:injectable/injectable.dart';
 
 /// Calculation result containing both the current streak run and the best
 /// historical run.
@@ -26,6 +27,7 @@ class StreakEngineResult extends Equatable {
 /// Period-abstract from day one: works identically for daily and monthly
 /// periods.
 /// Completely free of Flutter and I/O dependencies.
+@lazySingleton
 class StreakEngine {
   const StreakEngine();
 
