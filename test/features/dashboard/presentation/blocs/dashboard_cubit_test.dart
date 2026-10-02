@@ -9,6 +9,9 @@ import 'package:expense_tracker/features/dashboard/domain/entities/wealth_trajec
 import 'package:expense_tracker/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/domain/usecases/watch_transactions_use_case.dart';
@@ -91,6 +94,16 @@ void main() {
     headlineDescription: 'Your net worth increased by 25.0% this month.',
   );
 
+  const tStreak = Streak(
+    type: StreakType.tracking,
+    length: 5,
+    status: StreakStatus.active,
+    daysUntilBreak: 2,
+    nextMilestone: 7,
+    consistencyRate: 0.8,
+    bestLength: 10,
+  );
+
   final tSummary = DashboardSummary(
     totalBalance: 180,
     totalIncome: 350,
@@ -100,6 +113,7 @@ void main() {
       createTx(amount: 50, type: TransactionType.expense, desc: 'Expense 1'),
     ],
     wealthTrajectory: tTrajectory,
+    streak: tStreak,
   );
 
   group('DashboardCubit', () {
@@ -110,6 +124,7 @@ void main() {
       expect(cubit.state.totalExpense, 0);
       expect(cubit.state.recentTransactions, isEmpty);
       expect(cubit.state.wealthTrajectory, isNull);
+      expect(cubit.state.streak, const Streak.empty());
       expect(cubit.state.failureOption, const None<Failure>());
     });
 
@@ -144,6 +159,7 @@ void main() {
               'wealthTrajectory',
               tTrajectory,
             )
+            .having((s) => s.streak, 'streak', tStreak)
             .having(
               (s) => s.failureOption,
               'failureOption',
@@ -202,6 +218,83 @@ void main() {
               (s) => s.wealthTrajectory,
               'wealthTrajectory',
               tTrajectory,
+            )
+            .having((s) => s.streak, 'streak', tStreak),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should update streak when watchTransactions emits an update',
+      build: () {
+        final streamController =
+            StreamController<Either<Failure, List<Transaction>>>();
+        when(() => mockWatchUseCase(any()))
+            .thenAnswer((_) => streamController.stream);
+
+        const updatedStreak = Streak(
+          type: StreakType.tracking,
+          length: 6,
+          status: StreakStatus.active,
+          daysUntilBreak: 3,
+          nextMilestone: 7,
+          consistencyRate: 0.85,
+          bestLength: 10,
+        );
+
+        final updatedSummary = DashboardSummary(
+          totalBalance: 200,
+          totalIncome: 400,
+          totalExpense: 200,
+          recentTransactions: const [],
+          wealthTrajectory: tTrajectory,
+          streak: updatedStreak,
+        );
+
+        when(() => mockUseCase(any()))
+            .thenAnswer((_) async => Right(updatedSummary));
+
+        final c = DashboardCubit(mockUseCase, mockWatchUseCase);
+        streamController.add(const Right([]));
+        return c;
+      },
+      expect: () => [
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having((s) => s.totalBalance, 'totalBalance', 200)
+            .having(
+              (s) => s.streak,
+              'streak',
+              isA<Streak>().having((st) => st.length, 'length', 6),
+            ),
+      ],
+    );
+
+    blocTest<DashboardCubit, DashboardState>(
+      'should emit empty streak without failure when summary streak is empty',
+      build: () {
+        final summaryWithEmptyStreak = DashboardSummary(
+          totalBalance: 180,
+          totalIncome: 350,
+          totalExpense: 170,
+          recentTransactions: const [],
+          wealthTrajectory: tTrajectory,
+        );
+        when(() => mockUseCase(any()))
+            .thenAnswer((_) async => Right(summaryWithEmptyStreak));
+        return cubit;
+      },
+      act: (cubit) => cubit.loadDashboardData(),
+      expect: () => [
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isTrue),
+        isA<DashboardState>()
+            .having((s) => s.isLoading, 'isLoading', isFalse)
+            .having((s) => s.streak, 'streak', const Streak.empty())
+            .having((s) => s.streak.isEmpty, 'streak.isEmpty', isTrue)
+            .having(
+              (s) => s.failureOption,
+              'failureOption',
+              const None<Failure>(),
             ),
       ],
     );

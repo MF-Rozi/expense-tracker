@@ -3,6 +3,8 @@ import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/core/domain/usecases/use_case.dart';
 import 'package:expense_tracker/features/dashboard/domain/entities/dashboard_summary.dart';
 import 'package:expense_tracker/features/dashboard/domain/entities/wealth_trajectory.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
+import 'package:expense_tracker/features/streak/domain/repositories/streak_repository.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
@@ -13,11 +15,16 @@ import 'package:injectable/injectable.dart';
 /// - Top 5 most recent transactions
 /// - Rolling 5-month [WealthTrajectory] (months M-4 through M) with
 ///   month-over-month net worth growth rate and contextual copy.
+/// - Active tracking [Streak] derived from the streak system.
 @lazySingleton
 class GetDashboardSummaryUseCase extends UseCase<DashboardSummary, NoParams> {
-  GetDashboardSummaryUseCase(this._repository);
+  GetDashboardSummaryUseCase(
+    this._repository,
+    this._streakRepository,
+  );
 
   final TransactionRepository _repository;
+  final StreakRepository _streakRepository;
 
   @override
   Future<Either<Failure, DashboardSummary>> call(NoParams params) async {
@@ -29,8 +36,19 @@ class GetDashboardSummaryUseCase extends UseCase<DashboardSummary, NoParams> {
   Future<Either<Failure, DashboardSummary>> executeWithDate(
     DateTime now,
   ) async {
-    // Fetch all transactions
-    final result = await _repository.getTransactions();
+    final txFuture = _repository.getTransactions();
+    final streakFuture = _streakRepository.getStreak(referenceDate: now);
+
+    final result = await txFuture;
+    if (result.isLeft()) {
+      return result.fold(Left.new, (_) => throw StateError('Unreachable'));
+    }
+
+    final streakResult = await streakFuture;
+    final streak = streakResult.fold(
+      (_) => const Streak.empty(),
+      (s) => s,
+    );
 
     return result.map((allTransactions) {
       // Sort transactions descending by date (most recent first)
@@ -78,6 +96,7 @@ class GetDashboardSummaryUseCase extends UseCase<DashboardSummary, NoParams> {
         totalExpense: currentMonthExpense,
         recentTransactions: recentTransactions,
         wealthTrajectory: trajectory,
+        streak: streak,
       );
     });
   }
