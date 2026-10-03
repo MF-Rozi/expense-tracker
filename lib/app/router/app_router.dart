@@ -8,6 +8,7 @@ import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_eg
 import 'package:expense_tracker/features/insights/presentation/blocs/insights_cubit.dart';
 import 'package:expense_tracker/features/insights/presentation/pages/insights_page.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
+import 'package:expense_tracker/features/streak/presentation/pages/streaks_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
 import 'package:expense_tracker/features/transaction/presentation/pages/transaction_entry_page.dart';
@@ -19,9 +20,10 @@ import 'package:go_router/go_router.dart';
 
 class AppRouter extends Equatable {
   static const home = 'home';
+  static const streaks = 'streaks';
 
   @override
-  List<Object?> get props => [home];
+  List<Object?> get props => [home, streaks];
 }
 
 GoRouter router([
@@ -78,6 +80,11 @@ GoRouter router([
           path: '/categories',
           name: 'categories',
           builder: (context, state) => const CategoryManagePage(),
+        ),
+        GoRoute(
+          path: '/streaks',
+          name: AppRouter.streaks,
+          builder: (context, state) => const StreaksPage(),
         ),
         GoRoute(
           path: '/counter',

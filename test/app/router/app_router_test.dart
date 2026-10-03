@@ -1,4 +1,5 @@
 import 'package:expense_tracker/app/router/app_router.dart';
+import 'package:expense_tracker/features/streak/presentation/pages/streaks_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +22,7 @@ void main() {
   }) {
     return tester.pumpWidget(
       MaterialApp.router(
-        routerConfig: router('/counter', () => isCounterUnlocked),
+        routerConfig: router(location, () => isCounterUnlocked),
       ),
     );
   }
@@ -43,5 +44,16 @@ void main() {
 
     expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
     expect(find.text('Counter'), findsOneWidget);
+  });
+
+  testWidgets('routes to streaks page at /streaks', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router('/streaks'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(StreaksPage), findsOneWidget);
   });
 }
