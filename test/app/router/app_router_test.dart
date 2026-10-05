@@ -1,16 +1,49 @@
 import 'package:expense_tracker/app/router/app_router.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/presentation/blocs/streak_cubit.dart';
+import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
 import 'package:expense_tracker/features/streak/presentation/pages/streaks_page.dart';
+import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/helpers.dart';
+
+class MockStreakCubit extends Mock implements StreakCubit {}
 
 void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     await configureInjector();
+
+    final mockStreakCubit = MockStreakCubit();
+    when(() => mockStreakCubit.state).thenReturn(
+      StreakState(
+        isLoading: false,
+        streak: const Streak(
+          type: StreakType.tracking,
+          length: 5,
+          status: StreakStatus.active,
+          daysUntilBreak: 3,
+          nextMilestone: 7,
+          consistencyRate: 0.8,
+        ),
+        selectedMonth: DateTime(2026, 4),
+        monthlyConsistencyRate: 0.8,
+      ),
+    );
+    when(() => mockStreakCubit.stream).thenAnswer((_) => const Stream.empty());
+    when(mockStreakCubit.load).thenAnswer((_) async {});
+    when(mockStreakCubit.close).thenAnswer((_) async {});
+
+    getIt
+      ..allowReassignment = true
+      ..registerFactory<StreakCubit>(() => mockStreakCubit);
   });
 
   setUp(() => GoogleFonts.config.allowRuntimeFetching = false);
