@@ -5,10 +5,13 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'package:dartz/dartz.dart';
+import 'package:expense_tracker/app/app.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_state.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_cubit.dart';
 import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_state.dart';
+import 'package:expense_tracker/features/streak/domain/repositories/app_open_repository.dart';
 import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,9 +26,12 @@ class MockCategoryCubit extends Mock implements CategoryCubit {}
 
 class MockDashboardCubit extends Mock implements DashboardCubit {}
 
+class MockAppOpenRepository extends Mock implements AppOpenRepository {}
+
 void main() {
   late MockCategoryCubit mockCategoryCubit;
   late MockDashboardCubit mockDashboardCubit;
+  late MockAppOpenRepository mockAppOpenRepo;
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -47,10 +53,14 @@ void main() {
     ).thenAnswer((_) async {});
     when(() => mockDashboardCubit.close()).thenAnswer((_) async {});
 
+    mockAppOpenRepo = MockAppOpenRepository();
+    when(mockAppOpenRepo.recordOpen).thenAnswer((_) async => const Right(unit));
+
     getIt
       ..allowReassignment = true
       ..registerSingleton<CategoryCubit>(mockCategoryCubit)
-      ..registerFactory<DashboardCubit>(() => mockDashboardCubit);
+      ..registerFactory<DashboardCubit>(() => mockDashboardCubit)
+      ..registerSingleton<AppOpenRepository>(mockAppOpenRepo);
   });
 
   setUp(() => GoogleFonts.config.allowRuntimeFetching = false);
@@ -65,6 +75,16 @@ void main() {
         isConnected: false,
       );
       expect(find.byType(MaterialApp, skipOffstage: false), findsOneWidget);
+    });
+
+    testWidgets('records app open event once on startup', (tester) async {
+      when(mockAppOpenRepo.recordOpen)
+          .thenAnswer((_) async => const Right(unit));
+
+      await tester.pumpWidget(const App());
+      await tester.pump();
+
+      verify(mockAppOpenRepo.recordOpen).called(1);
     });
   });
 }

@@ -5,10 +5,13 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import 'dart:async';
+
 import 'package:expense_tracker/app/router/app_router.dart';
 import 'package:expense_tracker/core/extensions/context_extensions.dart';
 import 'package:expense_tracker/core/utils/constants.dart';
 import 'package:expense_tracker/features/category/presentation/blocs/category_cubit.dart';
+import 'package:expense_tracker/features/streak/domain/repositories/app_open_repository.dart';
 import 'package:expense_tracker/injector.dart';
 import 'package:expense_tracker/l10n/l10n.dart';
 import 'package:expense_tracker/shared/flash/presentation/blocs/cubit/flash_cubit.dart';
@@ -18,8 +21,21 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    super.initState();
+    if (getIt.isRegistered<AppOpenRepository>()) {
+      unawaited(getIt<AppOpenRepository>().recordOpen());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
