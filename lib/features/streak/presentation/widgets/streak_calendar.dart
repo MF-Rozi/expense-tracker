@@ -260,10 +260,12 @@ class _DayCell extends StatelessWidget {
 class StreakConsistencyCard extends StatelessWidget {
   const StreakConsistencyCard({
     required this.consistencyRate,
+    this.hasData = true,
     super.key,
   });
 
   final double consistencyRate;
+  final bool hasData;
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +293,7 @@ class StreakConsistencyCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '$percentage%',
+            hasData ? '$percentage%' : '—',
             style: GoogleFonts.manrope(
               fontSize: 40,
               fontWeight: FontWeight.w900,
@@ -301,7 +303,7 @@ class StreakConsistencyCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Completion rate this month',
+            hasData ? 'Completion rate this month' : 'No activity recorded yet',
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,

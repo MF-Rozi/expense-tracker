@@ -8,6 +8,7 @@ import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_eg
 import 'package:expense_tracker/features/insights/presentation/blocs/insights_cubit.dart';
 import 'package:expense_tracker/features/insights/presentation/pages/insights_page.dart';
 import 'package:expense_tracker/features/settings/presentation/pages/settings_page.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:expense_tracker/features/streak/presentation/pages/streaks_page.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/presentation/blocs/transaction_cubit.dart';
@@ -84,7 +85,16 @@ GoRouter router([
         GoRoute(
           path: '/streaks',
           name: AppRouter.streaks,
-          builder: (context, state) => const StreaksPage(),
+          builder: (context, state) {
+            final typeParam = state.uri.queryParameters['type'];
+            final initialType = typeParam != null
+                ? StreakType.values.firstWhere(
+                    (t) => t.name == typeParam,
+                    orElse: () => StreakType.tracking,
+                  )
+                : null;
+            return StreaksPage(initialType: initialType);
+          },
         ),
         GoRoute(
           path: '/counter',

@@ -95,6 +95,7 @@ void main() {
       expect(cubit.state.streak, equals(const Streak.empty()));
       expect(cubit.state.selectedMonth, equals(fixedMonth));
       expect(cubit.state.qualifyingDays, isEmpty);
+      expect(cubit.state.type, equals(StreakType.tracking));
     });
 
     test('load populates streak, qualifying days, and consistency rate',
@@ -109,6 +110,54 @@ void main() {
       // 3 qualifying days out of 15 elapsed days in April = 0.20
       expect(cubit.state.monthlyConsistencyRate, closeTo(0.2, 0.001));
       expect(cubit.state.failureOption.isNone(), isTrue);
+    });
+
+    test('selectType updates type and reloads data for the selected type',
+        () async {
+      final cubit = buildCubit();
+      await cubit.load();
+
+      clearInteractions(mockGetStreaksUseCase);
+      clearInteractions(mockGetQualifyingPeriodsUseCase);
+
+      const appOpenStreak = Streak(
+        type: StreakType.appOpen,
+        length: 7,
+        status: StreakStatus.active,
+        daysUntilBreak: 2,
+        nextMilestone: 14,
+        consistencyRate: 0.7,
+      );
+
+      when(() => mockGetStreaksUseCase(any()))
+          .thenAnswer((_) async => const Right(appOpenStreak));
+
+      await cubit.selectType(StreakType.appOpen);
+
+      expect(cubit.state.type, equals(StreakType.appOpen));
+      expect(cubit.state.streak, equals(appOpenStreak));
+
+      verify(
+        () => mockGetStreaksUseCase(
+          any(
+            that: isA<GetStreaksParams>().having(
+              (p) => p.type,
+              'type',
+              StreakType.appOpen,
+            ),
+          ),
+        ),
+      ).called(1);
+    });
+
+    test('selectType does nothing if target type is already active', () async {
+      final cubit = buildCubit();
+      await cubit.load();
+
+      clearInteractions(mockGetStreaksUseCase);
+      await cubit.selectType(StreakType.tracking);
+
+      verifyNever(() => mockGetStreaksUseCase(any()));
     });
 
     test('previousMonth navigates to prior month and calculates full rate',

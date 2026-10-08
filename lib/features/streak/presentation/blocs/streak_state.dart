@@ -16,11 +16,15 @@ class StreakState extends Equatable {
     this.type = StreakType.tracking,
   });
 
-  /// Factory creating initial state for a given [referenceDate].
-  factory StreakState.initial([DateTime? referenceDate]) {
+  /// Factory creating initial state for a given [referenceDate] and [type].
+  factory StreakState.initial([
+    DateTime? referenceDate,
+    StreakType type = StreakType.tracking,
+  ]) {
     final now = referenceDate ?? DateTime.now();
     return StreakState(
       selectedMonth: DateTime(now.year, now.month),
+      type: type,
     );
   }
 

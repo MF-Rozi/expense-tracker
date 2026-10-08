@@ -5,6 +5,7 @@ import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/core/domain/usecases/use_case.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_period.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_qualifying_periods_use_case.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_streaks_use_case.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
@@ -30,11 +31,12 @@ class StreakCubit extends Cubit<StreakState> {
     required GetQualifyingPeriodsUseCase getQualifyingPeriodsUseCase,
     WatchTransactionsUseCase? watchTransactionsUseCase,
     DateTime Function()? clock,
+    StreakType initialType = StreakType.tracking,
   })  : _getStreaksUseCase = getStreaksUseCase,
         _getQualifyingPeriodsUseCase = getQualifyingPeriodsUseCase,
         _watchTransactionsUseCase = watchTransactionsUseCase,
         _clock = clock ?? DateTime.now,
-        super(StreakState.initial(clock?.call())) {
+        super(StreakState.initial(clock?.call(), initialType)) {
     _init();
   }
 
@@ -64,20 +66,29 @@ class StreakCubit extends Cubit<StreakState> {
     return super.close();
   }
 
+  /// Switches the active streak type and reloads data.
+  Future<void> selectType(StreakType type) async {
+    if (state.type == type && !state.isLoading) return;
+    await load(type: type);
+  }
+
   /// Loads streak data and qualifying days for [month] (defaulting to current).
   Future<void> load({
     DateTime? month,
     bool showLoading = true,
+    StreakType? type,
   }) async {
     final now = _clock();
     final targetMonth = month ?? state.selectedMonth ?? now;
     final normalizedMonth = DateTime(targetMonth.year, targetMonth.month);
+    final activeType = type ?? state.type;
 
     if (showLoading) {
       emit(
         state.copyWith(
           isLoading: true,
           selectedMonth: normalizedMonth,
+          type: activeType,
         ),
       );
     }
@@ -92,13 +103,13 @@ class StreakCubit extends Cubit<StreakState> {
     final results = await Future.wait([
       _getStreaksUseCase(
         GetStreaksParams(
-          type: state.type,
+          type: activeType,
           referenceDate: now,
         ),
       ),
       _getQualifyingPeriodsUseCase(
         GetQualifyingPeriodsParams(
-          type: state.type,
+          type: activeType,
           startDate: startDate,
           endDate: endDate,
         ),
@@ -113,6 +124,7 @@ class StreakCubit extends Cubit<StreakState> {
         emit(
           state.copyWith(
             isLoading: false,
+            type: activeType,
             failureOption: some(failure),
           ),
         );
@@ -123,6 +135,7 @@ class StreakCubit extends Cubit<StreakState> {
             emit(
               state.copyWith(
                 isLoading: false,
+                type: activeType,
                 streak: streak,
                 failureOption: some(failure),
               ),
@@ -143,6 +156,7 @@ class StreakCubit extends Cubit<StreakState> {
             emit(
               state.copyWith(
                 isLoading: false,
+                type: activeType,
                 streak: streak,
                 selectedMonth: normalizedMonth,
                 qualifyingDays: qualifyingDays,

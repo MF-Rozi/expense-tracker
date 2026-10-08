@@ -1,5 +1,6 @@
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -39,10 +40,22 @@ class StreakHero extends StatelessWidget {
   String get _subtitle {
     switch (streak.status) {
       case StreakStatus.atRisk:
+        if (streak.type == StreakType.noSpend) {
+          return 'AT RISK • AVOID EXPENSES TODAY';
+        }
+        if (streak.type == StreakType.appOpen) {
+          return 'AT RISK • OPEN APP TODAY';
+        }
         return 'AT RISK • LOG AN EXPENSE TODAY';
       case StreakStatus.warmingUp:
         return 'WARMING UP • HABIT IN FORMATION';
       case StreakStatus.broken:
+        if (streak.type == StreakType.noSpend) {
+          return 'STREAK PAUSED • NO-SPEND DAY TO RESUME';
+        }
+        if (streak.type == StreakType.appOpen) {
+          return 'STREAK PAUSED • OPEN DAILY TO RESUME';
+        }
         return 'STREAK PAUSED • LOG TODAY TO RESUME';
       case StreakStatus.none:
         return 'START YOUR RUN TODAY';

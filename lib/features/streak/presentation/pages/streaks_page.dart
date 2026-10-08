@@ -1,3 +1,4 @@
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_cubit.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/milestone_progress.dart';
@@ -14,9 +15,11 @@ class StreaksPage extends StatelessWidget {
   const StreaksPage({
     super.key,
     this.cubit,
+    this.initialType,
   });
 
   final StreakCubit? cubit;
+  final StreakType? initialType;
 
   StreakCubit _resolveCubit() {
     if (cubit != null) return cubit!;
@@ -31,7 +34,15 @@ class StreaksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => _resolveCubit()..load(),
+      create: (_) {
+        final c = _resolveCubit();
+        if (initialType != null && initialType != StreakType.tracking) {
+          c.selectType(initialType!);
+        } else {
+          c.load();
+        }
+        return c;
+      },
       child: const _StreaksPageView(),
     );
   }
@@ -67,7 +78,7 @@ class _StreaksPageView extends StatelessWidget {
                 onPressed: () {
                   StreakConfigSheet.show(
                     context,
-                    initialType: state.streak.type,
+                    initialType: state.type,
                   );
                 },
               );
@@ -86,6 +97,8 @@ class _StreaksPageView extends StatelessWidget {
           }
 
           final cubit = context.read<StreakCubit>();
+          final hasData =
+              !state.streak.isEmpty || state.qualifyingDays.isNotEmpty;
 
           return RefreshIndicator(
             color: const Color(0xFF00113A),
@@ -99,12 +112,14 @@ class _StreaksPageView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  _buildTypeSelector(context, state.type),
+                  const SizedBox(height: 20),
                   StreakHero(
                     streak: state.streak,
                     onLongPress: () {
                       StreakConfigSheet.show(
                         context,
-                        initialType: state.streak.type,
+                        initialType: state.type,
                       );
                     },
                   ),
@@ -118,6 +133,7 @@ class _StreaksPageView extends StatelessWidget {
                   const SizedBox(height: 16),
                   StreakConsistencyCard(
                     consistencyRate: state.monthlyConsistencyRate,
+                    hasData: hasData,
                   ),
                   const SizedBox(height: 24),
                   MilestoneProgress(streak: state.streak),
@@ -127,6 +143,60 @@ class _StreaksPageView extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildTypeSelector(BuildContext context, StreakType selectedType) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: StreakType.activeTypes.map((type) {
+          final isSelected = type == selectedType;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onLongPress: () {
+                StreakConfigSheet.show(
+                  context,
+                  initialType: type,
+                );
+              },
+              child: ChoiceChip(
+                key: Key('streak_type_chip_${type.name}'),
+                label: Text(
+                  type.shortLabel,
+                  style: GoogleFonts.manrope(
+                    fontSize: 13,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.w600,
+                    color: isSelected ? Colors.white : const Color(0xFF00113A),
+                  ),
+                ),
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    context.read<StreakCubit>().selectType(type);
+                  }
+                },
+                selectedColor: const Color(0xFF00113A),
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                  side: BorderSide(
+                    color: isSelected
+                        ? const Color(0xFF00113A)
+                        : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

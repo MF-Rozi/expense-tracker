@@ -1,5 +1,6 @@
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_config_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -22,15 +23,26 @@ class StreakCard extends StatelessWidget {
   final VoidCallback? onLongPress;
 
   String get _title {
+    final prefix = streak.type == StreakType.tracking
+        ? ''
+        : '${streak.type.shortLabel} · ';
     if (streak.status == StreakStatus.warmingUp) {
-      return 'Warming Up';
+      return '${prefix}Warming Up';
     }
-    return '${streak.length} Day Streak';
+    return '$prefix${streak.length} Day Streak';
   }
 
   String get _subtitle {
     if (streak.status == StreakStatus.atRisk) {
-      return 'At risk! Log today to keep your streak';
+      switch (streak.type) {
+        case StreakType.noSpend:
+          return 'At risk! Avoid expenses today to keep your streak';
+        case StreakType.appOpen:
+          return 'At risk! Open app today to keep your streak';
+        case StreakType.tracking:
+        case StreakType.underBudget:
+          return 'At risk! Log today to keep your streak';
+      }
     }
     if (streak.status == StreakStatus.warmingUp) {
       return 'Warming up · Keep logging to activate your streak';
@@ -95,7 +107,10 @@ class StreakCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: onTap ?? () => context.push('/streaks'),
+          onTap: onTap ??
+              () => context.push(
+                    '/streaks?type=${streak.type.name}',
+                  ),
           onLongPress: onLongPress ??
               () => StreakConfigSheet.show(
                     context,

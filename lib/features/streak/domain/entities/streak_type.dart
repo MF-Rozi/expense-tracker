@@ -14,6 +14,27 @@ enum StreakType {
   /// budget.
   underBudget;
 
+  /// Active streak types available in Phase 2.
+  static const activeTypes = [
+    StreakType.tracking,
+    StreakType.noSpend,
+    StreakType.appOpen,
+  ];
+
+  /// Short display label for chips and tabs.
+  String get shortLabel {
+    switch (this) {
+      case StreakType.tracking:
+        return 'Tracking';
+      case StreakType.noSpend:
+        return 'No-Spend';
+      case StreakType.appOpen:
+        return 'App Open';
+      case StreakType.underBudget:
+        return 'Budget';
+    }
+  }
+
   String get displayName {
     switch (this) {
       case StreakType.tracking:
