@@ -6,8 +6,10 @@ import 'package:expense_tracker/core/domain/usecases/use_case.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_period.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/domain/entities/under_budget_month_status.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_qualifying_periods_use_case.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_streaks_use_case.dart';
+import 'package:expense_tracker/features/streak/domain/usecases/get_under_budget_status_use_case.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
 import 'package:expense_tracker/features/transaction/domain/usecases/watch_transactions_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,8 +21,10 @@ class StreakCubit extends Cubit<StreakState> {
   StreakCubit(
     this._getStreaksUseCase,
     this._getQualifyingPeriodsUseCase,
-    this._watchTransactionsUseCase,
-  )   : _clock = DateTime.now,
+    this._watchTransactionsUseCase, {
+    GetUnderBudgetStatusUseCase? getUnderBudgetStatusUseCase,
+  })  : _getUnderBudgetStatusUseCase = getUnderBudgetStatusUseCase,
+        _clock = DateTime.now,
         super(StreakState.initial()) {
     _init();
   }
@@ -30,11 +34,13 @@ class StreakCubit extends Cubit<StreakState> {
     required GetStreaksUseCase getStreaksUseCase,
     required GetQualifyingPeriodsUseCase getQualifyingPeriodsUseCase,
     WatchTransactionsUseCase? watchTransactionsUseCase,
+    GetUnderBudgetStatusUseCase? getUnderBudgetStatusUseCase,
     DateTime Function()? clock,
     StreakType initialType = StreakType.tracking,
   })  : _getStreaksUseCase = getStreaksUseCase,
         _getQualifyingPeriodsUseCase = getQualifyingPeriodsUseCase,
         _watchTransactionsUseCase = watchTransactionsUseCase,
+        _getUnderBudgetStatusUseCase = getUnderBudgetStatusUseCase,
         _clock = clock ?? DateTime.now,
         super(StreakState.initial(clock?.call(), initialType)) {
     _init();
@@ -43,6 +49,7 @@ class StreakCubit extends Cubit<StreakState> {
   final GetStreaksUseCase _getStreaksUseCase;
   final GetQualifyingPeriodsUseCase _getQualifyingPeriodsUseCase;
   final WatchTransactionsUseCase? _watchTransactionsUseCase;
+  final GetUnderBudgetStatusUseCase? _getUnderBudgetStatusUseCase;
   final DateTime Function() _clock;
 
   StreamSubscription<dynamic>? _txSubscription;
@@ -100,6 +107,13 @@ class StreakCubit extends Cubit<StreakState> {
       0,
     );
 
+    final underBudgetFuture = (activeType == StreakType.underBudget &&
+            _getUnderBudgetStatusUseCase != null)
+        ? _getUnderBudgetStatusUseCase(
+            GetUnderBudgetStatusParams(month: normalizedMonth),
+          )
+        : Future<Either<Failure, UnderBudgetMonthStatus>?>.value();
+
     final results = await Future.wait([
       _getStreaksUseCase(
         GetStreaksParams(
@@ -114,10 +128,13 @@ class StreakCubit extends Cubit<StreakState> {
           endDate: endDate,
         ),
       ),
+      underBudgetFuture,
     ]);
 
-    final streakResult = results[0] as Either<Failure, Streak>;
-    final periodsResult = results[1] as Either<Failure, List<StreakPeriod>>;
+    final streakResult = results[0]! as Either<Failure, Streak>;
+    final periodsResult = results[1]! as Either<Failure, List<StreakPeriod>>;
+    final underBudgetResult =
+        results[2] as Either<Failure, UnderBudgetMonthStatus>?;
 
     streakResult.fold(
       (failure) {
@@ -147,11 +164,16 @@ class StreakCubit extends Cubit<StreakState> {
                 .map((p) => DateTime(p.year, p.month, p.day))
                 .toSet();
 
-            final consistencyRate = _calculateMonthlyConsistency(
-              targetMonth: normalizedMonth,
-              qualifyingDays: qualifyingDays,
-              now: now,
-            );
+            final consistencyRate = activeType == StreakType.underBudget
+                ? streak.consistencyRate
+                : _calculateMonthlyConsistency(
+                    targetMonth: normalizedMonth,
+                    qualifyingDays: qualifyingDays,
+                    now: now,
+                  );
+
+            final underBudgetStatus =
+                underBudgetResult?.fold((_) => null, (status) => status);
 
             emit(
               state.copyWith(
@@ -161,6 +183,7 @@ class StreakCubit extends Cubit<StreakState> {
                 selectedMonth: normalizedMonth,
                 qualifyingDays: qualifyingDays,
                 monthlyConsistencyRate: consistencyRate,
+                underBudgetStatus: underBudgetStatus,
                 failureOption: none(),
               ),
             );
@@ -216,13 +239,13 @@ class StreakCubit extends Cubit<StreakState> {
       final count = qualifyingDays
           .where(
             (d) =>
-                d.year == targetMonth.year && d.month == targetMonth.month,
+                d.year == targetMonth.year &&
+                d.month == targetMonth.month,
           )
           .length;
       return (count / totalDays).clamp(0, 1);
     }
 
-    // Future months have 0 consistency rate
     return 0;
   }
 }

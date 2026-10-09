@@ -12,6 +12,7 @@ class Streak extends Equatable {
     required this.nextMilestone,
     required this.consistencyRate,
     this.bestLength = 0,
+    this.isCurrentMonthOnTrack,
   });
 
   /// Factory constructor for an empty streak when no records exist.
@@ -22,7 +23,8 @@ class Streak extends Equatable {
         daysUntilBreak = 0,
         nextMilestone = 7,
         consistencyRate = 0.0,
-        bestLength = 0;
+        bestLength = 0,
+        isCurrentMonthOnTrack = null;
 
   /// The streak category.
   final StreakType type;
@@ -45,6 +47,10 @@ class Streak extends Equatable {
   /// The longest historical streak length for this type.
   final int bestLength;
 
+  /// Preview indicator whether the in-progress month is currently within budget
+  /// (R14).
+  final bool? isCurrentMonthOnTrack;
+
   /// Whether this streak has no activity.
   bool get isEmpty => length == 0 && status == StreakStatus.none;
 
@@ -56,6 +62,7 @@ class Streak extends Equatable {
     int? nextMilestone,
     double? consistencyRate,
     int? bestLength,
+    bool? isCurrentMonthOnTrack,
   }) {
     return Streak(
       type: type ?? this.type,
@@ -65,6 +72,8 @@ class Streak extends Equatable {
       nextMilestone: nextMilestone ?? this.nextMilestone,
       consistencyRate: consistencyRate ?? this.consistencyRate,
       bestLength: bestLength ?? this.bestLength,
+      isCurrentMonthOnTrack:
+          isCurrentMonthOnTrack ?? this.isCurrentMonthOnTrack,
     );
   }
 
@@ -77,5 +86,6 @@ class Streak extends Equatable {
         nextMilestone,
         consistencyRate,
         bestLength,
+        isCurrentMonthOnTrack,
       ];
 }

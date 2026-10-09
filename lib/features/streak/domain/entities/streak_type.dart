@@ -14,11 +14,12 @@ enum StreakType {
   /// budget.
   underBudget;
 
-  /// Active streak types available in Phase 2.
+  /// Active streak types available across all phases (Phase 1-3).
   static const activeTypes = [
     StreakType.tracking,
     StreakType.noSpend,
     StreakType.appOpen,
+    StreakType.underBudget,
   ];
 
   /// Short display label for chips and tabs.

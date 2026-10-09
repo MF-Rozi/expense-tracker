@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
+import 'package:expense_tracker/features/streak/domain/entities/category_overrun_flag.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/domain/entities/under_budget_month_status.dart';
 
 /// State representation for the Streaks page.
 class StreakState extends Equatable {
@@ -14,6 +16,7 @@ class StreakState extends Equatable {
     this.monthlyConsistencyRate = 0.0,
     this.failureOption = const None(),
     this.type = StreakType.tracking,
+    this.underBudgetStatus,
   });
 
   /// Factory creating initial state for a given [referenceDate] and [type].
@@ -35,12 +38,27 @@ class StreakState extends Equatable {
   final double monthlyConsistencyRate;
   final Option<Failure> failureOption;
   final StreakType type;
+  final UnderBudgetMonthStatus? underBudgetStatus;
 
   /// Returns the current active month or today's month if null.
   DateTime get displayMonth {
     final now = DateTime.now();
     return selectedMonth ?? DateTime(now.year, now.month);
   }
+
+  /// Whether current in-progress month is within budget.
+  bool get isOnTrack =>
+      underBudgetStatus?.isOnTrack ?? (streak.isCurrentMonthOnTrack ?? true);
+
+  /// Overrun flags for the selected month (R17).
+  List<CategoryOverrunFlag> get categoryOverrunFlags =>
+      underBudgetStatus?.overrunFlags ?? const [];
+
+  /// Total budget for selected month.
+  double get currentMonthBudget => underBudgetStatus?.totalBudget ?? 0.0;
+
+  /// Total spent in selected month.
+  double get currentMonthExpense => underBudgetStatus?.totalSpent ?? 0.0;
 
   StreakState copyWith({
     bool? isLoading,
@@ -50,6 +68,7 @@ class StreakState extends Equatable {
     double? monthlyConsistencyRate,
     Option<Failure>? failureOption,
     StreakType? type,
+    UnderBudgetMonthStatus? underBudgetStatus,
   }) {
     return StreakState(
       isLoading: isLoading ?? this.isLoading,
@@ -60,6 +79,7 @@ class StreakState extends Equatable {
           monthlyConsistencyRate ?? this.monthlyConsistencyRate,
       failureOption: failureOption ?? this.failureOption,
       type: type ?? this.type,
+      underBudgetStatus: underBudgetStatus ?? this.underBudgetStatus,
     );
   }
 
@@ -72,5 +92,6 @@ class StreakState extends Equatable {
         monthlyConsistencyRate,
         failureOption,
         type,
+        underBudgetStatus,
       ];
 }

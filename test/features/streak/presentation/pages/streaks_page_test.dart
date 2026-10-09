@@ -1,7 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:expense_tracker/features/streak/domain/entities/category_overrun_flag.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/domain/entities/under_budget_month_status.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_cubit.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
 import 'package:expense_tracker/features/streak/presentation/pages/streaks_page.dart';
@@ -9,6 +11,7 @@ import 'package:expense_tracker/features/streak/presentation/widgets/milestone_p
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_calendar.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_config_sheet.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_hero.dart';
+import 'package:expense_tracker/features/streak/presentation/widgets/under_budget_month_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,11 +59,16 @@ void main() {
     when(mockCubit.nextMonth).thenAnswer((_) async {});
   });
 
-  Widget buildStreaksPage({StreakCubit? cubit, StreakType? initialType}) {
+  Widget buildStreaksPage({
+    StreakCubit? cubit,
+    StreakType? initialType,
+    DateTime? referenceDate,
+  }) {
     return MaterialApp(
       home: StreaksPage(
         cubit: cubit ?? mockCubit,
         initialType: initialType,
+        referenceDate: referenceDate,
       ),
     );
   }
@@ -130,6 +138,10 @@ void main() {
         find.byKey(const Key('streak_type_chip_appOpen')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const Key('streak_type_chip_underBudget')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('tapping a type chip calls selectType on cubit',
@@ -151,6 +163,9 @@ void main() {
 
       await tester.tap(find.byKey(const Key('streak_type_chip_appOpen')));
       verify(() => mockCubit.selectType(StreakType.appOpen)).called(1);
+
+      await tester.tap(find.byKey(const Key('streak_type_chip_underBudget')));
+      verify(() => mockCubit.selectType(StreakType.underBudget)).called(1);
     });
 
     testWidgets(
@@ -319,5 +334,70 @@ void main() {
 
       expect(find.byType(StreakConfigSheet), findsOneWidget);
     });
+
+    testWidgets(
+      'renders UnderBudgetMonthCard with flags and preview when type is '
+      'underBudget (AE7, AE8)',
+      (tester) async {
+        const underBudgetStreak = Streak(
+          type: StreakType.underBudget,
+          length: 2,
+          status: StreakStatus.active,
+          daysUntilBreak: 1,
+          nextMilestone: 3,
+          consistencyRate: 1,
+          isCurrentMonthOnTrack: false,
+        );
+
+        final status = UnderBudgetMonthStatus(
+          month: fixedMonth,
+          totalBudget: 1500,
+          totalSpent: 1600,
+          isOnTrack: false,
+          overrunFlags: const [
+            CategoryOverrunFlag(
+              categoryUuid: 'dining-1',
+              categoryName: 'Dining Out',
+              budget: 400,
+              spent: 550,
+            ),
+          ],
+        );
+
+        when(() => mockCubit.state).thenReturn(
+          StreakState(
+            isLoading: false,
+            type: StreakType.underBudget,
+            streak: underBudgetStreak,
+            selectedMonth: fixedMonth,
+            underBudgetStatus: status,
+            monthlyConsistencyRate: 1,
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildStreaksPage(referenceDate: fixedMonth),
+        );
+
+        // UnderBudgetMonthCard replaces StreakCalendar
+        expect(find.byType(UnderBudgetMonthCard), findsOneWidget);
+        expect(find.byType(StreakCalendar), findsNothing);
+
+        // Hero shows Month unit
+        expect(find.text('2 Month Streak'), findsOneWidget);
+
+        // Shows off-track preview
+        expect(find.text('OFF TRACK (PREVIEW)'), findsOneWidget);
+
+        // Shows budget vs spent values
+        expect(find.textContaining('1,600'), findsWidgets);
+        expect(find.textContaining('1,500'), findsWidgets);
+
+        // Shows category overrun flag (R17, AE8)
+        expect(find.textContaining('Category Budget Overruns'), findsOneWidget);
+        expect(find.text('Dining Out'), findsOneWidget);
+        expect(find.textContaining('150'), findsOneWidget);
+      },
+    );
   });
 }

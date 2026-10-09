@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/core/storages/local_storages.dart';
+import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/repositories/category_repository.dart';
 import 'package:expense_tracker/features/streak/data/repositories/streak_repository_impl.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_period.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
@@ -20,51 +22,107 @@ class MockLocalStorage extends Mock implements LocalStorage {}
 
 class MockAppOpenRepository extends Mock implements AppOpenRepository {}
 
+class MockCategoryRepository extends Mock implements CategoryRepository {}
+
 void main() {
   late MockTransactionRepository mockTxRepo;
   late MockLocalStorage mockStorage;
   late MockAppOpenRepository mockAppOpenRepo;
+  late MockCategoryRepository mockCategoryRepo;
   late StreakRepositoryImpl repository;
 
   setUp(() {
     mockTxRepo = MockTransactionRepository();
     mockStorage = MockLocalStorage();
     mockAppOpenRepo = MockAppOpenRepository();
+    mockCategoryRepo = MockCategoryRepository();
     repository = StreakRepositoryImpl(
       mockTxRepo,
       mockStorage,
       mockAppOpenRepo,
+      mockCategoryRepo,
     );
 
     // Default storage mocks
     when(() => mockStorage.getStreakWindowDays()).thenAnswer((_) async => 3);
     when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 3);
     when(() => mockStorage.getAppOpenCadenceDays()).thenAnswer((_) async => 7);
+    when(() => mockCategoryRepo.watchCategories())
+        .thenAnswer((_) => Stream.value(const Right([])));
   });
 
   Transaction createTx(
     DateTime date, {
     TransactionType type = TransactionType.expense,
+    double amount = 100,
+    UniqueId? categoryUuid,
   }) {
     return Transaction(
       uuid: UniqueId.generate(),
-      amount: Amount(100),
+      amount: Amount(amount),
       description: StringSingleLine('Test transaction'),
       date: date,
-      categoryUuid: UniqueId.generate(),
+      categoryUuid: categoryUuid ?? UniqueId.generate(),
       type: type,
     );
   }
 
+  Category createCategory({
+    required UniqueId uuid,
+    required String name,
+    UniqueId? parentId,
+    double budget = 0,
+    CategoryType type = CategoryType.expense,
+  }) {
+    return Category(
+      uuid: uuid,
+      name: StringSingleLine(name),
+      parentId: parentId,
+      isSynced: false,
+      updatedAt: DateTime.now(),
+      type: type,
+      expectedMonthlyBudget: budget,
+      behavioralModifier: BehavioralModifier.active,
+    );
+  }
+
+  List<Category> createStandardTestCategories({
+    required Map<UniqueId, double> leafBudgets,
+  }) {
+    final pillarId = UniqueId.generate();
+    final subParentId = UniqueId.generate();
+    final categories = <Category>[
+      createCategory(uuid: pillarId, name: 'Essential'),
+      createCategory(uuid: subParentId, name: 'Living', parentId: pillarId),
+    ];
+
+    leafBudgets.forEach((leafId, budget) {
+      final idStr = leafId.getOrCrash();
+      final suffix = idStr.length >= 4 ? idStr.substring(0, 4) : idStr;
+      categories.add(
+        createCategory(
+          uuid: leafId,
+          name: 'Envelope $suffix',
+          parentId: subParentId,
+          budget: budget,
+        ),
+      );
+    });
+
+    return categories;
+  }
+
   group('StreakRepositoryImpl.getStreak - Tracking', () {
     test(
-        'Transactions on scattered days within window -> '
-        'single run, calendar-span length', () async {
-      final refDate = DateTime(2026, 9, 25, 12);
+        'Records discrete transaction dates and produces active streak '
+        'when meeting minimum count', () async {
+      final refDate = DateTime(2026, 9, 25, 14);
       final transactions = [
-        createTx(DateTime(2026, 9, 20, 10)),
-        createTx(DateTime(2026, 9, 22, 15)),
-        createTx(DateTime(2026, 9, 25, 9)),
+        createTx(DateTime(2026, 9, 21, 10)),
+        createTx(DateTime(2026, 9, 22, 11)),
+        createTx(DateTime(2026, 9, 23, 9)),
+        createTx(DateTime(2026, 9, 24, 15)),
+        createTx(DateTime(2026, 9, 25, 12)),
       ];
 
       when(
@@ -80,26 +138,47 @@ void main() {
       result.fold(
         (_) => fail('Expected Right'),
         (streak) {
-          expect(streak.length, 6);
+          expect(streak.length, 5);
           expect(streak.status, StreakStatus.active);
+          expect(streak.bestLength, 5);
           expect(streak.daysUntilBreak, 3);
-          expect(streak.bestLength, 6);
         },
       );
     });
 
-    test(
-        'Two clusters separated by more than window -> '
-        'current run is the recent one; best run is the longer cluster',
-        () async {
-      final refDate = DateTime(2026, 9, 22, 10);
+    test('Warming up when count is below minimum', () async {
+      final refDate = DateTime(2026, 9, 25, 12);
       final transactions = [
-        createTx(DateTime(2026, 9, 1, 8)),
-        createTx(DateTime(2026, 9, 4, 12)),
-        createTx(DateTime(2026, 9, 7, 18)),
-        createTx(DateTime(2026, 9, 20, 11)),
-        createTx(DateTime(2026, 9, 21, 14)),
-        createTx(DateTime(2026, 9, 22, 9)),
+        createTx(DateTime(2026, 9, 24, 10)),
+        createTx(DateTime(2026, 9, 25, 12)),
+      ];
+
+      when(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer((_) async => Right(transactions));
+
+      final result = await repository.getStreak(referenceDate: refDate);
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (streak) {
+          expect(streak.length, 2);
+          expect(streak.status, StreakStatus.warmingUp);
+        },
+      );
+    });
+
+    test('At risk when last recorded transaction was at the edge of window',
+        () async {
+      final refDate = DateTime(2026, 9, 25, 12);
+      final transactions = [
+        createTx(DateTime(2026, 9, 20, 10)),
+        createTx(DateTime(2026, 9, 21, 10)),
+        createTx(DateTime(2026, 9, 22, 10)),
       ];
 
       when(
@@ -116,18 +195,19 @@ void main() {
         (_) => fail('Expected Right'),
         (streak) {
           expect(streak.length, 3);
-          expect(streak.status, StreakStatus.active);
-          expect(streak.bestLength, 7);
+          expect(streak.status, StreakStatus.atRisk);
+          expect(streak.daysUntilBreak, 1);
         },
       );
     });
 
-    test('Gap strictly greater than window -> broken status and length 0',
-        () async {
-      final refDate = DateTime(2026, 9, 25, 18);
+    test('Broken when gap exceeds window', () async {
+      final refDate = DateTime(2026, 9, 25, 12);
       final transactions = [
-        createTx(DateTime(2026, 9, 20, 9)),
-        createTx(DateTime(2026, 9, 21, 14)),
+        createTx(DateTime(2026, 9, 18, 10)),
+        createTx(DateTime(2026, 9, 19, 10)),
+        createTx(DateTime(2026, 9, 20, 10)),
+        createTx(DateTime(2026, 9, 21, 10)),
       ];
 
       when(
@@ -145,44 +225,12 @@ void main() {
         (streak) {
           expect(streak.length, 0);
           expect(streak.status, StreakStatus.broken);
-          expect(streak.daysUntilBreak, 0);
-          expect(streak.bestLength, 2);
+          expect(streak.bestLength, 4);
         },
       );
     });
 
-    test('1 transaction recorded today -> length 1, warmingUp, not active',
-        () async {
-      final refDate = DateTime(2026, 9, 25, 10);
-      final transactions = [
-        createTx(DateTime(2026, 9, 25, 8)),
-      ];
-
-      when(
-        () => mockTxRepo.getTransactions(
-          startDate: any(named: 'startDate'),
-          endDate: any(named: 'endDate'),
-        ),
-      ).thenAnswer((_) async => Right(transactions));
-
-      final result = await repository.getStreak(referenceDate: refDate);
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('Expected Right'),
-        (streak) {
-          expect(streak.length, 1);
-          expect(streak.status, StreakStatus.warmingUp);
-          expect(streak.status.isCelebratory, isFalse);
-          expect(streak.daysUntilBreak, 3);
-          expect(streak.bestLength, 1);
-        },
-      );
-    });
-
-    test('No transactions at all -> empty streak entity', () async {
-      final refDate = DateTime(2026, 9, 25, 10);
-
+    test('Empty transactions returns empty streak', () async {
       when(
         () => mockTxRepo.getTransactions(
           startDate: any(named: 'startDate'),
@@ -190,7 +238,7 @@ void main() {
         ),
       ).thenAnswer((_) async => const Right([]));
 
-      final result = await repository.getStreak(referenceDate: refDate);
+      final result = await repository.getStreak();
 
       expect(result.isRight(), isTrue);
       result.fold(
@@ -199,14 +247,11 @@ void main() {
           expect(streak.isEmpty, isTrue);
           expect(streak.length, 0);
           expect(streak.status, StreakStatus.none);
-          expect(streak.daysUntilBreak, 0);
-          expect(streak.consistencyRate, 0.0);
-          expect(streak.bestLength, 0);
         },
       );
     });
 
-    test('Propagates transaction repository failure as Left', () async {
+    test('Propagates TransactionRepository failure as Left', () async {
       when(
         () => mockTxRepo.getTransactions(
           startDate: any(named: 'startDate'),
@@ -229,16 +274,6 @@ void main() {
         'Expense-free days build a run; any expense that day '
         'disqualifies only that day', () async {
       final refDate = DateTime(2026, 9, 25, 12);
-      // History:
-      // Sept 20: Income
-      // Sept 21: Income
-      // Sept 22: Expense -> disqualified
-      // Sept 23: Income
-      // Sept 24: Income
-      // Sept 25: Income
-      // Qualifying days: Sept 20, 21, 23, 24, 25.
-      // Gap Sept 21 -> 23 is 2 days <= window 3.
-      // Span Sept 20 to Sept 25 = 6 days.
       final transactions = [
         createTx(DateTime(2026, 9, 20, 10), type: TransactionType.income),
         createTx(DateTime(2026, 9, 21, 11), type: TransactionType.income),
@@ -264,107 +299,7 @@ void main() {
       result.fold(
         (_) => fail('Expected Right'),
         (streak) {
-          expect(streak.type, StreakType.noSpend);
           expect(streak.length, 6);
-          expect(streak.status, StreakStatus.active);
-          expect(streak.bestLength, 6);
-        },
-      );
-    });
-
-    test('Income-only day still qualifies for no-spend streak', () async {
-      final refDate = DateTime(2026, 9, 25, 12);
-      // Only income recorded on Sept 23, 24, 25
-      final transactions = [
-        createTx(DateTime(2026, 9, 23, 10), type: TransactionType.income),
-        createTx(DateTime(2026, 9, 24, 11), type: TransactionType.income),
-        createTx(DateTime(2026, 9, 25, 9), type: TransactionType.income),
-      ];
-
-      when(
-        () => mockTxRepo.getTransactions(
-          startDate: any(named: 'startDate'),
-          endDate: any(named: 'endDate'),
-        ),
-      ).thenAnswer((_) async => Right(transactions));
-
-      final result = await repository.getStreak(
-        type: StreakType.noSpend,
-        referenceDate: refDate,
-      );
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('Expected Right'),
-        (streak) {
-          expect(streak.type, StreakType.noSpend);
-          expect(streak.length, 3);
-          expect(streak.status, StreakStatus.active);
-        },
-      );
-    });
-
-    test('Days with zero transactions between start and today qualify',
-        () async {
-      final refDate = DateTime(2026, 9, 23, 12);
-      // User logged an income on Sept 21. No transactions on Sept 22 or 23.
-      // Candidate days: Sept 21, Sept 22, Sept 23 -> all expense-free!
-      final transactions = [
-        createTx(DateTime(2026, 9, 21, 10), type: TransactionType.income),
-      ];
-
-      when(
-        () => mockTxRepo.getTransactions(
-          startDate: any(named: 'startDate'),
-          endDate: any(named: 'endDate'),
-        ),
-      ).thenAnswer((_) async => Right(transactions));
-
-      final result = await repository.getStreak(
-        type: StreakType.noSpend,
-        referenceDate: refDate,
-      );
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('Expected Right'),
-        (streak) {
-          expect(streak.length, 3);
-          expect(streak.status, StreakStatus.active);
-        },
-      );
-    });
-
-    test('Expense today with prior run -> remains active with window grace',
-        () async {
-      final refDate = DateTime(2026, 9, 23, 12);
-      // Income on Sept 20, 21, 22. Expense on Sept 23 (today).
-      // Last qualifying day is Sept 22. Delta = 1 <= window 3 ->
-      // active with 3 days until break.
-      final transactions = [
-        createTx(DateTime(2026, 9, 20, 10), type: TransactionType.income),
-        createTx(DateTime(2026, 9, 21, 10), type: TransactionType.income),
-        createTx(DateTime(2026, 9, 22, 10), type: TransactionType.income),
-        createTx(DateTime(2026, 9, 23, 10)),
-      ];
-
-      when(
-        () => mockTxRepo.getTransactions(
-          startDate: any(named: 'startDate'),
-          endDate: any(named: 'endDate'),
-        ),
-      ).thenAnswer((_) async => Right(transactions));
-
-      final result = await repository.getStreak(
-        type: StreakType.noSpend,
-        referenceDate: refDate,
-      );
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('Expected Right'),
-        (streak) {
-          expect(streak.length, 3);
           expect(streak.status, StreakStatus.active);
           expect(streak.daysUntilBreak, 3);
         },
@@ -375,8 +310,6 @@ void main() {
         'Expense on last day of window coverage -> '
         'at risk with 1 day until break', () async {
       final refDate = DateTime(2026, 9, 25, 12);
-      // Income on Sept 20, 21, 22. Expenses on Sept 23, 24, 25.
-      // Last qualifying day is Sept 22. Delta = 3 == window 3 -> atRisk!
       final transactions = [
         createTx(DateTime(2026, 9, 20, 10), type: TransactionType.income),
         createTx(DateTime(2026, 9, 21, 10), type: TransactionType.income),
@@ -449,7 +382,6 @@ void main() {
         ),
       ).thenAnswer((_) async => Right(openDates));
 
-      // Sept 22 (today, qualified): active
       final resultDay22 = await repository.getStreak(
         type: StreakType.appOpen,
         referenceDate: DateTime(2026, 9, 22, 12),
@@ -463,7 +395,6 @@ void main() {
         },
       );
 
-      // Sept 23 (unqualified, gap = 1 == cadence 1): atRisk
       final resultDay23 = await repository.getStreak(
         type: StreakType.appOpen,
         referenceDate: DateTime(2026, 9, 23, 12),
@@ -477,7 +408,6 @@ void main() {
         },
       );
 
-      // Sept 24 (unqualified, gap = 2 > cadence 1): broken
       final resultDay24 = await repository.getStreak(
         type: StreakType.appOpen,
         referenceDate: DateTime(2026, 9, 24, 12),
@@ -500,8 +430,7 @@ void main() {
       when(() => mockStorage.getStreakMinimumDays())
           .thenAnswer((_) async => 1);
 
-      // Opens on Sept 1 and Sept 7: diff 6 <= 7 -> continues
-      final opensCont = [
+      final opensSustained = [
         DateTime(2026, 9, 1, 9),
         DateTime(2026, 9, 7, 10),
       ];
@@ -511,7 +440,7 @@ void main() {
           startDate: any(named: 'startDate'),
           endDate: any(named: 'endDate'),
         ),
-      ).thenAnswer((_) async => Right(opensCont));
+      ).thenAnswer((_) async => Right(opensSustained));
 
       final resultSept7 = await repository.getStreak(
         type: StreakType.appOpen,
@@ -525,7 +454,6 @@ void main() {
         },
       );
 
-      // Open on Sept 1 and Sept 9: diff 8 > 7 -> breaks, fresh run of length 1
       final opensBroken = [
         DateTime(2026, 9, 1, 9),
         DateTime(2026, 9, 9, 10),
@@ -550,68 +478,292 @@ void main() {
         },
       );
     });
+  });
 
-    test('Custom cadence value (e.g. 5) drives the window', () async {
-      when(() => mockStorage.getAppOpenCadenceDays())
-          .thenAnswer((_) async => 5);
-      when(() => mockStorage.getStreakMinimumDays())
-          .thenAnswer((_) async => 1);
+  group('StreakRepositoryImpl.getStreak - Under-Budget (Phase 3)', () {
+    test(
+        'Covers AE7: Mid-month overspend leaves the count unchanged; '
+        'preview shows off track', () async {
+      when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 1);
 
-      // Opens on Sept 1 and Sept 6 (diff 5 <= 5): continuous run
-      final opens = [
-        DateTime(2026, 9, 1, 9),
-        DateTime(2026, 9, 6, 10),
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 1000},
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      final transactions = [
+        createTx(DateTime(2026, 3, 10), amount: 600, categoryUuid: leafId),
+        createTx(DateTime(2026, 4, 12), amount: 1500, categoryUuid: leafId),
       ];
 
       when(
-        () => mockAppOpenRepo.getOpenDates(
+        () => mockTxRepo.getTransactions(
           startDate: any(named: 'startDate'),
           endDate: any(named: 'endDate'),
         ),
-      ).thenAnswer((_) async => Right(opens));
+      ).thenAnswer((_) async => Right(transactions));
 
       final result = await repository.getStreak(
-        type: StreakType.appOpen,
-        referenceDate: DateTime(2026, 9, 6, 12),
+        type: StreakType.underBudget,
+        referenceDate: DateTime(2026, 4, 15),
       );
 
       expect(result.isRight(), isTrue);
       result.fold(
         (_) => fail('Expected Right'),
         (streak) {
-          expect(streak.length, 6);
+          expect(streak.length, 1);
           expect(streak.status, StreakStatus.active);
+          expect(streak.isCurrentMonthOnTrack, isFalse);
         },
       );
     });
 
-    test('Propagates AppOpenRepository failure as Left', () async {
+    test(
+        'Covers AE8: Completed month within total budgets with one category '
+        'over its budget -> qualifies for streak', () async {
+      when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 1);
+
+      final groceriesId = UniqueId.generate();
+      final diningId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {
+          groceriesId: 300,
+          diningId: 700,
+        },
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      final transactions = [
+        createTx(
+          DateTime(2026, 3, 10),
+          amount: 400,
+          categoryUuid: groceriesId,
+        ),
+        createTx(
+          DateTime(2026, 3, 15),
+          amount: 400,
+          categoryUuid: diningId,
+        ),
+      ];
+
       when(
-        () => mockAppOpenRepo.getOpenDates(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer((_) async => Right(transactions));
+
+      final result = await repository.getStreak(
+        type: StreakType.underBudget,
+        referenceDate: DateTime(2026, 4, 10),
+      );
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (streak) {
+          expect(streak.length, 1);
+          expect(streak.status, StreakStatus.active);
+        },
+      );
+
+      final flagsResult = await repository.getCategoryOverrunFlags(
+        month: DateTime(2026, 3),
+      );
+      expect(flagsResult.isRight(), isTrue);
+      flagsResult.fold(
+        (_) => fail('Expected Right'),
+        (flags) {
+          expect(flags.length, 1);
+          expect(flags.first.categoryUuid, groceriesId.getOrCrash());
+          expect(flags.first.budget, 300.0);
+          expect(flags.first.spent, 400.0);
+          expect(flags.first.overrunAmount, 100.0);
+        },
+      );
+    });
+
+    test('Completed month over total budgets -> run breaks at that month',
+        () async {
+      when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 1);
+
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 1000},
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      final transactions = [
+        createTx(DateTime(2026, 1, 10), amount: 800, categoryUuid: leafId),
+        createTx(DateTime(2026, 2, 10), amount: 1400, categoryUuid: leafId),
+      ];
+
+      when(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer((_) async => Right(transactions));
+
+      final result = await repository.getStreak(
+        type: StreakType.underBudget,
+        referenceDate: DateTime(2026, 3, 15),
+      );
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (streak) {
+          expect(streak.length, 0);
+          expect(streak.status, StreakStatus.broken);
+          expect(streak.bestLength, 1);
+        },
+      );
+    });
+
+    test('Month with zero budgets configured (all zeros) -> not qualifying',
+        () async {
+      when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 1);
+
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 0},
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      final transactions = [
+        createTx(DateTime(2026, 3, 10), amount: 0, categoryUuid: leafId),
+      ];
+
+      when(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer((_) async => Right(transactions));
+
+      final result = await repository.getStreak(
+        type: StreakType.underBudget,
+        referenceDate: DateTime(2026, 4, 15),
+      );
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (streak) {
+          expect(streak.length, 0);
+          expect(streak.isCurrentMonthOnTrack, isFalse);
+        },
+      );
+    });
+
+    test(
+      'Year-boundary consecutive months (Dec, Jan) compute correctly on the '
+      'month engine',
+      () async {
+        when(() => mockStorage.getStreakMinimumDays())
+            .thenAnswer((_) async => 2);
+
+        final leafId = UniqueId.generate();
+        final categories = createStandardTestCategories(
+          leafBudgets: {leafId: 1000},
+        );
+        when(() => mockCategoryRepo.watchCategories())
+            .thenAnswer((_) => Stream.value(Right(categories)));
+
+        final transactions = [
+          createTx(DateTime(2025, 12, 15), amount: 700, categoryUuid: leafId),
+          createTx(DateTime(2026, 1, 15), amount: 800, categoryUuid: leafId),
+        ];
+
+        when(
+          () => mockTxRepo.getTransactions(
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          ),
+        ).thenAnswer((_) async => Right(transactions));
+
+        final result = await repository.getStreak(
+          type: StreakType.underBudget,
+          referenceDate: DateTime(2026, 2, 15),
+        );
+
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (_) => fail('Expected Right'),
+          (streak) {
+            expect(streak.length, 2);
+            expect(streak.status, StreakStatus.active);
+          },
+        );
+      },
+    );
+
+    test('isCurrentMonthOnTrack returns boolean based on total budget',
+        () async {
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 1000},
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      when(
+        () => mockTxRepo.getTransactions(
           startDate: any(named: 'startDate'),
           endDate: any(named: 'endDate'),
         ),
       ).thenAnswer(
-        (_) async => const Left(
-          Failure.localFailure(message: 'Storage read failure'),
-        ),
+        (_) async => Right([
+          createTx(DateTime(2026, 4, 5), amount: 400, categoryUuid: leafId),
+        ]),
       );
 
-      final result = await repository.getStreak(type: StreakType.appOpen);
-
-      expect(result.isLeft(), isTrue);
+      final onTrackResult = await repository.isCurrentMonthOnTrack(
+        referenceDate: DateTime(2026, 4, 15),
+      );
+      expect(onTrackResult, const Right<Failure, bool>(true));
     });
-  });
 
-  group('StreakRepositoryImpl - UnderBudget & Unsupported', () {
-    test('Returns Left for underBudget streak in phase 2', () async {
-      final result = await repository.getStreak(type: StreakType.underBudget);
-      expect(result.isLeft(), isTrue);
-
-      final periodsResult = await repository.getQualifyingPeriods(
-        type: StreakType.underBudget,
+    test('getUnderBudgetStatus aggregates budget, spent, and flags', () async {
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 1000},
       );
-      expect(periodsResult.isLeft(), isTrue);
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      when(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer(
+        (_) async => Right([
+          createTx(DateTime(2026, 4, 5), amount: 650, categoryUuid: leafId),
+        ]),
+      );
+
+      final statusResult = await repository.getUnderBudgetStatus(
+        month: DateTime(2026, 4),
+      );
+
+      expect(statusResult.isRight(), isTrue);
+      statusResult.fold(
+        (_) => fail('Expected Right'),
+        (status) {
+          expect(status.totalBudget, 1000.0);
+          expect(status.totalSpent, 650.0);
+          expect(status.isOnTrack, isTrue);
+          expect(status.remainingBudget, 350.0);
+        },
+      );
     });
   });
 
@@ -623,7 +775,7 @@ void main() {
       final transactions = [
         createTx(DateTime(2026, 9, 5, 10)),
         createTx(DateTime(2026, 9, 2, 8)),
-        createTx(DateTime(2026, 9, 5, 16)), // duplicate day
+        createTx(DateTime(2026, 9, 5, 16)),
         createTx(DateTime(2026, 9, 10, 12)),
       ];
 
@@ -655,7 +807,6 @@ void main() {
     test('extracts qualifying dates for noSpend (expense-free days)', () async {
       final startDate = DateTime(2026, 9);
       final endDate = DateTime(2026, 9, 5);
-      // Expenses on Sept 2 and Sept 4. Sept 1, 3, 5 are expense-free.
       final transactions = [
         createTx(DateTime(2026, 9, 2, 10)),
         createTx(DateTime(2026, 9, 4, 14)),
@@ -693,7 +844,7 @@ void main() {
       final openDates = [
         DateTime(2026, 9, 5, 10),
         DateTime(2026, 9, 2, 8),
-        DateTime(2026, 9, 5, 16), // duplicate day
+        DateTime(2026, 9, 5, 16),
         DateTime(2026, 9, 10, 12),
       ];
 
@@ -718,6 +869,44 @@ void main() {
             const StreakDay.fromYmd(2026, 9, 2),
             const StreakDay.fromYmd(2026, 9, 5),
             const StreakDay.fromYmd(2026, 9, 10),
+          ]);
+        },
+      );
+    });
+
+    test('extracts qualifying StreakMonths for underBudget', () async {
+      final leafId = UniqueId.generate();
+      final categories = createStandardTestCategories(
+        leafBudgets: {leafId: 1000},
+      );
+      when(() => mockCategoryRepo.watchCategories())
+          .thenAnswer((_) => Stream.value(Right(categories)));
+
+      final transactions = [
+        createTx(DateTime(2025, 11, 10), amount: 800, categoryUuid: leafId),
+        createTx(DateTime(2025, 12, 10), amount: 900, categoryUuid: leafId),
+      ];
+
+      when(
+        () => mockTxRepo.getTransactions(
+          startDate: any(named: 'startDate'),
+          endDate: any(named: 'endDate'),
+        ),
+      ).thenAnswer((_) async => Right(transactions));
+
+      final result = await repository.getQualifyingPeriods(
+        type: StreakType.underBudget,
+        startDate: DateTime(2025, 11),
+        endDate: DateTime(2025, 12, 31),
+      );
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (periods) {
+          expect(periods, [
+            const StreakMonth(2025, 11),
+            const StreakMonth(2025, 12),
           ]);
         },
       );

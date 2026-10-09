@@ -29,7 +29,8 @@ class StreakCard extends StatelessWidget {
     if (streak.status == StreakStatus.warmingUp) {
       return '${prefix}Warming Up';
     }
-    return '$prefix${streak.length} Day Streak';
+    final unit = streak.type == StreakType.underBudget ? 'Month' : 'Day';
+    return '$prefix${streak.length} $unit Streak';
   }
 
   String get _subtitle {
@@ -39,17 +40,22 @@ class StreakCard extends StatelessWidget {
           return 'At risk! Avoid expenses today to keep your streak';
         case StreakType.appOpen:
           return 'At risk! Open app today to keep your streak';
-        case StreakType.tracking:
         case StreakType.underBudget:
+          return 'At risk! Stay under budget this month to keep your streak';
+        case StreakType.tracking:
           return 'At risk! Log today to keep your streak';
       }
     }
     if (streak.status == StreakStatus.warmingUp) {
-      return 'Warming up · Keep logging to activate your streak';
+      return streak.type == StreakType.underBudget
+          ? 'Warming up · Stay under budget to activate your streak'
+          : 'Warming up · Keep logging to activate your streak';
     }
     final remaining = streak.nextMilestone - streak.length;
-    final dayWord = remaining == 1 ? 'day' : 'days';
-    return '$remaining $dayWord to next milestone';
+    final unitWord = streak.type == StreakType.underBudget
+        ? (remaining == 1 ? 'month' : 'months')
+        : (remaining == 1 ? 'day' : 'days');
+    return '$remaining $unitWord to next milestone';
   }
 
   Color get _accentColor {
@@ -94,11 +100,14 @@ class StreakCard extends StatelessWidget {
           color: isAtRisk
               ? const Color(0xFFFFB4AB).withValues(alpha: 0.8)
               : const Color(0xFFE5E7EB),
+          width: isAtRisk ? 1.5 : 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF191C1D).withValues(alpha: 0.04),
-            blurRadius: 16,
+            color: isAtRisk
+                ? const Color(0xFFBA1A1A).withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -108,82 +117,91 @@ class StreakCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: onTap ??
-              () => context.push(
-                    '/streaks?type=${streak.type.name}',
-                  ),
+              () {
+                context.push('/streaks?type=${streak.type.name}');
+              },
           onLongPress: onLongPress ??
-              () => StreakConfigSheet.show(
-                    context,
+              () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => StreakConfigSheet(
                     initialType: streak.type,
                   ),
+                );
+              },
           child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: _flameContainerColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.local_fire_department_rounded,
-                          color: _accentColor,
-                          size: 26,
+                // Flame icon container
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: _flameContainerColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.local_fire_department_rounded,
+                      color: _accentColor,
+                      size: 26,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+
+                // Streak text & milestone progress bar
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _title,
+                        style: GoogleFonts.manrope(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF00113A),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _title,
-                            style: GoogleFonts.manrope(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF00113A),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _subtitle,
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: isAtRisk
-                                  ? const Color(0xFFBA1A1A)
-                                  : const Color(0xFF444650),
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        _subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: isAtRisk
+                              ? const Color(0xFFBA1A1A)
+                              : const Color(0xFF757682),
+                          fontWeight: isAtRisk
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
                       ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF757682),
-                      size: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: LinearProgressIndicator(
-                    value: _progressFraction,
-                    minHeight: 6,
-                    backgroundColor: const Color(0xFFF1F2F6),
-                    valueColor: AlwaysStoppedAnimation<Color>(_accentColor),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: _progressFraction,
+                          backgroundColor: const Color(0xFFF3F4F6),
+                          color: _accentColor,
+                          minHeight: 5,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                const SizedBox(width: 8),
+
+                // Trailing chevron
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: isAtRisk
+                      ? const Color(0xFFBA1A1A)
+                      : const Color(0xFF9CA3AF),
+                  size: 22,
                 ),
               ],
             ),

@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/core/domain/usecases/use_case.dart';
+import 'package:expense_tracker/features/streak/domain/entities/category_overrun_flag.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_period.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/domain/entities/under_budget_month_status.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_qualifying_periods_use_case.dart';
 import 'package:expense_tracker/features/streak/domain/usecases/get_streaks_use_case.dart';
+import 'package:expense_tracker/features/streak/domain/usecases/get_under_budget_status_use_case.dart';
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_cubit.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/usecases/watch_transactions_use_case.dart';
@@ -23,16 +26,21 @@ class MockGetQualifyingPeriodsUseCase extends Mock
 class MockWatchTransactionsUseCase extends Mock
     implements WatchTransactionsUseCase {}
 
+class MockGetUnderBudgetStatusUseCase extends Mock
+    implements GetUnderBudgetStatusUseCase {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(const GetStreaksParams());
     registerFallbackValue(const GetQualifyingPeriodsParams());
+    registerFallbackValue(const GetUnderBudgetStatusParams());
     registerFallbackValue(NoParams());
   });
 
   late MockGetStreaksUseCase mockGetStreaksUseCase;
   late MockGetQualifyingPeriodsUseCase mockGetQualifyingPeriodsUseCase;
   late MockWatchTransactionsUseCase mockWatchTransactionsUseCase;
+  late MockGetUnderBudgetStatusUseCase mockGetUnderBudgetStatusUseCase;
   late StreamController<Either<Failure, List<Transaction>>>
       transactionsController;
 
@@ -48,10 +56,26 @@ void main() {
     consistencyRate: 0.5,
   );
 
+  final tUnderBudgetStatus = UnderBudgetMonthStatus(
+    month: fixedMonth,
+    totalBudget: 1000,
+    totalSpent: 600,
+    isOnTrack: true,
+    overrunFlags: const [
+      CategoryOverrunFlag(
+        categoryUuid: 'dining-123',
+        categoryName: 'Dining Out',
+        budget: 200,
+        spent: 250,
+      ),
+    ],
+  );
+
   setUp(() {
     mockGetStreaksUseCase = MockGetStreaksUseCase();
     mockGetQualifyingPeriodsUseCase = MockGetQualifyingPeriodsUseCase();
     mockWatchTransactionsUseCase = MockWatchTransactionsUseCase();
+    mockGetUnderBudgetStatusUseCase = MockGetUnderBudgetStatusUseCase();
     transactionsController = StreamController.broadcast();
 
     when(() => mockWatchTransactionsUseCase(any()))
@@ -59,6 +83,9 @@ void main() {
 
     when(() => mockGetStreaksUseCase(any()))
         .thenAnswer((_) async => const Right(tStreak));
+
+    when(() => mockGetUnderBudgetStatusUseCase(any()))
+        .thenAnswer((_) async => Right(tUnderBudgetStatus));
 
     when(() => mockGetQualifyingPeriodsUseCase(any())).thenAnswer((invocation) {
       final params =
@@ -78,12 +105,17 @@ void main() {
     transactionsController.close();
   });
 
-  StreakCubit buildCubit({DateTime Function()? clock}) {
+  StreakCubit buildCubit({
+    DateTime Function()? clock,
+    StreakType initialType = StreakType.tracking,
+  }) {
     return StreakCubit.test(
       getStreaksUseCase: mockGetStreaksUseCase,
       getQualifyingPeriodsUseCase: mockGetQualifyingPeriodsUseCase,
       watchTransactionsUseCase: mockWatchTransactionsUseCase,
+      getUnderBudgetStatusUseCase: mockGetUnderBudgetStatusUseCase,
       clock: clock ?? () => fixedDate,
+      initialType: initialType,
     );
   }
 
@@ -148,6 +180,36 @@ void main() {
           ),
         ),
       ).called(1);
+    });
+
+    test('selectType with underBudget loads budget status and overrun flags',
+        () async {
+      final cubit = buildCubit();
+      await cubit.load();
+
+      const underBudgetStreak = Streak(
+        type: StreakType.underBudget,
+        length: 2,
+        status: StreakStatus.active,
+        daysUntilBreak: 1,
+        nextMilestone: 3,
+        consistencyRate: 1,
+        isCurrentMonthOnTrack: true,
+      );
+
+      when(() => mockGetStreaksUseCase(any()))
+          .thenAnswer((_) async => const Right(underBudgetStreak));
+
+      await cubit.selectType(StreakType.underBudget);
+
+      expect(cubit.state.type, equals(StreakType.underBudget));
+      expect(cubit.state.streak, equals(underBudgetStreak));
+      expect(cubit.state.underBudgetStatus, equals(tUnderBudgetStatus));
+      expect(cubit.state.isOnTrack, isTrue);
+      expect(cubit.state.currentMonthBudget, 1000);
+      expect(cubit.state.currentMonthExpense, 600);
+      expect(cubit.state.categoryOverrunFlags.length, 1);
+      expect(cubit.state.categoryOverrunFlags.first.categoryName, 'Dining Out');
     });
 
     test('selectType does nothing if target type is already active', () async {

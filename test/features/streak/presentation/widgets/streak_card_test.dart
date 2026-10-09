@@ -270,4 +270,46 @@ void main() {
       expect(find.text('Streak Settings'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'underBudget active streak renders "N Month Streak" and '
+    '"months to next milestone"',
+    (tester) async {
+      const streak = Streak(
+        type: StreakType.underBudget,
+        length: 2,
+        status: StreakStatus.active,
+        daysUntilBreak: 1,
+        nextMilestone: 3,
+        consistencyRate: 1,
+      );
+
+      await tester.pumpWidget(buildCard(streak: streak));
+
+      expect(find.text('Budget · 2 Month Streak'), findsOneWidget);
+      expect(find.text('1 month to next milestone'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'underBudget at-risk streak renders under-budget risk subtitle',
+    (tester) async {
+      const streak = Streak(
+        type: StreakType.underBudget,
+        length: 2,
+        status: StreakStatus.atRisk,
+        daysUntilBreak: 1,
+        nextMilestone: 3,
+        consistencyRate: 1,
+      );
+
+      await tester.pumpWidget(buildCard(streak: streak));
+
+      expect(find.text('Budget · 2 Month Streak'), findsOneWidget);
+      expect(
+        find.text('At risk! Stay under budget this month to keep your streak'),
+        findsOneWidget,
+      );
+    },
+  );
 }

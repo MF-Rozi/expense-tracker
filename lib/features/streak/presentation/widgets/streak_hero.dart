@@ -31,10 +31,11 @@ class StreakHero extends StatelessWidget {
       }
       return 'No Active Streak';
     }
+    final unit = streak.type == StreakType.underBudget ? 'Month' : 'Day';
     if (streak.length == 1) {
-      return '1 Day Streak';
+      return '1 $unit Streak';
     }
-    return '${streak.length} Day Streak';
+    return '${streak.length} $unit Streak';
   }
 
   String get _subtitle {
@@ -46,6 +47,9 @@ class StreakHero extends StatelessWidget {
         if (streak.type == StreakType.appOpen) {
           return 'AT RISK • OPEN APP TODAY';
         }
+        if (streak.type == StreakType.underBudget) {
+          return 'AT RISK • STAY UNDER BUDGET THIS MONTH';
+        }
         return 'AT RISK • LOG AN EXPENSE TODAY';
       case StreakStatus.warmingUp:
         return 'WARMING UP • HABIT IN FORMATION';
@@ -56,8 +60,14 @@ class StreakHero extends StatelessWidget {
         if (streak.type == StreakType.appOpen) {
           return 'STREAK PAUSED • OPEN DAILY TO RESUME';
         }
+        if (streak.type == StreakType.underBudget) {
+          return 'STREAK PAUSED • STAY UNDER BUDGET TO RESUME';
+        }
         return 'STREAK PAUSED • LOG TODAY TO RESUME';
       case StreakStatus.none:
+        if (streak.type == StreakType.underBudget) {
+          return 'STAY UNDER BUDGET THIS MONTH TO START';
+        }
         return 'START YOUR RUN TODAY';
       case StreakStatus.active:
         return 'MASTERING FINANCIAL DISCIPLINE';
@@ -102,24 +112,24 @@ class StreakHero extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 _headline,
-                textAlign: TextAlign.center,
                 style: GoogleFonts.manrope(
-                  fontSize: 34,
+                  fontSize: 32,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
-                  letterSpacing: -1,
+                  letterSpacing: -0.5,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
               Text(
                 _subtitle,
-                textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
                   color: _subtitleColor,
-                  letterSpacing: 1.5,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
               Row(
@@ -127,14 +137,14 @@ class StreakHero extends StatelessWidget {
                 children: List.generate(5, (index) {
                   final isFilled = index < _filledDots;
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isFilled
                           ? _flameColor
-                          : _flameColor.withValues(alpha: 0.25),
+                          : Colors.white.withValues(alpha: 0.2),
                     ),
                   );
                 }),
