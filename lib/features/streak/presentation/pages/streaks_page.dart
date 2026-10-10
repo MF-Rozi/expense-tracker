@@ -3,7 +3,6 @@ import 'package:expense_tracker/features/streak/presentation/blocs/streak_cubit.
 import 'package:expense_tracker/features/streak/presentation/blocs/streak_state.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/milestone_progress.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_calendar.dart';
-import 'package:expense_tracker/features/streak/presentation/widgets/streak_config_sheet.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_hero.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/under_budget_month_card.dart';
 import 'package:expense_tracker/injector.dart';
@@ -157,17 +156,6 @@ class StreaksPage extends StatelessWidget {
                 ),
               ),
               centerTitle: true,
-              actions: [
-                IconButton(
-                  tooltip: 'Configure Streak',
-                  icon: const Icon(Icons.tune_rounded),
-                  color: const Color(0xFF00113A),
-                  onPressed: () => StreakConfigSheet.show(
-                    context,
-                    initialType: state.type,
-                  ),
-                ),
-              ],
             ),
             body: RefreshIndicator(
               color: const Color(0xFF00113A),
@@ -185,12 +173,6 @@ class StreaksPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     StreakHero(
                       streak: state.streak,
-                      onLongPress: () {
-                        StreakConfigSheet.show(
-                          context,
-                          initialType: state.type,
-                        );
-                      },
                     ),
                     const SizedBox(height: 20),
                     if (state.type == StreakType.underBudget)
@@ -236,36 +218,28 @@ class StreaksPage extends StatelessWidget {
           final isSelected = type == selectedType;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onLongPress: () {
-                StreakConfigSheet.show(
-                  context,
-                  initialType: type,
-                );
+            child: ChoiceChip(
+              key: Key('streak_type_chip_${type.name}'),
+              label: Text(type.shortLabel),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  context.read<StreakCubit>().selectType(type);
+                }
               },
-              child: ChoiceChip(
-                key: Key('streak_type_chip_${type.name}'),
-                label: Text(type.shortLabel),
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) {
-                    context.read<StreakCubit>().selectType(type);
-                  }
-                },
-                selectedColor: const Color(0xFF00113A),
-                backgroundColor: Colors.white,
-                labelStyle: GoogleFonts.inter(
-                  color: isSelected ? Colors.white : const Color(0xFF757682),
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 13,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: isSelected
-                        ? const Color(0xFF00113A)
-                        : const Color(0xFFE5E7EB),
-                  ),
+              selectedColor: const Color(0xFF00113A),
+              backgroundColor: Colors.white,
+              labelStyle: GoogleFonts.inter(
+                color: isSelected ? Colors.white : const Color(0xFF757682),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 13,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected
+                      ? const Color(0xFF00113A)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
             ),

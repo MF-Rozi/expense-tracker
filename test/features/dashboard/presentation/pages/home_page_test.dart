@@ -7,6 +7,7 @@ import 'package:expense_tracker/features/dashboard/presentation/widgets/wealth_t
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/presentation/widgets/streak_badge.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,6 +36,32 @@ void main() {
       ),
     );
   }
+
+  testWidgets(
+    'renders StreakBadge in header',
+    (tester) async {
+      const streak = Streak(
+        type: StreakType.tracking,
+        length: 5,
+        status: StreakStatus.active,
+        daysUntilBreak: 2,
+        nextMilestone: 7,
+        consistencyRate: 0.8,
+      );
+
+      when(() => mockCubit.state).thenReturn(
+        const DashboardState(
+          isLoading: false,
+          streak: streak,
+        ),
+      );
+
+      await tester.pumpWidget(buildHomePage());
+
+      expect(find.byType(StreakBadge), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'renders StreakCard between SummaryCard and WealthTrajectoryChart '

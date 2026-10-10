@@ -244,7 +244,7 @@ void main() {
   );
 
   testWidgets(
-    'long-press opens StreakConfigSheet by default',
+    'long-press does not open StreakConfigSheet by default',
     (tester) async {
       const streak = Streak(
         type: StreakType.tracking,
@@ -256,18 +256,16 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StreakCard(streak: streak),
-          ),
+        buildCard(
+          streak: streak,
+          onTap: () {},
         ),
       );
 
       await tester.longPress(find.byType(StreakCard));
       await tester.pumpAndSettle();
 
-      expect(find.byType(StreakConfigSheet), findsOneWidget);
-      expect(find.text('Streak Settings'), findsOneWidget);
+      expect(find.byType(StreakConfigSheet), findsNothing);
     },
   );
 

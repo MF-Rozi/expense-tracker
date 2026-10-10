@@ -3,6 +3,7 @@ import 'package:expense_tracker/features/dashboard/presentation/blocs/dashboard_
 import 'package:expense_tracker/features/dashboard/presentation/widgets/record_entry_card.dart';
 import 'package:expense_tracker/features/dashboard/presentation/widgets/summary_card.dart';
 import 'package:expense_tracker/features/dashboard/presentation/widgets/wealth_trajectory_chart.dart';
+import 'package:expense_tracker/features/streak/presentation/widgets/streak_badge.dart';
 import 'package:expense_tracker/features/streak/presentation/widgets/streak_card.dart';
 import 'package:expense_tracker/features/transaction/presentation/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const Spacer(),
+                          StreakBadge(streak: state.streak),
+                          const SizedBox(width: 8),
                           IconButton(
                             icon: const Icon(
                               Icons.notifications_none,

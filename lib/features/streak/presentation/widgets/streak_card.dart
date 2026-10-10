@@ -1,14 +1,13 @@
 import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
 import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
-import 'package:expense_tracker/features/streak/presentation/widgets/streak_config_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Compact flame card displayed on the home dashboard.
 ///
-/// Tap navigates to `/streaks`; long-press opens the [StreakConfigSheet].
+/// Tap navigates to `/streaks`.
 /// When the streak is empty, this widget renders [SizedBox.shrink].
 class StreakCard extends StatelessWidget {
   const StreakCard({
@@ -120,17 +119,7 @@ class StreakCard extends StatelessWidget {
               () {
                 context.push('/streaks?type=${streak.type.name}');
               },
-          onLongPress: onLongPress ??
-              () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) => StreakConfigSheet(
-                    initialType: streak.type,
-                  ),
-                );
-              },
+          onLongPress: onLongPress,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(

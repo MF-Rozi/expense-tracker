@@ -208,7 +208,7 @@ void main() {
     });
 
     testWidgets(
-        'long-press on an app-open element deep-links to its config section',
+        'long-press on a type chip does not open StreakConfigSheet',
         (tester) async {
       when(() => mockCubit.state).thenReturn(
         StreakState(
@@ -232,8 +232,7 @@ void main() {
       await tester.longPress(find.byKey(const Key('streak_type_chip_appOpen')));
       await tester.pumpAndSettle();
 
-      expect(find.byType(StreakConfigSheet), findsOneWidget);
-      expect(find.text('App-Open Cadence'), findsOneWidget);
+      expect(find.byType(StreakConfigSheet), findsNothing);
     });
 
     testWidgets('types without records yet render empty states, not zeros',
@@ -263,7 +262,6 @@ void main() {
       when(() => mockCubit.state).thenReturn(
         StreakState(
           isLoading: false,
-          type: StreakType.appOpen,
           selectedMonth: fixedMonth,
         ),
       );
@@ -296,8 +294,7 @@ void main() {
       verify(mockCubit.nextMonth).called(1);
     });
 
-    testWidgets('tapping configure action opens StreakConfigSheet',
-        (tester) async {
+    testWidgets('configure action is not shown in AppBar', (tester) async {
       when(() => mockCubit.state).thenReturn(
         StreakState(
           isLoading: false,
@@ -310,13 +307,12 @@ void main() {
 
       await tester.pumpWidget(buildStreaksPage());
 
-      await tester.tap(find.byTooltip('Configure Streak'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(StreakConfigSheet), findsOneWidget);
+      expect(find.byTooltip('Configure Streak'), findsNothing);
+      expect(find.byIcon(Icons.tune_rounded), findsNothing);
     });
 
-    testWidgets('long pressing hero opens StreakConfigSheet', (tester) async {
+    testWidgets('long pressing hero does not open StreakConfigSheet',
+        (tester) async {
       when(() => mockCubit.state).thenReturn(
         StreakState(
           isLoading: false,
@@ -332,7 +328,7 @@ void main() {
       await tester.longPress(find.byType(StreakHero));
       await tester.pumpAndSettle();
 
-      expect(find.byType(StreakConfigSheet), findsOneWidget);
+      expect(find.byType(StreakConfigSheet), findsNothing);
     });
 
     testWidgets(
