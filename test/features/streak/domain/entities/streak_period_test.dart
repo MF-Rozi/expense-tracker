@@ -68,8 +68,7 @@ void main() {
       );
     });
 
-    test(
-        'DST and timezone safety: difference is exact across 23/25 hour days',
+    test('DST and timezone safety: difference is exact across 23/25 hour days',
         () {
       // March DST transition in Europe/US (23 hours)
       const march28 = StreakDay.fromYmd(2026, 3, 28);
@@ -108,8 +107,7 @@ void main() {
       );
     });
 
-    test(
-        'calculates differenceInPeriods across months and year boundaries',
+    test('calculates differenceInPeriods across months and year boundaries',
         () {
       const dec2025 = StreakMonth(2025, 12);
       const jan2026 = StreakMonth(2026, 1);

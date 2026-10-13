@@ -15,8 +15,7 @@ import 'package:expense_tracker/shared/domain/entities/value_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockTransactionRepository extends Mock
-    implements TransactionRepository {}
+class MockTransactionRepository extends Mock implements TransactionRepository {}
 
 class MockLocalStorage extends Mock implements LocalStorage {}
 
@@ -427,8 +426,7 @@ void main() {
         '9th breaks', () async {
       when(() => mockStorage.getAppOpenCadenceDays())
           .thenAnswer((_) async => 7);
-      when(() => mockStorage.getStreakMinimumDays())
-          .thenAnswer((_) async => 1);
+      when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 1);
 
       final opensSustained = [
         DateTime(2026, 9, 1, 9),

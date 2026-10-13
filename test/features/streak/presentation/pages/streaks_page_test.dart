@@ -207,8 +207,7 @@ void main() {
       expect(appOpenChip.selected, isTrue);
     });
 
-    testWidgets(
-        'long-press on a type chip does not open StreakConfigSheet',
+    testWidgets('long-press on a type chip does not open StreakConfigSheet',
         (tester) async {
       when(() => mockCubit.state).thenReturn(
         StreakState(

@@ -164,9 +164,8 @@ class StreakCard extends StatelessWidget {
                           color: isAtRisk
                               ? const Color(0xFFBA1A1A)
                               : const Color(0xFF757682),
-                          fontWeight: isAtRisk
-                              ? FontWeight.w600
-                              : FontWeight.normal,
+                          fontWeight:
+                              isAtRisk ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
                       const SizedBox(height: 6),

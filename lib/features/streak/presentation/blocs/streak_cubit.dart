@@ -238,9 +238,7 @@ class StreakCubit extends Cubit<StreakState> {
       if (totalDays <= 0) return 0;
       final count = qualifyingDays
           .where(
-            (d) =>
-                d.year == targetMonth.year &&
-                d.month == targetMonth.month,
+            (d) => d.year == targetMonth.year && d.month == targetMonth.month,
           )
           .length;
       return (count / totalDays).clamp(0, 1);

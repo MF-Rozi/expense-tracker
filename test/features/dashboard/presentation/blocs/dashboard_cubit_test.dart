@@ -285,8 +285,7 @@ void main() {
       },
       act: (cubit) => cubit.loadDashboardData(),
       expect: () => [
-        isA<DashboardState>()
-            .having((s) => s.isLoading, 'isLoading', isTrue),
+        isA<DashboardState>().having((s) => s.isLoading, 'isLoading', isTrue),
         isA<DashboardState>()
             .having((s) => s.isLoading, 'isLoading', isFalse)
             .having((s) => s.streak, 'streak', const Streak.empty())

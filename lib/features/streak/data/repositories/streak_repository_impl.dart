@@ -198,8 +198,7 @@ class StreakRepositoryImpl implements StreakRepository {
 
           final allCategories =
               categoriesEither.getOrElse(() => const <Category>[]);
-          final transactions =
-              txResult.getOrElse(() => const <Transaction>[]);
+          final transactions = txResult.getOrElse(() => const <Transaction>[]);
 
           final totalBudget = CategoryBudgetCalculator.calculateTotalBudget(
             allCategories,
@@ -245,8 +244,7 @@ class StreakRepositoryImpl implements StreakRepository {
           final earliestTx = transactions
               .map((tx) => tx.date)
               .reduce((a, b) => a.isBefore(b) ? a : b);
-          final earliestMonth =
-              StreakMonth(earliestTx.year, earliestTx.month);
+          final earliestMonth = StreakMonth(earliestTx.year, earliestTx.month);
 
           final qualifyingMonths = <StreakPeriod>{};
           if (earliestMonth.compareTo(lastCompletedMonth) <= 0) {
@@ -407,8 +405,7 @@ class StreakRepositoryImpl implements StreakRepository {
 
           final allCategories =
               categoriesEither.getOrElse(() => const <Category>[]);
-          final transactions =
-              txResult.getOrElse(() => const <Transaction>[]);
+          final transactions = txResult.getOrElse(() => const <Transaction>[]);
 
           final totalBudget = CategoryBudgetCalculator.calculateTotalBudget(
             allCategories,
@@ -482,8 +479,7 @@ class StreakRepositoryImpl implements StreakRepository {
 
       final allCategories =
           categoriesEither.getOrElse(() => const <Category>[]);
-      final transactions =
-          txResult.getOrElse(() => const <Transaction>[]);
+      final transactions = txResult.getOrElse(() => const <Transaction>[]);
 
       final flags = CategoryBudgetCalculator.calculateOverrunFlags(
         allCategories: allCategories,
@@ -520,8 +516,7 @@ class StreakRepositoryImpl implements StreakRepository {
 
       final allCategories =
           categoriesEither.getOrElse(() => const <Category>[]);
-      final transactions =
-          txResult.getOrElse(() => const <Transaction>[]);
+      final transactions = txResult.getOrElse(() => const <Transaction>[]);
 
       final totalBudget = CategoryBudgetCalculator.calculateTotalBudget(
         allCategories,
@@ -564,8 +559,7 @@ class StreakRepositoryImpl implements StreakRepository {
 
       final allCategories =
           categoriesEither.getOrElse(() => const <Category>[]);
-      final transactions =
-          txResult.getOrElse(() => const <Transaction>[]);
+      final transactions = txResult.getOrElse(() => const <Transaction>[]);
 
       final totalBudget = CategoryBudgetCalculator.calculateTotalBudget(
         allCategories,

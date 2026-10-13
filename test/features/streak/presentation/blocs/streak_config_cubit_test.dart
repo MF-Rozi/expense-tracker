@@ -15,14 +15,10 @@ void main() {
 
   setUp(() {
     mockStorage = MockLocalStorage();
-    when(() => mockStorage.getStreakWindowDays())
-        .thenAnswer((_) async => 3);
-    when(() => mockStorage.getStreakMinimumDays())
-        .thenAnswer((_) async => 3);
-    when(() => mockStorage.getAppOpenCadenceDays())
-        .thenAnswer((_) async => 7);
-    when(() => mockStorage.setStreakWindowDays(any()))
-        .thenAnswer((_) async {});
+    when(() => mockStorage.getStreakWindowDays()).thenAnswer((_) async => 3);
+    when(() => mockStorage.getStreakMinimumDays()).thenAnswer((_) async => 3);
+    when(() => mockStorage.getAppOpenCadenceDays()).thenAnswer((_) async => 7);
+    when(() => mockStorage.setStreakWindowDays(any())).thenAnswer((_) async {});
     when(() => mockStorage.setStreakMinimumDays(any()))
         .thenAnswer((_) async {});
     when(() => mockStorage.setAppOpenCadenceDays(any()))

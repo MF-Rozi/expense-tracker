@@ -43,8 +43,7 @@ void main() {
       ).called(1);
     });
 
-    test(
-        'multiple opens on same day persist as separate calls to datasource',
+    test('multiple opens on same day persist as separate calls to datasource',
         () async {
       when(
         () => mockDataSource.recordOpen(

@@ -24,8 +24,7 @@ class StreakCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = referenceDate ?? DateTime.now();
-    final firstDayOfMonth =
-        DateTime(selectedMonth.year, selectedMonth.month);
+    final firstDayOfMonth = DateTime(selectedMonth.year, selectedMonth.month);
     final daysInMonth =
         DateTime(selectedMonth.year, selectedMonth.month + 1, 0).day;
 
@@ -246,9 +245,7 @@ class _DayCell extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: isFuture
-                ? const Color(0xFFB0B2B8)
-                : const Color(0xFF444650),
+            color: isFuture ? const Color(0xFFB0B2B8) : const Color(0xFF444650),
           ),
         ),
       ),

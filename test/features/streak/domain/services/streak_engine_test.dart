@@ -130,8 +130,7 @@ void main() {
       expect(resultThu.current.bestLength, 3);
     });
 
-    test(
-        'Covers AE3: Length below minimum reports warming up, never active',
+    test('Covers AE3: Length below minimum reports warming up, never active',
         () {
       // 2 consecutive days with minimum 3
       final periods = [
@@ -151,8 +150,7 @@ void main() {
       expect(result.current.status.isCelebratory, isFalse);
     });
 
-    test(
-        'Covers AE4: Backdating heals a run with a 2-day gap inside window',
+    test('Covers AE4: Backdating heals a run with a 2-day gap inside window',
         () {
       // User logs on Monday (Sept 21) and Friday (Sept 25).
       // Gap is 4 days > window 3, so they are separate runs.

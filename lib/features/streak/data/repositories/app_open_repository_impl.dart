@@ -50,9 +50,8 @@ class AppOpenRepositoryImpl implements AppOpenRepository {
         startDate: startDate,
         endDate: endDate,
       );
-      final entities = models
-          .map((m) => AppOpen(uuid: m.uuid, date: m.date))
-          .toList();
+      final entities =
+          models.map((m) => AppOpen(uuid: m.uuid, date: m.date)).toList();
       return Right(entities);
     } catch (e) {
       return Left(Failure.localFailure(message: e.toString()));

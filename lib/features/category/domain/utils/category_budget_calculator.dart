@@ -40,8 +40,7 @@ class CategoryBudgetCalculator {
     final spendByCategory = <String, double>{};
     for (final tx in expenseTxs) {
       final id = tx.categoryUuid.getOrCrash();
-      spendByCategory[id] =
-          (spendByCategory[id] ?? 0) + tx.amount.getOrCrash();
+      spendByCategory[id] = (spendByCategory[id] ?? 0) + tx.amount.getOrCrash();
     }
 
     final flags = <CategoryOverrunFlag>[];

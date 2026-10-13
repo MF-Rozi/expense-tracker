@@ -186,11 +186,8 @@ class _StreakConfigSheetState extends State<StreakConfigSheet> {
                 _typeShortLabel(type),
                 style: GoogleFonts.manrope(
                   fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.w600,
-                  color: isSelected
-                      ? Colors.white
-                      : const Color(0xFF444650),
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? Colors.white : const Color(0xFF444650),
                 ),
               ),
               selected: isSelected,
@@ -250,8 +247,7 @@ class _StreakConfigSheetState extends State<StreakConfigSheet> {
       children: [
         _buildStepperCard(
           title: 'Window Gap Allowance',
-          subtitle:
-              'Maximum consecutive days allowed between transactions '
+          subtitle: 'Maximum consecutive days allowed between transactions '
               'without breaking the run.',
           value: state.config.window,
           decrementKey: const Key('window_decrement'),
@@ -349,11 +345,8 @@ class _StreakConfigSheetState extends State<StreakConfigSheet> {
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected
-                      ? Colors.white
-                      : const Color(0xFF00113A),
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : const Color(0xFF00113A),
                 ),
               ),
               backgroundColor: isSelected
@@ -422,8 +415,7 @@ class _StreakConfigSheetState extends State<StreakConfigSheet> {
               ),
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F2F6),
                   borderRadius: BorderRadius.circular(100),

@@ -24,8 +24,7 @@ void main() {
   setUp(() {
     GoogleFonts.config.allowRuntimeFetching = false;
     mockCubit = MockDashboardCubit();
-    when(() => mockCubit.loadDashboardData())
-        .thenAnswer((_) async {});
+    when(() => mockCubit.loadDashboardData()).thenAnswer((_) async {});
   });
 
   Widget buildHomePage() {

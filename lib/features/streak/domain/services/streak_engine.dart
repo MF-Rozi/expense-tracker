@@ -161,8 +161,7 @@ class StreakEngine {
         daysUntilBreak: daysUntilBreak,
         nextMilestone: resolveNextMilestone(currentLength),
         consistencyRate: consistencyRate,
-        bestLength:
-            maxRunLength > currentLength ? maxRunLength : currentLength,
+        bestLength: maxRunLength > currentLength ? maxRunLength : currentLength,
       );
     }
 
