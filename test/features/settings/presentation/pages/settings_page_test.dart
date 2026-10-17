@@ -77,4 +77,25 @@ void main() {
     expect(find.text('Counter'), findsOneWidget);
     expect(find.text('Secret unlocked — Counter is below'), findsOneWidget);
   });
+
+  testWidgets('streak tuning tile appears only when unlocked', (tester) async {
+    final cubit = await buildCubit();
+    await tester.pumpApp(SettingsPage(easterEggCubit: cubit));
+    expect(find.text('Streak Tuning'), findsNothing);
+
+    for (var i = 0; i < 7; i++) {
+      await tester.tap(find.text('Version'));
+      await tester.pump();
+    }
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
+
+    cubit
+      ..onTransactionLogged()
+      ..onStatsVisited()
+      ..onCategoriesOpened();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Streak Tuning'), findsOneWidget);
+  });
 }

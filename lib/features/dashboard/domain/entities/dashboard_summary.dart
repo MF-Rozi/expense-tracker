@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/features/dashboard/domain/entities/wealth_trajectory.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 
 /// Aggregated summary model for the home dashboard screen.
@@ -10,6 +11,7 @@ class DashboardSummary extends Equatable {
     required this.totalExpense,
     required this.recentTransactions,
     required this.wealthTrajectory,
+    this.streak = const Streak.empty(),
   });
 
   /// Net balance for the current calendar month (totalIncome - totalExpense).
@@ -27,6 +29,9 @@ class DashboardSummary extends Equatable {
   /// 5-month wealth trajectory timeline and growth metrics.
   final WealthTrajectory wealthTrajectory;
 
+  /// Current tracking streak details.
+  final Streak streak;
+
   @override
   List<Object?> get props => [
         totalBalance,
@@ -34,5 +39,6 @@ class DashboardSummary extends Equatable {
         totalExpense,
         recentTransactions,
         wealthTrajectory,
+        streak,
       ];
 }

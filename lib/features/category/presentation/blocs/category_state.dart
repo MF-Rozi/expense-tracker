@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/features/category/domain/entities/category.dart';
+import 'package:expense_tracker/features/category/domain/utils/category_budget_calculator.dart';
 
 class CategoryState extends Equatable {
   const CategoryState({
@@ -64,19 +65,10 @@ class CategoryState extends Equatable {
     return budgets;
   }
 
-  double get totalBudget {
-    return allCategories
-        .where((c) => c.type == selectedType && c.parentId != null)
-        .where((c) {
-          final parent = allCategories.firstWhere(
-            (parent) => parent.uuid == c.parentId,
-            orElse: () => c,
-          );
-          return parent != c && parent.parentId != null;
-        })
-        .map((c) => c.expectedMonthlyBudget)
-        .fold(0, (sum, val) => sum + val);
-  }
+  double get totalBudget => CategoryBudgetCalculator.calculateTotalBudget(
+        allCategories,
+        type: selectedType,
+      );
 
   CategoryState copyWith({
     List<Category>? allCategories,

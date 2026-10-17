@@ -1,5 +1,6 @@
 import 'package:expense_tracker/features/easter_egg/domain/entities/easter_egg_progress.dart';
 import 'package:expense_tracker/features/easter_egg/presentation/blocs/easter_egg_cubit.dart';
+import 'package:expense_tracker/features/streak/presentation/widgets/streak_config_sheet.dart';
 import 'package:expense_tracker/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,13 +42,23 @@ class SettingsPage extends StatelessWidget {
                   subtitle: Text(_versionSubtitle(progress)),
                   onTap: () => context.read<EasterEggCubit>().onVersionTapped(),
                 ),
-                if (progress.unlocked)
+                if (progress.unlocked) ...[
                   ListTile(
                     leading: const Icon(Icons.calculate_outlined),
                     title: const Text('Counter'),
                     subtitle: const Text('A long-forgotten classic'),
                     onTap: () => context.push('/counter'),
                   ),
+                  ListTile(
+                    key: const Key('streak_tuning_tile'),
+                    leading: const Icon(Icons.local_fire_department_outlined),
+                    title: const Text('Streak Tuning'),
+                    subtitle: const Text(
+                      'Configure cadence, windows, and thresholds',
+                    ),
+                    onTap: () => StreakConfigSheet.show(context),
+                  ),
+                ],
               ],
             );
           },
