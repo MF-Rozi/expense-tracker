@@ -76,23 +76,23 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return txResult.fold(
-            Left.new,
-            (transactions) {
-              final qualifyingPeriods = transactions
-                  .map((tx) => StreakDay.fromDateTime(tx.date))
-                  .toSet();
+          final failure = txResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
 
-              final result = _engine.calculate(
-                qualifyingPeriods: qualifyingPeriods,
-                today: today,
-                config: config,
-                type: type,
-              );
+          final transactions = txResult.getOrElse(() => const []);
+          final qualifyingPeriods =
+              transactions.map((tx) => StreakDay.fromDateTime(tx.date)).toSet();
 
-              return Right(result.current);
-            },
+          final result = _engine.calculate(
+            qualifyingPeriods: qualifyingPeriods,
+            today: today,
+            config: config,
+            type: type,
           );
+
+          return Right(result.current);
 
         case StreakType.noSpend:
           final config = StreakConfig(
@@ -105,53 +105,52 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return txResult.fold(
-            Left.new,
-            (transactions) {
-              if (transactions.isEmpty) {
-                final result = _engine.calculate(
-                  qualifyingPeriods: const <StreakPeriod>{},
-                  today: today,
-                  config: config,
-                  type: type,
-                );
-                return Right(result.current);
-              }
+          final failure = txResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
 
-              final earliestTx = transactions
-                  .map((tx) => tx.date)
-                  .reduce((a, b) => a.isBefore(b) ? a : b);
-              final startDay = StreakDay.fromDateTime(earliestTx);
+          final transactions = txResult.getOrElse(() => const []);
+          if (transactions.isEmpty) {
+            final result = _engine.calculate(
+              qualifyingPeriods: const <StreakPeriod>{},
+              today: today,
+              config: config,
+              type: type,
+            );
+            return Right(result.current);
+          }
 
-              final expenseDays = transactions
-                  .where((tx) => tx.type == TransactionType.expense)
-                  .map((tx) => StreakDay.fromDateTime(tx.date))
-                  .toSet();
+          final earliestTx = transactions
+              .map((tx) => tx.date)
+              .reduce((a, b) => a.isBefore(b) ? a : b);
+          final startDay = StreakDay.fromDateTime(earliestTx);
 
-              final qualifyingPeriods = <StreakPeriod>{};
-              var current =
-                  DateTime(startDay.year, startDay.month, startDay.day);
-              final target = DateTime(today.year, today.month, today.day);
+          final expenseDays = transactions
+              .where((tx) => tx.type == TransactionType.expense)
+              .map((tx) => StreakDay.fromDateTime(tx.date))
+              .toSet();
 
-              while (!current.isAfter(target)) {
-                final day = StreakDay.fromDateTime(current);
-                if (!expenseDays.contains(day)) {
-                  qualifyingPeriods.add(day);
-                }
-                current =
-                    DateTime(current.year, current.month, current.day + 1);
-              }
+          final qualifyingPeriods = <StreakPeriod>{};
+          var current = DateTime(startDay.year, startDay.month, startDay.day);
+          final target = DateTime(today.year, today.month, today.day);
 
-              final result = _engine.calculate(
-                qualifyingPeriods: qualifyingPeriods,
-                today: today,
-                config: config,
-                type: type,
-              );
+          while (!current.isAfter(target)) {
+            final day = StreakDay.fromDateTime(current);
+            if (!expenseDays.contains(day)) {
+              qualifyingPeriods.add(day);
+            }
+            current = DateTime(current.year, current.month, current.day + 1);
+          }
 
-              return Right(result.current);
-            },
+          final result = _engine.calculate(
+            qualifyingPeriods: qualifyingPeriods,
+            today: today,
+            config: config,
+            type: type,
           );
+
+          return Right(result.current);
 
         case StreakType.appOpen:
           // Cadence N drives the window for app-open consistency.
@@ -165,22 +164,23 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return opensResult.fold(
-            Left.new,
-            (openDates) {
-              final qualifyingPeriods =
-                  openDates.map(StreakDay.fromDateTime).toSet();
+          final failure = opensResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
 
-              final result = _engine.calculate(
-                qualifyingPeriods: qualifyingPeriods,
-                today: today,
-                config: config,
-                type: type,
-              );
+          final openDates = opensResult.getOrElse(() => const []);
+          final qualifyingPeriods =
+              openDates.map(StreakDay.fromDateTime).toSet();
 
-              return Right(result.current);
-            },
+          final result = _engine.calculate(
+            qualifyingPeriods: qualifyingPeriods,
+            today: today,
+            config: config,
+            type: type,
           );
+
+          return Right(result.current);
 
         case StreakType.underBudget:
           final categoriesEither =
@@ -313,17 +313,18 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return txResult.fold(
-            Left.new,
-            (transactions) {
-              final periods = transactions
-                  .map((tx) => StreakDay.fromDateTime(tx.date))
-                  .toSet()
-                  .toList()
-                ..sort();
-              return Right(periods);
-            },
-          );
+          final failure = txResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
+
+          final transactions = txResult.getOrElse(() => const []);
+          final periods = transactions
+              .map((tx) => StreakDay.fromDateTime(tx.date))
+              .toSet()
+              .toList()
+            ..sort();
+          return Right(periods);
 
         case StreakType.noSpend:
           final txResult = await _transactionRepository.getTransactions(
@@ -331,45 +332,44 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return txResult.fold(
-            Left.new,
-            (transactions) {
-              if (transactions.isEmpty && startDate == null) {
-                return const Right(<StreakPeriod>[]);
-              }
+          final failure = txResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
 
-              final start = startDate ??
-                  transactions
-                      .map((tx) => tx.date)
-                      .reduce((a, b) => a.isBefore(b) ? a : b);
-              final end = endDate ?? DateTime.now();
+          final transactions = txResult.getOrElse(() => const []);
+          if (transactions.isEmpty && startDate == null) {
+            return const Right(<StreakPeriod>[]);
+          }
 
-              final startDay = StreakDay.fromDateTime(start);
-              final endDay = StreakDay.fromDateTime(end);
+          final start = startDate ??
+              transactions
+                  .map((tx) => tx.date)
+                  .reduce((a, b) => a.isBefore(b) ? a : b);
+          final end = endDate ?? DateTime.now();
 
-              final expenseDays = transactions
-                  .where((tx) => tx.type == TransactionType.expense)
-                  .map((tx) => StreakDay.fromDateTime(tx.date))
-                  .toSet();
+          final startDay = StreakDay.fromDateTime(start);
+          final endDay = StreakDay.fromDateTime(end);
 
-              final periods = <StreakPeriod>[];
-              var current =
-                  DateTime(startDay.year, startDay.month, startDay.day);
-              final target = DateTime(endDay.year, endDay.month, endDay.day);
+          final expenseDays = transactions
+              .where((tx) => tx.type == TransactionType.expense)
+              .map((tx) => StreakDay.fromDateTime(tx.date))
+              .toSet();
 
-              while (!current.isAfter(target)) {
-                final day = StreakDay.fromDateTime(current);
-                if (!expenseDays.contains(day)) {
-                  periods.add(day);
-                }
-                current =
-                    DateTime(current.year, current.month, current.day + 1);
-              }
+          final periods = <StreakPeriod>[];
+          var current = DateTime(startDay.year, startDay.month, startDay.day);
+          final target = DateTime(endDay.year, endDay.month, endDay.day);
 
-              periods.sort();
-              return Right(periods);
-            },
-          );
+          while (!current.isAfter(target)) {
+            final day = StreakDay.fromDateTime(current);
+            if (!expenseDays.contains(day)) {
+              periods.add(day);
+            }
+            current = DateTime(current.year, current.month, current.day + 1);
+          }
+
+          periods.sort();
+          return Right(periods);
 
         case StreakType.appOpen:
           final opensResult = await _appOpenRepository.getOpenDates(
@@ -377,17 +377,15 @@ class StreakRepositoryImpl implements StreakRepository {
             endDate: endDate,
           );
 
-          return opensResult.fold(
-            Left.new,
-            (openDates) {
-              final periods = openDates
-                  .map(StreakDay.fromDateTime)
-                  .toSet()
-                  .toList()
-                ..sort();
-              return Right(periods);
-            },
-          );
+          final failure = opensResult.fold((f) => f, (_) => null);
+          if (failure != null) {
+            return Left(failure);
+          }
+
+          final openDates = opensResult.getOrElse(() => const []);
+          final periods = openDates.map(StreakDay.fromDateTime).toSet().toList()
+            ..sort();
+          return Right(periods);
 
         case StreakType.underBudget:
           final categoriesEither =
