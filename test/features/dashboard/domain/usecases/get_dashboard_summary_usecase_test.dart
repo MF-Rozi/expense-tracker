@@ -2,6 +2,10 @@ import 'package:dartz/dartz.dart';
 import 'package:expense_tracker/core/domain/failures/failure.dart';
 import 'package:expense_tracker/features/dashboard/domain/entities/dashboard_summary.dart';
 import 'package:expense_tracker/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_status.dart';
+import 'package:expense_tracker/features/streak/domain/entities/streak_type.dart';
+import 'package:expense_tracker/features/streak/domain/repositories/streak_repository.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction.dart';
 import 'package:expense_tracker/features/transaction/domain/entities/transaction_type.dart';
 import 'package:expense_tracker/features/transaction/domain/repositories/transaction_repository.dart';
@@ -11,17 +15,41 @@ import 'package:mocktail/mocktail.dart';
 
 class MockTransactionRepository extends Mock implements TransactionRepository {}
 
+class MockStreakRepository extends Mock implements StreakRepository {}
+
 void main() {
   late MockTransactionRepository mockRepository;
+  late MockStreakRepository mockStreakRepository;
   late GetDashboardSummaryUseCase useCase;
 
   // Fixed deterministic anchor: Sept 21, 2026
   final fixedNow = DateTime(2026, 9, 21, 15, 30);
   final tCategoryUuid = UniqueId.generate();
 
+  const tStreak = Streak(
+    type: StreakType.tracking,
+    length: 5,
+    status: StreakStatus.active,
+    daysUntilBreak: 2,
+    nextMilestone: 7,
+    consistencyRate: 0.8,
+    bestLength: 10,
+  );
+
+  setUpAll(() {
+    registerFallbackValue(StreakType.tracking);
+  });
+
   setUp(() {
     mockRepository = MockTransactionRepository();
-    useCase = GetDashboardSummaryUseCase(mockRepository);
+    mockStreakRepository = MockStreakRepository();
+    when(
+      () => mockStreakRepository.getStreak(
+        type: any(named: 'type'),
+        referenceDate: any(named: 'referenceDate'),
+      ),
+    ).thenAnswer((_) async => const Right(tStreak));
+    useCase = GetDashboardSummaryUseCase(mockRepository, mockStreakRepository);
   });
 
   Transaction makeTx({
@@ -233,6 +261,49 @@ void main() {
       },
     );
   });
+
+  test('attaches resolved streak to dashboard summary', () async {
+    when(() => mockRepository.getTransactions())
+        .thenAnswer((_) async => const Right([]));
+
+    final result = await useCase.executeWithDate(fixedNow);
+
+    expect(result.isRight(), isTrue);
+    result.fold(
+      (_) => fail('Expected Right'),
+      (summary) {
+        expect(summary.streak, tStreak);
+      },
+    );
+  });
+
+  test(
+    'degrades gracefully when streak repository fails: returns Right with '
+    'empty streak',
+    () async {
+      when(() => mockRepository.getTransactions())
+          .thenAnswer((_) async => const Right([]));
+      when(
+        () => mockStreakRepository.getStreak(
+          type: any(named: 'type'),
+          referenceDate: any(named: 'referenceDate'),
+        ),
+      ).thenAnswer(
+        (_) async => const Left(Failure.localFailure(message: 'Streak error')),
+      );
+
+      final result = await useCase.executeWithDate(fixedNow);
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (_) => fail('Expected Right'),
+        (summary) {
+          expect(summary.streak, const Streak.empty());
+          expect(summary.streak.isEmpty, isTrue);
+        },
+      );
+    },
+  );
 
   test('propagates repository failure as Left(Failure)', () async {
     const failure = Failure.localFailure(message: 'Database unavailable');

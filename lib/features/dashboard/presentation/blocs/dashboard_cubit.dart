@@ -74,6 +74,7 @@ class DashboardCubit extends Cubit<DashboardState> {
             totalExpense: summary.totalExpense,
             recentTransactions: summary.recentTransactions,
             wealthTrajectory: summary.wealthTrajectory,
+            streak: summary.streak,
             failureOption: none(),
           ),
         );
